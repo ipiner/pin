@@ -1,0 +1,124 @@
+{
+  // =========================
+  // Editor
+  // =========================
+  "editor.fontSize": 14,
+  "editor.tabSize": 4,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.minimap.enabled": false,
+  "editor.inlineSuggest.enabled": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+
+  // =========================
+  // Files
+  // =========================
+  "files.autoSave": "afterDelay",
+  "files.autoGuessEncoding": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true
+  },
+
+  // =========================
+  // PHP
+  // =========================
+  "php.validate.enable": true,
+  "php.suggest.basic": false,
+
+  // =========================
+  // Intelephense
+  // =========================
+  "intelephense.environment.phpVersion": "8.5",
+
+  "intelephense.files.maxSize": 5000000,
+
+  "intelephense.files.exclude": [
+    "**/.git/**",
+    "**/.svn/**",
+    "**/.hg/**",
+    "**/CVS/**",
+    "**/.DS_Store/**",
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/vendor/**/Tests/**",
+    "**/vendor/**/tests/**",
+    "**/storage/framework/views/**",
+    "**/storage/logs/**"
+  ],
+
+  "intelephense.rename.exclude": ["**/vendor/**"],
+
+  "intelephense.references.exclude": ["**/vendor/**"],
+
+  "intelephense.completion.insertUseDeclaration": true,
+  "intelephense.completion.fullyQualifyGlobalConstantsAndFunctions": false,
+
+  "intelephense.diagnostics.enable": true,
+  "intelephense.diagnostics.undefinedTypes": true,
+  "intelephense.diagnostics.undefinedFunctions": true,
+  "intelephense.diagnostics.undefinedConstants": true,
+  "intelephense.diagnostics.undefinedMethods": true,
+  "intelephense.diagnostics.undefinedProperties": true,
+
+  "intelephense.format.enable": true,
+
+  // =========================
+  // Formatting
+  // =========================
+  "[php]": {
+    "editor.defaultFormatter": "open-southeners.laravel-pint"
+  },
+
+  "laravel-pint.enable": true,
+
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+
+  "[markdown]": {
+    "editor.wordWrap": "on"
+  },
+
+  // =========================
+  // Terminal
+  // =========================
+  "terminal.integrated.defaultProfile.osx": "zsh",
+
+  // =========================
+  // Git
+  // =========================
+  "git.autofetch": true,
+  "git.confirmSync": false,
+
+  // =========================
+  // Explorer
+  // =========================
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+
+  // =========================
+  // Search
+  // =========================
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/vendor": true,
+    "**/storage/logs": true,
+    "**/storage/framework": true
+  },
+
+  // =========================
+  // Recommended Extensions
+  // =========================
+  "extensions.ignoreRecommendations": false
+}

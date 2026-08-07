@@ -1,0 +1,64 @@
+{
+  "name": "ipiner/pin",
+  "description": "轻量级 Laravel API 开发基座",
+  "keywords": [
+    "laravel",
+    "api",
+    "rest",
+    "testing",
+    "eloquent",
+    "queryable",
+    "pin"
+  ],
+  "homepage": "https://ipiner.cn",
+  "license": "MIT",
+  "require": {
+    "php": "^8.5",
+    "ext-ctype": "*",
+    "ext-openssl": "*",
+    "ext-pdo": "*",
+    "laravel/framework": "^13.0"
+  },
+  "require-dev": {
+    "dedoc/scramble": "^0.13.22",
+    "firebase/php-jwt": "^7.1",
+    "godruoyi/php-snowflake": "^3.2",
+    "laravel/facade-documenter": "dev-main",
+    "laravel/pint": "^1.15",
+    "orchestra/testbench": "^11.1",
+    "pestphp/pest": "^4.7",
+    "phpstan/phpstan": "^2.2",
+    "phpunit/phpunit": "^12"
+  },
+  "autoload": {
+    "psr-4": {
+      "Pin\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "App\\": "tests/laravel/app",
+      "Pin\\Tests\\": "tests"
+    }
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "repositories": [
+    {
+      "name": "facade-documenter",
+      "type": "vcs",
+      "url": "git@github.com:laravel/facade-documenter.git"
+    }
+  ],
+  "suggest": {
+    "firebase/php-jwt": "Required when using the JWT token driver.",
+    "godruoyi/php-snowflake": "Required when using the Snowflake ID generator."
+  }
+}
