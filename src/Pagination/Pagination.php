@@ -92,6 +92,12 @@ class Pagination implements JsonSerializable
 
     /**
      * 转换为数组结构
+     *
+     * @return array{
+     *     total:int,
+     *     total_page:int,
+     *     items:TData
+     * }
      */
     public function toArray(bool|string|Closure $withItems = true): array
     {
