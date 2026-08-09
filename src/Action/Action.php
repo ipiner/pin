@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Pin\Actions;
+namespace Pin\Action;
 
-use Pin\Actions\Concerns\HasFake;
+use Pin\Action\Concerns\HasFake;
 use Pin\Models\Model;
 use Pin\Models\Queryable\Queryable;
 use Pin\Support\Traits\HasContext;

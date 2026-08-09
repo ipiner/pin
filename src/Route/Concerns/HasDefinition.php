@@ -22,7 +22,7 @@ trait HasDefinition
     {
         return RuntimeCache::rememberForever(
             static::class.'.'.$this->name.'.'.__FUNCTION__,
-            fn () => new RouteDefinition($this)
+            fn () => app(RouteDefinition::class, ['route' => $this])
         );
     }
 

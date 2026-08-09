@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pin\Actions\Concerns;
+namespace Pin\Action\Concerns;
 
 use Pin\Faker\Fake;
 

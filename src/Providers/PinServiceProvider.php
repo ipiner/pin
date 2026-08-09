@@ -6,7 +6,7 @@ namespace Pin\Providers;
 
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\ServiceProvider;
-use Pin\Actions\ActionServiceProvider;
+use Pin\Action\ActionServiceProvider;
 use Pin\Auth\AuthServiceProvider;
 use Pin\Cache\CacheServiceProvider;
 use Pin\Console\Commands\IdeHelperCommand;

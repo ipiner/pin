@@ -2,7 +2,7 @@
 
 namespace Pin\Tests\Route\Testing;
 
-use Pin\Actions\Action;
+use Pin\Action\Action;
 
 class TestingAction extends Action
 {

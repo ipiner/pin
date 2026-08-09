@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pin\Actions;
+namespace Pin\Action;
 
 use Illuminate\Http\Request;
 use Pin\Exceptions\FakeResponseException;

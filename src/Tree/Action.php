@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Pin\Tree\Actions;
+namespace Pin\Tree;
 
 use Illuminate\Support\Facades\Request;
 use Pin\Models\Model;
-use Pin\Tree\ModelService;
 use Pin\Tree\Rules\TreeParentRule;
-use Pin\Tree\TreeGuard;
 use Pin\Validation\Rules\Unique;
 
 /**
@@ -18,7 +16,7 @@ use Pin\Validation\Rules\Unique;
  *
  * @template TModel of Model
  */
-abstract class Action extends \Pin\Actions\Action
+abstract class Action extends \Pin\Action\Action
 {
     public function __construct(public protected(set) ModelService $service)
     {

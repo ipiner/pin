@@ -8,7 +8,7 @@ use App\Services\MenuService;
 use Pin\Errors\Errors;
 use Pin\Testing\Concerns\InteractsWithRedis;
 use Pin\Tests\InteractsWithDatabase;
-use Pin\Tree\Actions\Action;
+use Pin\Tree\Action;
 use Pin\Tree\ModelService;
 use Pin\Tree\TreeGuard;
 

@@ -6,7 +6,7 @@ use App\Modules\User\Actions\CreateUserAction;
 use App\Modules\User\Actions\ListUsersAction;
 use App\Routes\DummyRoute;
 use App\Routes\User\UserRoute;
-use Pin\Actions\Action;
+use Pin\Action\Action;
 use Pin\Support\Facades\RuntimeCache;
 
 afterEach(function () {

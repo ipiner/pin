@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Pin\Actions\Action;
+use Pin\Action\Action;
 use Pin\Exceptions\FakeResponseException;
 
 it('sets modelClass after boot', function () {

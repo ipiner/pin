@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Pin\Actions\Action;
+use Pin\Action\Action;
 
 it('generates fake data from validation rules', function () {
     $action = new class extends Action

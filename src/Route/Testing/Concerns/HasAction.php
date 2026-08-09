@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Pin\Route\Testing\Concerns;
 
-use Pin\Actions\Action;
+use Pin\Action\Action;
 use Pin\Module\ModuleInspector;
 
 /**

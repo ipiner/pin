@@ -2,7 +2,7 @@
 
 namespace App\Modules\User\Actions;
 
-use Pin\Actions\Action;
+use Pin\Action\Action;
 
 class ListUsersAction extends Action
 {

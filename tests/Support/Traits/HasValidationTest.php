@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Validation\ValidationException;
-use Pin\Actions\Action;
+use Pin\Action\Action;
 use Pin\Support\Invoker;
 
 beforeEach(function () {
