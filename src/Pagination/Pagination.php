@@ -12,17 +12,7 @@ use JsonSerializable;
 /**
  * 分页结果包装类
  *
- * 用于统一封装 Laravel LengthAwarePaginator 的输出结构，
- * 便于前后端约定统一的分页返回格式。
- *
- * 默认返回结构：
- * - total：总条数
- * - total_page：总页数
- * - items：当前页数据
- *
- * 同时支持对 items 进行二次处理（如 Resource 转换、闭包处理等）。
- *
- * @template TData
+ * @template TItem
  */
 class Pagination implements JsonSerializable
 {
@@ -96,7 +86,7 @@ class Pagination implements JsonSerializable
      * @return array{
      *     total:int,
      *     total_page:int,
-     *     items:TData
+     *     items:TItem[]
      * }
      */
     public function toArray(bool|string|Closure $withItems = true): array
@@ -115,7 +105,7 @@ class Pagination implements JsonSerializable
             /**
              * 数据
              *
-             * @var TData
+             * @var TItem[]
              */
             'items' => $this->resolveItems($items, $withItems),
         ];

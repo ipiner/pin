@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * 下拉选项响应文档资源
  */
-class SelectOption extends JsonResource
+class SelectOption extends JsonResource implements SchemaType
 {
     /**
      * 定义选项响应结构
