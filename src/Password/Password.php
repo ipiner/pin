@@ -6,6 +6,7 @@ namespace Pin\Password;
 
 use Illuminate\Support\Facades\Hash;
 use Pin\Crypt\CryptException;
+use Pin\Errors\Errors;
 use Pin\Support\Facades\Aes;
 
 /**
@@ -38,7 +39,7 @@ class Password
         } catch (CryptException $e) {
             throw new PasswordException(
                 "请求密码异常[{$requestPassword}]",
-                $e->getCode(),
+                Errors::PasswordDecodeFailed->code(),
                 $e,
             );
         }
@@ -50,6 +51,7 @@ class Password
 
         throw new PasswordException(
             "请求密码异常[{$requestPassword}: {$encoded}]",
+            Errors::PasswordInvalid->code(),
         );
     }
 
@@ -87,7 +89,10 @@ class Password
             return Hash::make($password.$salt);
         }
 
-        throw new PasswordException("密码异常[{$password}]");
+        throw new PasswordException(
+            "密码异常[{$password}]",
+            Errors::PasswordInvalid->code(),
+        );
     }
 
     /**

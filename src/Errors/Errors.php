@@ -21,7 +21,7 @@ use Pin\Errors\Attribute\Group;
  * - 20xx：验证码
  * - 30xx：上传
  * - >= 10000：应用错误码
- * - 其余：ipiner/pin内部
+ * - 其余：pin 内部
  */
 #[Group('pin::errors')]
 enum Errors: string implements IError
@@ -61,19 +61,23 @@ enum Errors: string implements IError
     case TokenMissing = '1022|token_missing';
 
     // password
-    case PasswordTooShort = '1030|422|password_too_short';
-    case PasswordTooLong = '1031|422|password_too_long';
-    case PasswordRequiresNumber = '1032|422|password_requires_number';
-    case PasswordRequiresLetter = '1033|422|password_requires_letter';
-    case PasswordRequiresLowercase = '1034|422|password_requires_lowercase';
-    case PasswordRequiresUppercase = '1035|422|password_requires_uppercase';
-    case PasswordRequiresMixedCase = '1036|422|password_requires_mixed_case';
-    case PasswordRequiresSymbol = '1037|422|password_requires_symbol';
-    case PasswordInsufficientTypes = '1038|422|password_insufficient_types';
-    case PasswordRequiresAllTypes = '1039|422|password_requires_all_types';
-    case PasswordContainsWhitespace = '1040|422|password_contains_whitespace';
-    case PasswordSequenceTooLong = '1041|422|password_sequence_too_long';
-    case PasswordTooManyRepeats = '1042|422|password_too_many_repeats';
+    case PasswordDecodeFailed = '1030|422|password_decode_failed';
+    case PasswordInvalid = '1031|422|password_invalid';
+
+    // password policy
+    case PasswordTooShort = '1040|422|password_too_short';
+    case PasswordTooLong = '1041|422|password_too_long';
+    case PasswordRequiresNumber = '1042|422|password_requires_number';
+    case PasswordRequiresLetter = '1043|422|password_requires_letter';
+    case PasswordRequiresLowercase = '1044|422|password_requires_lowercase';
+    case PasswordRequiresUppercase = '1045|422|password_requires_uppercase';
+    case PasswordRequiresMixedCase = '1046|422|password_requires_mixed_case';
+    case PasswordRequiresSymbol = '1047|422|password_requires_symbol';
+    case PasswordInsufficientTypes = '1048|422|password_insufficient_types';
+    case PasswordRequiresAllTypes = '1049|422|password_requires_all_types';
+    case PasswordContainsWhitespace = '1050|422|password_contains_whitespace';
+    case PasswordSequenceTooLong = '1051|422|password_sequence_too_long';
+    case PasswordTooManyRepeats = '1052|422|password_too_many_repeats';
 
     /**
      * 根据错误码获取错误定义

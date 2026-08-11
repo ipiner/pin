@@ -28,6 +28,9 @@ return [
     'token_invalid' => '无效的令牌',
     'token_missing' => '令牌不能为空',
 
+    'password_decode_failed' => '无效的密码',
+    'password_invalid' => '无效的密码',
+
     'password_too_short' => ':attribute不能少于:min个字符',
     'password_too_long' => ':attribute不能超过:max个字符',
     'password_requires_number' => ':attribute必须至少包含一个数字',

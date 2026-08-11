@@ -27,6 +27,9 @@ return [
     'token_invalid' => 'Invalid token',
     'token_missing' => 'Token is missing',
 
+    'password_decode_failed' => 'Invalid password',
+    'password_invalid' => 'Invalid password',
+
     'password_too_short' => 'The :attribute must be at least :min characters',
     'password_too_long' => 'The :attribute must not be greater than :max characters',
     'password_requires_number' => 'The :attribute must contain at least one number',

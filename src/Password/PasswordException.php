@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pin\Password;
 
+use Override;
+use Pin\Errors\Errors;
 use Pin\Exceptions\Exception;
 
 /**
@@ -11,4 +13,12 @@ use Pin\Exceptions\Exception;
  */
 class PasswordException extends Exception
 {
+    #[Override]
+    protected function initialize(): void
+    {
+        $this->withResponseMessage(Errors::PasswordInvalid->message())
+            ->withStatusCode(422)
+            ->withLogLevel('info')
+            ->withReport();
+    }
 }
