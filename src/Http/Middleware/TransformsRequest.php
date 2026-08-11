@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pin\Http\Middleware;
 
+use Illuminate\Support\Facades\Request;
 use Override;
 
 /**
@@ -21,14 +22,19 @@ abstract class TransformsRequest extends \Illuminate\Foundation\Http\Middleware\
     protected array $fields = [];
 
     /**
-     * 解析非生产环境下的明文输入
+     * 解析明文输入
      *
-     * 仅用于非生产环境（如 API 文档 Scramble 或本地调试），
-     * 提供明文输入支持以便绕过加密流程进行开发验证。
+     * 满足以下条件之一时，支持使用 `plain:` 明文输入
+     *
+     * - 非生产环境
+     * - API 文档
      */
     public static function resolvePlainInput(string $input): ?string
     {
-        if (! app()->isProduction() && str_starts_with($input, 'plain:')) {
+        if (
+            str_starts_with($input, 'plain:')
+            && (Request::isFromApiDocument() || ! app()->isProduction())
+        ) {
             return substr($input, 6);
         }
 

@@ -14,7 +14,10 @@ return [
         /**
          * 是否启用
          */
-        'enabled' => env('APP_ENV') !== 'production',
+        'enabled' => (bool) env(
+            'X_API_DOCUMENT_ENABLED',
+            env('APP_ENV') !== 'production'
+        ),
         /**
          * 允许的值
          */
