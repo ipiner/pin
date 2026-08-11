@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * 创建成功响应文档资源
  */
-class Created extends JsonResource
+class Created extends JsonResource implements SchemaType
 {
     /**
      * 定义创建响应结构

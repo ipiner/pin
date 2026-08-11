@@ -1,6 +1,7 @@
 <?php
 
-use Pin\Scramble\TypeToSchemaExtensions\ResponseTypeToSchema;
+use Pin\Scramble\TypeToSchemaExtensions\ApiResponseToSchema;
+use Pin\Scramble\TypeToSchemaExtensions\PaginationToSchema;
 
 return [
     'renderers' => [
@@ -29,6 +30,7 @@ return [
         ],
     ],
     'extensions' => [
-        ResponseTypeToSchema::class,
+        ApiResponseToSchema::class,
+        PaginationToSchema::class,
     ],
 ];

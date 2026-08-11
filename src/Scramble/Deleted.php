@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * 删除成功响应文档资源
  */
-class Deleted extends JsonResource
+class Deleted extends JsonResource implements SchemaType
 {
     /**
      * 定义删除响应结构
