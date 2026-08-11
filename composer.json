@@ -17,6 +17,7 @@
     "ext-ctype": "*",
     "ext-openssl": "*",
     "ext-pdo": "*",
+    "ext-redis": "*",
     "laravel/framework": "^13.0"
   },
   "require-dev": {
