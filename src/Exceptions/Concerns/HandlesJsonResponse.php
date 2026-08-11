@@ -73,7 +73,6 @@ trait HandlesJsonResponse
             $this->resolveResponseCode($e),
             $this->resolveResponseMessage($e),
             $exceptionArray,
-            ['caller' => implode(':', $this->resolveCaller($e))]
         )
             ->withStatusCode($this->resolveStatusCode($e))
             ->withHeaders($this->resolveHeaders($e))

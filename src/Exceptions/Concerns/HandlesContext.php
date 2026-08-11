@@ -31,13 +31,7 @@ trait HandlesContext
             ? $e->getCaller()
             : Caller::resolve($e->getTrace());
 
-        $caller = Arr::only($caller, ['file', 'line']);
-
-        if (! app()->hasDebugModeEnabled()) {
-            $caller['file'] = basename($caller['file'], '.php');
-        }
-
-        return $caller;
+        return Arr::only($caller, ['file', 'line']);
     }
 
     #[Override]

@@ -12,16 +12,9 @@ beforeEach(function () {
 });
 
 it('resolves caller', function () {
-    $file = $this->invoker->resolveCaller(new RuntimeException())['file'];
+    $caller = $this->invoker->resolveCaller(new RuntimeException());
 
-    expect($file)->not()->toContain(dirname(__DIR__, 3))
-        ->and($file)->not()->toEndWith('.php');
-
-    config(['app.debug' => true]);
-    $file = $this->invoker->resolveCaller(new RuntimeException())['file'];
-
-    expect($file)->toContain(dirname(__DIR__, 3))
-        ->and($file)->toEndWith('.php');
+    expect($caller)->toHaveCount(2);
 });
 
 it('builds exception context', function () {
