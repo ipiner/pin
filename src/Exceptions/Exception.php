@@ -74,6 +74,8 @@ class Exception extends \Exception
             $code,
             $previous
         );
+
+        $this->initialize();
     }
 
     /**
@@ -198,5 +200,13 @@ class Exception extends \Exception
         $this->statusCode = $statusCode;
 
         return $this;
+    }
+
+    /**
+     * 异常初始化
+     */
+    protected function initialize(): void
+    {
+        //
     }
 }
