@@ -13,6 +13,11 @@ use Pin\Support\Timer;
 trait HandlesContext
 {
     /**
+     * 请求耗时（ms）
+     */
+    protected int $duration;
+
+    /**
      * 构建日志上下文数据
      */
     protected function buildLogContext(): array

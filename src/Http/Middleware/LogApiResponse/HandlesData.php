@@ -26,10 +26,7 @@ trait HandlesData
     {
         $ignores = config('pin.logging.response.ignore_response_data');
 
-        if ($ignores) {
-            return ! $this->request->isRequest($ignores);
-        }
-
-        return true;
+        return ! in_array('*', $ignores)
+            && ! $this->request->isRequest($ignores);
     }
 }
