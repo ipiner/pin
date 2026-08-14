@@ -5,5 +5,5 @@ parameters:
     ignoreErrors:
         - '#Undefined variable: \$this#'
         - '#Call to an undefined method#'
-        - '#Access to an undefined property#'
         - '#Unsafe usage of new static#'
+        - '#Request::isFromApiDocument#'
