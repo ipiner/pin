@@ -30,7 +30,7 @@ class Decrypt extends TransformsRequest
      */
     protected function normalize(string $value): string
     {
-        if ($plain = static::resolvePlainInput($value)) {
+        if ($plain = static::resolvePlainValue($value)) {
             return $plain;
         }
 

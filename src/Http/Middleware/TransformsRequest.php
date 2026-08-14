@@ -29,7 +29,7 @@ abstract class TransformsRequest extends \Illuminate\Foundation\Http\Middleware\
      * - 非生产环境
      * - API 文档
      */
-    public static function resolvePlainInput(string $input): ?string
+    public static function resolvePlainValue(string $input): ?string
     {
         if (
             str_starts_with($input, 'plain:')

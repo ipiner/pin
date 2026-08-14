@@ -16,7 +16,7 @@ beforeEach(function () {
 
         protected function normalize(string $value): string
         {
-            return self::resolvePlainInput($value) ?? $value;
+            return self::resolvePlainValue($value) ?? $value;
         }
     };
 });
@@ -25,7 +25,7 @@ it('resolves plain input', function ($env, $input, $expected) {
     app()->detectEnvironment(fn () => $env);
 
     expect(
-        TransformsRequest::resolvePlainInput($input)
+        TransformsRequest::resolvePlainValue($input)
     )->toBe($expected);
 })->with([
     ['production', 'plain:123', null],
