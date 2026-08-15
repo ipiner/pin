@@ -69,12 +69,12 @@ class Password
     /**
      * 将明文密码转为请求传输格式
      *
-     * @param  string  $rawPassword  明文密码
+     * @param  string  $plain  明文密码
      * @return string 加密后的请求密码
      */
-    public function encodeToRequest(string $rawPassword): string
+    public function encodeToRequest(string $plain): string
     {
-        return Aes::encrypt(static::encode($rawPassword), true);
+        return Aes::encrypt(static::encode($plain), true);
     }
 
     /**
