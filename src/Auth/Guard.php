@@ -93,7 +93,7 @@ class Guard implements \Illuminate\Contracts\Auth\Guard
 
         $resolver = clone $this->tokenResolver;
         $resolver->resolve($credentials[$key]);
-        $id = $this->tokenResolver->getUid();
+        $id = $resolver->getUid();
 
         return $id > 0 && $this->provider->retrieveById($id);
     }
