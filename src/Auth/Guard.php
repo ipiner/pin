@@ -89,7 +89,7 @@ class Guard implements \Illuminate\Contracts\Auth\Guard
      */
     public function validate(array $credentials = []): bool
     {
-        $key = config('auth.guards.token_key', 'token');
+        $key = config('auth.guards.pin.token_key', 'token');
 
         $resolver = clone $this->tokenResolver;
         $resolver->resolve($credentials[$key]);
