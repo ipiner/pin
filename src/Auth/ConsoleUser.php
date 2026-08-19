@@ -41,19 +41,11 @@ class ConsoleUser
     }
 
     /**
-     * 获取当前进程的有效用户 ID。
-     */
-    protected function geteuid(): ?int
-    {
-        return function_exists('posix_geteuid') ? posix_geteuid() : null;
-    }
-
-    /**
      * 解析当前运行环境的用户 ID。
      */
     protected function resolveUid(): int
     {
-        return $this->geteuid() ?? 0;
+        return function_exists('posix_geteuid') ? posix_geteuid() : 0;
     }
 
     /**
