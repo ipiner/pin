@@ -28,7 +28,11 @@ trait HandlesLogging
      */
     protected function isForceLogEnabled(): bool
     {
-        return app()->hasDebugModeEnabled() || config('pin.logging.response.enabled', false);
+        $enabled = config('pin.logging.response.enabled');
+
+        return app()->hasDebugModeEnabled()
+            || $enabled === true
+            || $enabled !== false && $this->request->isRequest($enabled);
     }
 
     /**

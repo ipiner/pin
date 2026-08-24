@@ -55,3 +55,17 @@ it('logs when response failed', function () {
 
     expect($this->invoker($middleware)->shouldLog())->toBeTrue();
 });
+
+it('logs when force log is enabled for the request', function () {
+    config()->set('pin.logging.response.enabled', 'api/*');
+
+    $middleware = app(LogApiResponse::class);
+    $request = Request::create('/api/health');
+
+    $middleware->terminate(
+        $request,
+        ApiResponse::make()->toResponse($request)
+    );
+
+    expect($this->invoker($middleware)->shouldLog())->toBeTrue();
+});
