@@ -4,11 +4,20 @@ declare(strict_types=1);
 
 namespace Pin\Log;
 
+use Monolog\Formatter\NormalizerFormatter;
+
 /**
  * 日志配置助手
  */
 class Config
 {
+    /**
+     * 默认日志格式化器
+     *
+     * @var class-string<NormalizerFormatter>|null
+     */
+    public static ?string $defaultFormatter = JsonFormatter::class;
+
     /**
      * 创建按天滚动日志配置
      */
@@ -41,7 +50,7 @@ class Config
             'permission' => 0777,
 
             // JSON 日志格式化
-            'formatter' => JsonFormatter::class,
+            'formatter' => self::$defaultFormatter,
 
             // 日志扩展处理器
             'tap' => [ExtraTapper::class],
