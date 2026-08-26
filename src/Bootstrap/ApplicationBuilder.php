@@ -65,6 +65,7 @@ class ApplicationBuilder
                 web: is_file($file = $path.'/routes/web.php') ? $file : null,
                 api: is_file($file = $path.'/routes/api.php') ? $file : null,
                 commands: is_file($file = $path.'/routes/console.php') ? $file : null,
+                health: '/up',
                 apiPrefix: '',
             );
         }
