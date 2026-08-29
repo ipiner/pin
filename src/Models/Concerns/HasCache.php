@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pin\Models\Concerns;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
@@ -95,8 +96,10 @@ trait HasCache
      *
      * @return Collection<int, static> keyBy('id') 结构
      */
-    public static function findMany(array $ids): Collection
+    public static function findMany(array|Arrayable $ids): Collection
     {
+        $ids = $ids instanceof Arrayable ? $ids->toArray() : $ids;
+
         if (static::cacheType() === CacheType::CacheAll) {
             return static::findAll()->whereIn('id', $ids);
         }
