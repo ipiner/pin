@@ -17,17 +17,23 @@ class RouteScanner
     /**
      * 扫描 Route Enum
      *
-     * @param  array<string|RouteScanPath>  $paths
+     * @param  array<string|int,string|RouteScanPath>  $paths
      * @return class-string<Routable>[]
      */
     public function scan(array $paths): array
     {
         return collect($paths)
-            ->flatMap(function (string|RouteScanPath $path) {
-                $path = is_string($path) ? new RouteScanPath($path) : $path;
+            ->map(function (string|RouteScanPath $path, string|int $key) {
+                if ($path instanceof RouteScanPath) {
+                    return $path;
+                }
 
-                return $this->scanPath($path);
+                return new RouteScanPath(
+                    path: is_string($key) ? $key : $path,
+                    namespace: is_string($key) ? $path : null,
+                );
             })
+            ->flatMap(fn (RouteScanPath $path) => $this->scanPath($path))
             ->values()
             ->all();
     }
