@@ -33,7 +33,7 @@ trait TreePresenter
         $ids = explode('/', $this->path);
         $items = static::findMany($ids);
         $names = collect($ids)->map(
-            fn ($id) => $items[$id]->name ?? '不存在或已删除'
+            fn ($id) => $items->get($id)?->name ?? '不存在或已删除'
         );
 
         return $separator === null ? $names->toArray() : $names->join($separator);
