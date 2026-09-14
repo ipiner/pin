@@ -38,7 +38,7 @@ class Password
             $encoded = Aes::decrypt($requestPassword);
         } catch (CryptException $e) {
             throw new PasswordException(
-                "请求密码异常[{$requestPassword}]",
+                "请求密码异常",
                 Errors::PasswordDecodeFailed->code(),
                 $e,
             );
@@ -50,7 +50,7 @@ class Password
         }
 
         throw new PasswordException(
-            "请求密码异常[{$requestPassword}: {$encoded}]",
+            "请求密码异常",
             Errors::PasswordInvalid->code(),
         );
     }
@@ -63,7 +63,7 @@ class Password
      */
     public function encode(string $plain): string
     {
-        return strtoupper(md5(strtoupper($plain)));
+        return strtoupper(md5(md5($plain)));
     }
 
     /**
@@ -82,24 +82,33 @@ class Password
      *
      * @throws PasswordException
      */
-    public function hash(string $password, string $salt): string
+    public function hash(string $encoded, string $salt): string
     {
         // 必须为 encode 后格式（32位大写）
-        if ($this->isValid($password)) {
-            return Hash::make($password.$salt);
+        if ($this->isValid($encoded)) {
+            return Hash::make($encoded.$salt);
         }
 
         throw new PasswordException(
-            "密码异常[{$password}]",
+            "密码异常",
             Errors::PasswordInvalid->code(),
         );
     }
 
     /**
+     * 密码已编码密码是否为双重md5空字符
+     */
+    public function isEmpty(string $encoded): bool
+    {
+        // strtoupper(md5(md5('')))
+        return strtoupper($encoded) === '74BE16979710D4C4E7C6647856088456';
+    }
+
+    /**
      * 校验密码是否合法（encode 后格式）
      */
-    protected function isValid(string $password): bool
+    protected function isValid(string $encoded): bool
     {
-        return strlen($password) === 32 && $password === strtoupper($password);
+        return strlen($encoded) === 32 && $encoded === strtoupper($encoded);
     }
 }

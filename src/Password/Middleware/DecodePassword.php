@@ -35,6 +35,8 @@ class DecodePassword extends TransformsRequest
             return Password::encode($plain);
         }
 
-        return Password::decodeFromRequest($value);
+        $encoded = Password::decodeFromRequest($value);
+
+        return Password::isEmpty($encoded) ? '' : $encoded;
     }
 }

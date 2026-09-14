@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static string decodeFromRequest(string $requestPassword)
  * @method static string encode(string $plain)
  * @method static string encodeToRequest(string $rawPassword)
- * @method static string hash(string $password, string $salt)
+ * @method static string hash(string $encoded, string $salt)
+ * @method static string isEmpty(string $encoded)
  *
  * @see \Pin\Password\Password
  */

@@ -44,6 +44,6 @@ it('hashes password successfully', function () {
     $password = Str::random();
     $encoded = Password::encode($password);
 
-    expect($encoded)->toBe(strtoupper(md5(strtoupper($password))))
+    expect($encoded)->toBe(strtoupper(md5(md5($password))))
         ->and(Hash::check($encoded, Password::hash($encoded, '')))->toBeTrue();
 });

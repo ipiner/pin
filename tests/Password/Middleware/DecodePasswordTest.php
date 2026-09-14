@@ -19,6 +19,13 @@ it('decodes password field when value is encoded', function () {
         ->toBe(Password::encode($password));
 });
 
+it('decodes password field when value is encoded is empty', function () {
+    expect(
+        $this->middleware->transform('password', Password::encodeToRequest(''))
+    )
+        ->toBe('');
+});
+
 it('encodes plain value in non production', function () {
     $result = $this->middleware->transform('password', 'plain:123456');
     expect($result)->toBe(Password::encode('123456'));
