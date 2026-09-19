@@ -12,9 +12,7 @@ use Pin\Models\Scopes\Sort;
 use Pin\Support\ServiceProvider;
 
 /**
- * 模型增强服务提供者
- *
- * 为 Eloquent Builder 注册分页、筛选、排序和聚合宏。
+ * 模型服务提供者
  */
 class ModelServiceProvider extends ServiceProvider
 {
@@ -23,9 +21,9 @@ class ModelServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Builder::mixin(new Aggregate());          // 聚合函数宏
-        Builder::macro('pagination', Pagination::pagination()); // 分页宏
-        Builder::macro('queryable', QueryableScope::queryable()); // 查询条件宏
-        Builder::macro('sort', Sort::sort());     // 排序宏
+        Builder::mixin(new Aggregate());
+        Builder::macro('pagination', Pagination::pagination());
+        Builder::macro('queryable', QueryableScope::queryable());
+        Builder::macro('sort', Sort::sort());
     }
 }

@@ -6,33 +6,34 @@ namespace Pin\Route\Testing;
 
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Collection;
+use Orchestra\Testbench\TestCase as TestbenchTestCase;
+use Pin\Route\Attributes\TestingMethod as TestingMethodAttribute;
 use Pin\Route\Routable;
 
 /**
- * Route 测试套件
- *
- * 用于批量执行一组 Route 测试任务
+ * 路由测试套件
  */
 class TestSuite
 {
     /**
      * Route 名称关键字与测试方法映射。
+     *
+     * @var array<string, string>
      */
-    protected array $testingMethods = [];
+    protected array $testingMethods = [
+        'Create' => TestingMethod::Created->value,
+        'Update' => TestingMethod::Updated->value,
+        'Delete' => TestingMethod::Deleted->value,
+        'Index' => TestingMethod::Paginated->value,
+    ];
 
     /**
      * @param  array<Routable>  $routes
      */
     public function __construct(
-        protected TestCase|\Orchestra\Testbench\TestCase $testCase,
+        protected TestCase|TestbenchTestCase $testCase,
         protected array $routes
     ) {
-        $this->testingMethods = [
-            'Create' => TestingMethod::Created->value,
-            'Update' => TestingMethod::Updated->value,
-            'Delete' => TestingMethod::Deleted->value,
-            'Index' => TestingMethod::Paginated->value,
-        ];
     }
 
     /**
@@ -50,12 +51,10 @@ class TestSuite
      */
     public function tasks(): Collection
     {
-        return collect($this->routes)->map(function (Routable $route) {
-            return new TestingTask(
-                $route->testing($this->testCase),
-                $this->resolveTestingMethod($route)
-            );
-        });
+        return collect($this->routes)->map(fn (Routable $route) => new TestingTask(
+            $route->testing($this->testCase),
+            $this->resolveTestingMethod($route)
+        ));
     }
 
     /**
@@ -63,10 +62,9 @@ class TestSuite
      */
     protected function resolveTestingMethod(Routable $route): string
     {
-        /** @var \Pin\Route\Attributes\TestingMethod|null $attr */
-        $attr = $route->attribute(\Pin\Route\Attributes\TestingMethod::class);
-        if ($attr !== null) {
-            return $attr->value;
+        $attribute = $route->attribute(TestingMethodAttribute::class);
+        if ($attribute) {
+            return $attribute->value;
         }
 
         foreach ($this->testingMethods as $name => $method) {

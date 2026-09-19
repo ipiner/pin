@@ -6,22 +6,21 @@ namespace Pin\Models\Scopes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use Pin\Pagination\Pagination as PaginationResult;
 
 /**
- * Pagination Scopes
- *
- * 提供 Eloquent 分页查询封装
+ * 分页查询宏
  */
 class Pagination
 {
     /**
-     * 分页方法封装
+     * 创建分页宏
      */
     public static function pagination(): Closure
     {
         return function (?int $page = null, ?int $pageSize = null, array $columns = ['*']) {
             /** @var Builder $this */
-            return \Pin\Pagination\Pagination::make($this->paginate(
+            return PaginationResult::make($this->paginate(
                 $pageSize,
                 $columns,
                 config('pin.pagination.page_name'),

@@ -9,6 +9,7 @@ it('resolves column label', function (array $attributes, string $expected) {
 
     expect($column->label)->toBe($expected);
 })->with([
+    'missing comment' => [['name' => 'created_at'], 'Created At'],
     'default generated label' => [
         [
             'name' => 'created_at',

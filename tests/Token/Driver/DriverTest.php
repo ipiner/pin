@@ -39,3 +39,20 @@ it('checks token expiration logic', function () {
     $token = new Token(['iat' => time(), 'expires' => -100], '');
     expect($o->isExpired($token))->toBeTrue();
 });
+
+it('preserves explicit expiration when a lifetime is also supplied', function (string $name) {
+    $factory = Pin\Support\Facades\Token::driver($name);
+    $expiresAt = time() + 600;
+    $token = $factory->decode($factory->encode(['uid' => 1, 'exp' => $expiresAt], 60));
+
+    expect($token->exp)->toBe($expiresAt)
+        ->and($token->uid)->toBe(1);
+})->with(['default', 'jwt']);
+
+it('does not add an expiration for a zero lifetime', function (string $name) {
+    $factory = Pin\Support\Facades\Token::driver($name);
+    $token = $factory->decode($factory->encode(['uid' => 1], 0));
+
+    expect(isset($token->exp))->toBeFalse()
+        ->and($token->uid)->toBe(1);
+})->with(['default', 'jwt']);

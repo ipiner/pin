@@ -6,6 +6,7 @@ namespace Pin\Providers;
 
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\ServiceProvider;
+use Override;
 use Pin\Action\ActionServiceProvider;
 use Pin\Auth\AuthServiceProvider;
 use Pin\Cache\CacheServiceProvider;
@@ -31,8 +32,6 @@ use Pin\Validation\ValidationServiceProvider;
 
 /**
  * Pin 框架核心服务提供者
- *
- * 汇总注册框架内置服务、命令、宏和错误页资源。
  */
 class PinServiceProvider extends ServiceProvider
 {
@@ -65,7 +64,7 @@ class PinServiceProvider extends ServiceProvider
     /**
      * 单例绑定
      *
-     * @var array<class-string, class-string>
+     * @var class-string[]
      */
     public array $singletons = [
         StackTracePolicy::class,
@@ -73,36 +72,57 @@ class PinServiceProvider extends ServiceProvider
     ];
 
     /**
-     * 发布框架错误页资源
+     * 启动框架服务
      */
     public function boot(): void
     {
         ThrottleRequests::shouldHashKeys(false);
+        $this->registerTranslations();
 
-        $path = __DIR__.'/../../lang';
-        $this->loadTranslationsFrom($path, 'pin');
-        $this->loadJsonTranslationsFrom($path);
-        $this->publishes([
-            $path => $this->app->langPath('vendor/pin'),
-        ], 'pin-lang');
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
 
-        $this->publishes([
-            __DIR__.'/../../config/pin' => config_path('pin'),
-        ], 'pin-config');
+        $this->publishResources();
     }
 
     /**
      * 注册请求宏和开发辅助命令
      */
+    #[Override]
     public function register(): void
     {
-        // Illuminate\Http\Request 自定义宏
         Request::registerMacros();
 
-        // 自定义命令
         $this->commands([
             IdeHelperCommand::class,
             TableSchemasGenerateCommand::class,
         ]);
+    }
+
+    /**
+     * 注册翻译资源
+     */
+    protected function registerTranslations(): void
+    {
+        $path = __DIR__.'/../../lang';
+
+        $this->loadTranslationsFrom($path, 'pin');
+        $this->loadJsonTranslationsFrom($path);
+        $this->loadJsonTranslationsFrom($this->app->langPath('vendor/pin'));
+    }
+
+    /**
+     * 发布语言包和配置
+     */
+    protected function publishResources(): void
+    {
+        $this->publishes([
+            __DIR__.'/../../lang' => $this->app->langPath('vendor/pin'),
+        ], 'pin-lang');
+
+        $this->publishes([
+            __DIR__.'/../../config/pin' => $this->app->configPath('pin'),
+        ], 'pin-config');
     }
 }

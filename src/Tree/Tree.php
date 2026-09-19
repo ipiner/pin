@@ -7,17 +7,16 @@ namespace Pin\Tree;
 use Illuminate\Support\Collection;
 use Pin\Models\Model;
 
+/**
+ * 树结构工具。
+ */
 class Tree
 {
     /**
      * 校验树结构完整性。
      *
-     * @param  Collection<Model>  $models
-     * @return array<int, array{
-     *     id:int,
-     *     rule:string,
-     *     message:string
-     * }>
+     * @param  Collection<array-key, Model>  $models
+     * @return list<array{id: int, rule: string, message: string}>
      */
     public function check(Collection $models): array
     {
@@ -25,11 +24,11 @@ class Tree
     }
 
     /**
-     * 过滤树结构数据，并自动维护结构完整性。
+     * 过滤节点并修剪空分支。
      *
-     * @param  Collection<Model>  $models
-     * @param  callable(Model):bool  $predicate
-     * @return Collection<Model>
+     * @param  Collection<array-key, Model>  $models
+     * @param  callable(Model): bool  $predicate
+     * @return Collection<int, Model>
      */
     public function filter(Collection $models, callable $predicate): Collection
     {
@@ -37,7 +36,7 @@ class Tree
     }
 
     /**
-     * 排序树节点集合
+     * 按父节点、排序值和 ID 排序。
      */
     public function sort(Collection $items): Collection
     {

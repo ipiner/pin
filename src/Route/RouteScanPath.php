@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Pin\Route;
 
 /**
- * Route 扫描路径配置
- *
- * 用于定义 Route Enum 的扫描目录、命名空间及文件匹配规则。
+ * 路由扫描路径
  */
 final readonly class RouteScanPath
 {
@@ -21,6 +19,5 @@ final readonly class RouteScanPath
         public ?string $namespace = null,
         public string $pattern = '*Route.php',
     ) {
-        //
     }
 }

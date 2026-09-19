@@ -51,3 +51,9 @@ it('parses and detects expired placeholder', function () {
     expect($parsed)->toBeInstanceOf(NullPlaceholder::class)
         ->and($parsed->isExpired())->toBeTrue();
 });
+
+it('expires at the exact expiration time', function () {
+    $this->freezeTime();
+
+    expect(NullPlaceholder::make(0)->isExpired())->toBeTrue();
+});

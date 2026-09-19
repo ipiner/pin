@@ -43,3 +43,16 @@ it('can retrieve nested context values by key', function () {
     $action->context(['user' => ['id' => 1]]);
     expect($action->context('user.id'))->toBe(1);
 });
+
+it('sets explicit null values and clears the context', function () {
+    $action = new class
+    {
+        use HasContext;
+    };
+
+    $action->context('user.id', null);
+
+    expect($action->context()->toArray())->toBe(['user' => ['id' => null]])
+        ->and($action->context(null))->toBe($action)
+        ->and($action->context()->toArray())->toBe([]);
+});

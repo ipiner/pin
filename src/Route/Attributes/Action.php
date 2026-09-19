@@ -7,13 +7,13 @@ namespace Pin\Route\Attributes;
 use Attribute;
 
 /**
- * 指定 Route Testing 默认使用的 Action 类。
+ * 指定路由测试 Action
  */
 #[Attribute(Attribute::TARGET_CLASS_CONSTANT)]
 class Action
 {
     /**
-     * @param  string  $value  Action名称
+     * @param  class-string<\Pin\Action\Action>  $value
      */
     public function __construct(public readonly string $value)
     {

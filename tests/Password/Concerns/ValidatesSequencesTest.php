@@ -38,4 +38,11 @@ it('validates max sequential characters', function (
         'DCBA',
         Errors::PasswordSequenceTooLong->code(),
     ],
+    'empty value' => [1, '', 0],
+    'single character' => [1, 'a', Errors::PasswordSequenceTooLong->code()],
+    'short sequence' => [4, 'abc', 0],
+    'direction change' => [3, 'aba', 0],
+    'repeated character breaks sequence' => [3, 'abbc', 0],
+    'sequence after direction change' => [4, 'abcdcba', Errors::PasswordSequenceTooLong->code()],
+    'sequence at the end' => [3, '!xyz', Errors::PasswordSequenceTooLong->code()],
 ]);

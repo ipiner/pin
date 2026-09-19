@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pin\Faker\Generators;
 
 use Illuminate\Support\Str;
+use Override;
 
 /**
  * 生成随机字符串
@@ -12,10 +13,11 @@ use Illuminate\Support\Str;
 class StringGenerator extends Generator
 {
     /**
-     * 执行生成
+     * 生成数据
      */
-    public function fake()
+    #[Override]
+    public function fake(): string
     {
-        return Str::random($this->rule->parameter(0, 16));
+        return Str::random((int) $this->rule->parameter(0, 16));
     }
 }

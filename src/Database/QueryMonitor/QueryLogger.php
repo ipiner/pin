@@ -4,24 +4,20 @@ declare(strict_types=1);
 
 namespace Pin\Database\QueryMonitor;
 
+use Closure;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\Log;
 use Psr\Log\LogLevel;
 
 /**
- * SQL 日志收集器
+ * SQL 日志收集器。
  */
 class QueryLogger
 {
     /**
      * SQL 队列。
      *
-     * [
-     *   'sql' => string,
-     *   'context' => array
-     * ]
-     *
-     * @var array<int, array{sql:string, context:array}>
+     * @var list<array{sql: string, context: array}>
      */
     protected array $queries = [];
 
@@ -30,79 +26,76 @@ class QueryLogger
     }
 
     /**
-     * 批量写入 SQL 日志
+     * 批量写入 SQL 日志。
      */
     public function flush(): void
     {
-        foreach ($this->queries as $query) {
-            Log::channel('sql')->log(
+        if (! $this->queries) {
+            return;
+        }
+
+        $logger = Log::channel('sql');
+        $queries = $this->queries;
+        $this->queries = [];
+
+        foreach ($queries as $query) {
+            $logger->log(
                 $this->resolveLogLevel($query['context']),
                 $query['sql'],
                 $query['context']
             );
         }
-
-        $this->queries = [];
     }
 
     /**
-     * 记录 SQL 到内存队列（延迟写入）。
-     *
-     * @param  string  $sql  已格式化 SQL 字符串
+     * 收集 SQL 日志。
      */
-    public function push(QueryExecuted $event, string $sql): void
+    public function push(QueryExecuted $event, string|Closure $sql): void
     {
-        if (! $this->shouldLog($event)) {
+        $slow = $this->profile->isSlow($event);
+
+        if (! $this->shouldLog($event, $slow)) {
             return;
         }
 
         $this->queries[] = [
-            'sql' => $sql,
+            'sql' => value($sql),
             'context' => [
                 'category' => 'sql',
                 'connection' => $event->connectionName,
                 'time' => (int) $event->time,
-                'slow' => $this->profile->isSlow($event),
+                'slow' => $slow,
             ],
         ];
     }
 
     /**
-     * 是否忽略 SQL
+     * 是否忽略 SQL。
      */
     protected function isIgnored(QueryExecuted $event): bool
     {
-        $sql = $event->sql;
-
         return array_any(
             config('logging.channels.sql.ignores', []),
-            fn (string $rule) => $this->matchIgnore($sql, $rule)
+            fn (string $rule) => $this->matchIgnore($event->sql, $rule)
         );
     }
 
     /**
-     * ignore 规则匹配（regex / contains）
-     *
-     * @param  string  $sql  SQL 内容
-     * @param  string  $term  规则字符串
+     * 匹配正则或包含规则。
      */
-    protected function matchIgnore(string $sql, string $term): bool
+    protected function matchIgnore(string $sql, string $rule): bool
     {
-        // 正则规则（以 / 开头）
-        if (str_starts_with($term, '/')) {
-            return (bool) preg_match($term, $sql);
+        if (str_starts_with($rule, '/')) {
+            return preg_match($rule, $sql) === 1;
         }
 
-        // 普通字符串包含匹配
-        return str_contains($sql, $term);
+        return str_contains($sql, $rule);
     }
 
     /**
-     * 日志等级映射
+     * 获取日志等级。
      *
-     * @param  array{
-     *     slow: bool
-     * }  $context
+     * @param  array{slow: bool}  $context
      */
     protected function resolveLogLevel(array $context): string
     {
@@ -110,16 +103,14 @@ class QueryLogger
     }
 
     /**
-     * 是否记录 SQL
+     * 是否记录 SQL。
      */
-    protected function shouldLog(QueryExecuted $event): bool
+    protected function shouldLog(QueryExecuted $event, bool $slow): bool
     {
-        if ($this->isIgnored($event)) {
+        if (! $slow && ! config('app.debug') && ! config('pin.logging.sql_logging')) {
             return false;
         }
 
-        return config('app.debug')
-            || config('pin.logging.sql_logging')
-            || $this->profile->isSlow($event);
+        return ! $this->isIgnored($event);
     }
 }

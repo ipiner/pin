@@ -45,6 +45,24 @@ it('checks if request matches URI', function () {
         ->and($request->isRequest('captcha'))->toBeFalse();
 });
 
+it('registers request macros from subclasses', function () {
+    $extension = new class extends Pin\Http\Request
+    {
+        public static function getReferer(Illuminate\Http\Request $request): string
+        {
+            return 'custom';
+        }
+    };
+
+    try {
+        $extension::registerMacros();
+
+        expect(Request::create('/')->getReferer())->toBe('custom');
+    } finally {
+        Pin\Http\Request::registerMacros();
+    }
+});
+
 describe('gets referer', function () {
     it('returns x-referer header first', function () {
         $request = Request::create('/');

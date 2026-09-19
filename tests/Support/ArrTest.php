@@ -92,6 +92,26 @@ it('converts null values to empty strings recursively', function () {
         ->and($data['b']['c']['a'])->toBe('');
 });
 
+it('accepts a merge mode without arrays', function (bool $preserveNumericKeys) {
+    expect(Arr::merge($preserveNumericKeys))->toBe([]);
+})->with([true, false]);
+
+it('preserves sparse keys and handles existing null values when merging', function () {
+    $first = [2 => null, 'config' => ['value' => null]];
+    $second = [2 => 'next', 'config' => ['value' => ['id' => 1]]];
+
+    expect(Arr::merge($first))->toBe($first)
+        ->and(Arr::merge(false, $first, $second))->toBe([
+            2 => null,
+            'config' => ['value' => ['id' => 1]],
+            3 => 'next',
+        ])
+        ->and(Arr::merge(true, $first, $second))->toBe([
+            2 => 'next',
+            'config' => ['value' => ['id' => 1]],
+        ]);
+});
+
 it('converts flat arrays to tree structure', function () {
     $array2tree = [
         1 => [

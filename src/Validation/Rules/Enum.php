@@ -4,26 +4,34 @@ declare(strict_types=1);
 
 namespace Pin\Validation\Rules;
 
+use BackedEnum;
+use Override;
+use TypeError;
+
 /**
- * Enum 枚举验证
+ * 枚举值验证。
  */
 class Enum extends ValidationRule
 {
+    protected string $message = 'validation.enum';
+
     /**
-     * 构造函数
-     *
-     * @param  class-string  $enum  验证的枚举类
+     * @param  class-string<BackedEnum>  $enum  枚举类
      */
     public function __construct(public protected(set) string $enum)
     {
-        $this->message('validation.enum');
     }
 
     /**
-     * 执行验证
+     * 验证枚举值。
      */
+    #[Override]
     protected function handle(string $attribute, mixed $value): bool
     {
-        return $this->enum::tryFrom($value) !== null;
+        try {
+            return $this->enum::tryFrom($value) !== null;
+        } catch (TypeError) {
+            return false;
+        }
     }
 }

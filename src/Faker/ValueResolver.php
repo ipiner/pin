@@ -9,43 +9,48 @@ use Illuminate\Support\Str;
 use Pin\Faker\Generators\Generator;
 
 /**
- * FakeRule 值解析器
- *
- * 将 FakeRule 转换为最终 fake 值
+ * 生成规则值解析器
  */
 class ValueResolver
 {
     /**
-     * 解析 FakeRule
+     * 内置生成器类缓存。
+     *
+     * @var array<string, class-string<Generator>|null>
+     */
+    protected array $generators = [];
+
+    /**
+     * 解析生成规则
      */
     public function resolve(FakeRule $rule, ?RuleBag $rules = null): mixed
     {
-        $rules ??= new RuleBag([]);
+        $generator = $rule->generator();
 
-        // closure
-        if ($rule->generator() instanceof Closure) {
-            return ($rule->generator())($rules, ...$rule->parameters());
+        if ($generator instanceof Closure) {
+            return $generator($rules ?? new RuleBag([]), ...$rule->parameters());
         }
 
-        // 内置
-        if ($class = $this->resolveBuiltinGenerator($rule->generator())) {
+        if ($class = $this->resolveBuiltinGenerator($generator)) {
             return app($class)->generate($rule, $rules);
         }
 
-        // FakerPHP
-        return fake()->{$rule->generator()}(...$rule->parameters());
+        return fake()->{$generator}(...$rule->parameters());
     }
 
     /**
-     * 解析内置 Generator
+     * 解析内置生成器类。
+     *
+     * @return class-string<Generator>|null
      */
     protected function resolveBuiltinGenerator(string $generator): ?string
     {
-        $class = sprintf(
-            'Pin\\Faker\\Generators\\%sGenerator',
-            Str::studly($generator),
-        );
+        if (array_key_exists($generator, $this->generators)) {
+            return $this->generators[$generator];
+        }
 
-        return class_exists($class) ? $class : null;
+        $class = __NAMESPACE__.'\\Generators\\'.Str::studly($generator).'Generator';
+
+        return $this->generators[$generator] = class_exists($class) ? $class : null;
     }
 }

@@ -5,27 +5,21 @@ declare(strict_types=1);
 namespace Pin\Faker;
 
 /**
- * Fake 数据生成器
- *
- * 基于 Validation Rules 生成 fake 数据：
- * - FakeRule parsing
- * - Rule inference
- * - Generator resolving
+ * 根据验证规则生成测试数据
  */
 class Faker
 {
     /**
-     * 创建 Faker 实例
+     * 构造函数
      */
     public function __construct(
         public protected(set) RuleParser $ruleParser,
         public protected(set) ValueResolver $valueResolver
     ) {
-        //
     }
 
     /**
-     * 根据 Validation Rules 生成 fake 数据。
+     * 生成测试数据。
      *
      * @return array<string, mixed>
      */
@@ -33,15 +27,20 @@ class Faker
     {
         $data = [];
 
-        foreach ($rules as $field => $item) {
-            $bag = $this->normalize($item);
+        foreach ($rules as $field => $fieldRules) {
+            if ($this->isWildcardField($field)) {
+                continue;
+            }
+
+            $bag = $this->normalize($fieldRules);
             $rule = $this->ruleParser->parse($bag);
 
-            if ($rule === null || $this->isWildcardField($field)) {
+            if (! $rule) {
                 continue;
             }
 
             $value = $this->valueResolver->resolve($rule, $bag);
+
             if (! $value instanceof MissingValue) {
                 $data[$field] = $value;
             }
@@ -51,11 +50,7 @@ class Faker
     }
 
     /**
-     * 判断字段是否为 Laravel wildcard 字段
-     *
-     *  例如：
-     *  - users.*.id
-     *  - items.*.name
+     * 是否为通配符字段
      */
     protected function isWildcardField(string $field): bool
     {
@@ -63,12 +58,10 @@ class Faker
     }
 
     /**
-     * 标准化 Validation Rules
+     * 标准化验证规则
      */
     protected function normalize(array|string $rules): RuleBag
     {
-        return new RuleBag(
-            is_array($rules) ? $rules : explode('|', $rules)
-        );
+        return new RuleBag($rules);
     }
 }

@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Pin\Testing;
 
-use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Foundation\Application as BaseApplication;
+use Illuminate\Foundation\Bootstrap\LoadConfiguration as BaseLoadConfiguration;
+use Illuminate\Support\ServiceProvider;
+use Orchestra\Testbench\TestCase as BaseTestCase;
 use Override;
+use Pin\Bootstrap\LoadConfiguration;
 use Pin\Support\Invoker;
 
 Pest::boot();
 
 /**
- * Pin 测试基类
- *
- * 基于 Orchestra Testbench 构建，
- * 用于在测试环境中模拟 Laravel 应用实例，并加载自定义配置与服务。
+ * Pin 测试基类。
  */
-abstract class TestCase extends \Orchestra\Testbench\TestCase
+abstract class TestCase extends BaseTestCase
 {
     /**
      * @param  class-string|object  $obj
@@ -27,20 +28,23 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     }
 
     /**
-     * 替换测试环境配置加载器
+     * 替换配置加载器。
+     *
+     * @param  BaseApplication  $app
+     * @return array<class-string, class-string>
      */
     #[Override]
     protected function overrideApplicationBindings($app): array
     {
         return [
-            LoadConfiguration::class => \Pin\Bootstrap\LoadConfiguration::class,
+            BaseLoadConfiguration::class => LoadConfiguration::class,
         ];
     }
 
     /**
-     * 获取测试环境加载的服务提供者
+     * 获取附加服务提供者。
      *
-     * @return array<int, class-string>
+     * @return list<class-string<ServiceProvider>>
      */
     protected function providers(): array
     {
@@ -48,10 +52,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     }
 
     /**
-     * 创建加载 Pin 服务提供者的测试应用
+     * 创建测试应用。
      */
     #[Override]
-    protected function resolveApplication()
+    protected function resolveApplication(): BaseApplication
     {
         return Application::configure(static::applicationBasePath())
             ->withProviders($this->providers())

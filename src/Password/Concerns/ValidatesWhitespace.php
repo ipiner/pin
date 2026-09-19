@@ -29,10 +29,10 @@ trait ValidatesWhitespace
     /**
      * 验证密码是否包含空白字符
      */
-    protected function validateWhiteSpace(): int
+    protected function validateWhitespace(): int
     {
         return $this->allowWhitespace
             ? 0
-            : $this->matchPattern('/^\S+$/', Errors::PasswordContainsWhitespace);
+            : $this->matchPattern('/\A\S+\z/', Errors::PasswordContainsWhitespace);
     }
 }

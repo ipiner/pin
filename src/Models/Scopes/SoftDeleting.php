@@ -10,9 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Override;
 
 /**
- * SoftDeleting Scope
- *
- * 提供 Eloquent 模型的软删除全局作用域功能
+ * 软删除查询作用域
  */
 class SoftDeleting extends SoftDeletingScope
 {
@@ -20,7 +18,7 @@ class SoftDeleting extends SoftDeletingScope
      * 默认排除已软删除记录
      */
     #[Override]
-    public function apply(Builder $builder, Model $model)
+    public function apply(Builder $builder, Model $model): void
     {
         $this->withoutTrashed($builder, $model);
     }
@@ -29,22 +27,22 @@ class SoftDeleting extends SoftDeletingScope
      * 扩展 Builder 方法
      */
     #[Override]
-    public function extend(Builder $builder)
+    public function extend(Builder $builder): void
     {
         foreach ($this->extensions as $extension) {
             $this->{"add{$extension}"}($builder);
         }
 
-        $builder->onDelete(
-            fn (Builder $builder) => $builder->update($builder->getModel()->softDeletedValuesForUpdate(true))
-        );
+        $builder->onDelete(static function (Builder $builder) {
+            return $builder->update($builder->getModel()->softDeletedValuesForUpdate(true));
+        });
     }
 
     /**
      * 添加 onlyTrashed 宏方法
      */
     #[Override]
-    protected function addOnlyTrashed(Builder $builder)
+    protected function addOnlyTrashed(Builder $builder): void
     {
         $builder->macro(
             'onlyTrashed',
@@ -56,13 +54,12 @@ class SoftDeleting extends SoftDeletingScope
      * 添加 restore 宏方法
      */
     #[Override]
-    protected function addRestore(Builder $builder)
+    protected function addRestore(Builder $builder): void
     {
-        $builder->macro('restore', function (Builder $builder) {
+        $builder->macro('restore', static function (Builder $builder) {
             $builder->withTrashed();
 
-            // 恢复软删除，将 deleted_at 值重置
-            return $builder->update($builder->getModel()->getModel()->softDeletedValuesForUpdate(false));
+            return $builder->update($builder->getModel()->softDeletedValuesForUpdate(false));
         });
     }
 
@@ -70,7 +67,7 @@ class SoftDeleting extends SoftDeletingScope
      * 添加 withoutTrashed 宏方法
      */
     #[Override]
-    protected function addWithoutTrashed(Builder $builder)
+    protected function addWithoutTrashed(Builder $builder): void
     {
         $builder->macro(
             'withoutTrashed',
@@ -83,11 +80,13 @@ class SoftDeleting extends SoftDeletingScope
      */
     protected function onlyTrashed(Builder $builder, ?Model $model = null): Builder
     {
-        $model = $model ?: $builder->getModel();
+        $model ??= $builder->getModel();
         $column = $model->getQualifiedDeletedAtColumn();
         $value = $model->softDeletedAtValue(false);
 
-        return $value === null ? $builder->whereNotNull($column) : $builder->where($column, '>', 0);
+        return $value === null
+            ? $builder->whereNotNull($column)
+            : $builder->where($column, '!=', $value);
     }
 
     /**
@@ -95,13 +94,10 @@ class SoftDeleting extends SoftDeletingScope
      */
     protected function withoutTrashed(Builder $builder, ?Model $model = null): Builder
     {
-        $model = $model ?: $builder->getModel();
+        $model ??= $builder->getModel();
         $column = $model->getQualifiedDeletedAtColumn();
         $value = $model->softDeletedAtValue(false);
 
-        return match ($value) {
-            null => $builder->whereNull($column),
-            default => $builder->where($column, 0),
-        };
+        return $builder->where($column, $value);
     }
 }

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Pin\Route\Concerns;
 
-use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route as RouteFacade;
 use Pin\Module\ModuleInspector;
 use Pin\Route\Attributes\Handler;
 use Pin\Route\Attributes\Middleware;
@@ -12,9 +13,7 @@ use Pin\Route\Routable;
 use Pin\Route\RouteRegistry;
 
 /**
- * HasRegister
- *
- * 提供 Route Enum 的路由注册能力
+ * 路由注册
  */
 trait HasRegister
 {
@@ -35,11 +34,12 @@ trait HasRegister
     public function register(
         callable|array|string $handler,
         string|array|null $middlewares = null,
-    ): \Illuminate\Routing\Route {
-        $info = $this->definition();
-        $route = Route::addRoute($info->method, $info->uri, $handler)->name($info->name);
+    ): Route {
+        $definition = $this->definition();
+        $route = RouteFacade::addRoute($definition->method, $definition->uri, $handler)
+            ->name($definition->name);
 
-        $middlewares = $middlewares ?? $this->middlewares();
+        $middlewares ??= $this->middlewares();
         if ($middlewares) {
             $route->middleware($middlewares);
         }
@@ -50,11 +50,10 @@ trait HasRegister
     }
 
     /**
-     * 生成当前路由 URL。
+     * 生成路由 URL
      *
      * @param  array<string, mixed>|null  $params  路由参数
      * @param  bool  $absolute  是否生成绝对 URL
-     * @return string 生成后的路由 URL
      */
     public function route(?array $params = null, bool $absolute = true): string
     {
@@ -62,7 +61,7 @@ trait HasRegister
     }
 
     /**
-     * 把所有路由加进路由表
+     * 注册枚举路由
      */
     protected static function addRoutes(): void
     {
@@ -73,7 +72,7 @@ trait HasRegister
     }
 
     /**
-     * 推导当前 Route 对应的 Controller 类名。
+     * 推导控制器类名
      *
      * @return class-string
      */
@@ -83,9 +82,7 @@ trait HasRegister
     }
 
     /**
-     * 获取路由处理器。
-     *
-     * @return array{0: class-string, 1: string}
+     * 获取路由处理器
      */
     protected function handler(): mixed
     {
@@ -94,7 +91,7 @@ trait HasRegister
     }
 
     /**
-     * 获取当前路由声明的 Middleware。
+     * 获取路由中间件
      */
     protected function middlewares(): string|array|null
     {

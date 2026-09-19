@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Factories\MenuFactory;
 use App\Models\Menu;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Pin\Exceptions\Exception;
 use Pin\Testing\Concerns\InteractsWithRedis;
 use Pin\Tests\InteractsWithDatabase;
 
@@ -44,3 +46,18 @@ it('relocates a subtree', function () {
         ->and(Menu::find(223)->level)->toBe(4)
         ->and(Menu::find(2234)->path)->toBe('1/12/22/223/2234');
 });
+
+it('rejects a missing parent when building a path', function () {
+    expect(fn () => Menu::buildPath(1, 99999))->toThrow(ModelNotFoundException::class);
+});
+
+it('rejects moving a node into its own subtree', function (bool $self) {
+    $root = MenuFactory::new()->create(['id' => 1]);
+    $child = MenuFactory::new()->create(['id' => 2, 'pid' => 1]);
+
+    expect(fn () => $root->update(['pid' => $self ? $root->id : $child->id]))
+        ->toThrow(Exception::class, '不能以自身或子节点作为父节点');
+
+    expect(Menu::query()->find(1)->path)->toBe('1')
+        ->and(Menu::query()->find(2)->path)->toBe('1/2');
+})->with([true, false]);

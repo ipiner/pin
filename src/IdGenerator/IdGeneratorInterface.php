@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pin\IdGenerator;
 
 /**
@@ -8,11 +10,10 @@ namespace Pin\IdGenerator;
 interface IdGeneratorInterface
 {
     /**
-     * 生成 ID
+     * 生成一个或多个 ID。
      *
-     * @param  int  $count  要生成的 ID 数量，默认为 1
-     * @return int|int[]|string[] 返回单个 ID 或 ID 数组
-     * @return array|int|string
+     * @param  int  $count  生成数量
+     * @return int|string|list<int|string>
      */
     public function generate(int $count = 1);
 }

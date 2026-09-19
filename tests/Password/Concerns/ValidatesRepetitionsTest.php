@@ -32,6 +32,11 @@ it('validates max repeated characters', function (
         '11111a',
         Errors::PasswordTooManyRepeats->code(),
     ],
+    'empty value' => [1, '', 0],
+    'single character' => [1, 'a', Errors::PasswordTooManyRepeats->code()],
+    'separated repeats' => [3, 'aabaa', 0],
+    'repeats at the end' => [3, 'baaa', Errors::PasswordTooManyRepeats->code()],
+    'repeated symbols' => [3, 'a!!!', Errors::PasswordTooManyRepeats->code()],
 ]);
 
 it('returns zero when max repeated characters validation is disabled', function () {

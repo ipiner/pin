@@ -1,7 +1,5 @@
 <?php
 
-/** @noinspection PhpParamsInspection */
-
 declare(strict_types=1);
 
 namespace Pin\Cache;
@@ -9,7 +7,7 @@ namespace Pin\Cache;
 use Illuminate\Support\Facades\Redis;
 
 /**
- * Laravel Cache Store，使用 Redis Hash 保存缓存数据。
+ * Redis Hash 缓存存储。
  */
 class RedisStore implements HashStore
 {

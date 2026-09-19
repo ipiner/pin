@@ -7,21 +7,12 @@ namespace Pin\Errors;
 use Pin\Errors\Attribute\Group;
 
 /**
- * 系统错误码定义（统一错误枚举）
- *
- * 用于定义全局错误码体系，并通过 IError 提供标准化访问能力：
- * - 错误码（code）
- * - 错误信息（message）
- * - HTTP 状态码映射（statusCode）
- *
- * 该枚举作为系统错误的唯一来源
- *
- * 错误码分配：
+ * 系统错误码。
  *
  * - 20xx：验证码
  * - 30xx：上传
- * - >= 10000：应用错误码
- * - 其余：pin 内部
+ * - >= 10000：应用
+ * - 其余：框架内部
  */
 #[Group('pin::errors')]
 enum Errors: string implements IError
@@ -43,28 +34,28 @@ enum Errors: string implements IError
     case AccessDenied = '4030|403|access_denied';
     case Unknown = '9999|unknown';
 
-    // crud
+    // 增删改
     case CreateFailed = '1000|create_failed';
     case UpdateFailed = '1001|update_failed';
     case DeleteFailed = '1002|delete_failed';
     case DataVersionMismatch = '1003|data_version_mismatch';
 
-    // auth
+    // 身份认证
     case AuthUserNotFound = '1010|401|auth_user_not_found';
     case AuthTokenExpired = '1011|401|auth_token_expired';
     case AuthTokenInvalid = '1012|401|auth_token_invalid';
     case AuthTokenMissing = '1013|401|auth_token_missing';
 
-    // token
+    // Token
     case TokenExpired = '1020|token_expired';
     case TokenInvalid = '1021|500|token_invalid';
     case TokenMissing = '1022|token_missing';
 
-    // password
+    // 密码
     case PasswordDecodeFailed = '1030|422|password_decode_failed';
     case PasswordInvalid = '1031|422|password_invalid';
 
-    // password policy
+    // 密码规则
     case PasswordTooShort = '1040|422|password_too_short';
     case PasswordTooLong = '1041|422|password_too_long';
     case PasswordRequiresNumber = '1042|422|password_requires_number';
@@ -80,9 +71,7 @@ enum Errors: string implements IError
     case PasswordTooManyRepeats = '1052|422|password_too_many_repeats';
 
     /**
-     * 根据错误码获取错误定义
-     *
-     * 未命中时返回 Unknown
+     * 查找错误定义。
      */
     public static function get(int $code): IError
     {
@@ -90,7 +79,7 @@ enum Errors: string implements IError
     }
 
     /**
-     * 获取错误消息（支持占位符替换）
+     * 获取错误消息。
      */
     public static function getMessage(int $code, array $replace = []): string
     {

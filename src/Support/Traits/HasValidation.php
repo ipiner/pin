@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
 /**
- * Validation 交互能力
+ * 数据验证与权限校验。
  */
 trait HasValidation
 {
@@ -19,7 +19,7 @@ trait HasValidation
     /**
      * 已验证的数据
      */
-    protected ?array $validated;
+    protected ?array $validated = null;
 
     /**
      * 验证规则
@@ -40,7 +40,6 @@ trait HasValidation
      * 设置验证规则
      *
      * @param  array<string, string|array>  $rules
-     * @return $this
      */
     public function withRules(array $rules): static
     {
@@ -52,8 +51,6 @@ trait HasValidation
 
     /**
      * 权限校验失败后的处理
-     *
-     * 默认抛出 UnauthorizedException。
      *
      * @throws UnauthorizedException
      */
@@ -83,6 +80,14 @@ trait HasValidation
     }
 
     /**
+     * 清除已验证数据。
+     */
+    protected function payloadChanged(): void
+    {
+        $this->validated = null;
+    }
+
+    /**
      * 执行权限校验
      */
     protected function passesAuthorization(): bool
@@ -92,8 +97,6 @@ trait HasValidation
 
     /**
      * 执行数据验证
-     *
-     * @return array 验证后的数据
      *
      * @throws ValidationException
      * @throws UnauthorizedException
@@ -115,7 +118,7 @@ trait HasValidation
     }
 
     /**
-     * 获取自定义验证 attributes
+     * 获取验证字段名称。
      */
     protected function validationAttributes(): array
     {
@@ -139,7 +142,7 @@ trait HasValidation
     }
 
     /**
-     * 创建 Validator 实例
+     * 创建验证器。
      */
     protected function validator(): Validator
     {

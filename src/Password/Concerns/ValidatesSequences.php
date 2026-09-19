@@ -4,17 +4,10 @@ declare(strict_types=1);
 
 namespace Pin\Password\Concerns;
 
-use Illuminate\Support\Collection;
 use Pin\Errors\Errors;
 
 /**
  * 连续顺序字符验证
- *
- * 用于限制密码中连续递增或递减的字符序列长度。
- *
- * 支持检测：
- * - 连续递增字符
- * - 连续递减字符
  */
 trait ValidatesSequences
 {
@@ -38,26 +31,26 @@ trait ValidatesSequences
      */
     protected function validateMaxSequentialCharacters(): int
     {
-        // 递增字符：
-        // abc / 123
-        $has = collect(str_split($this->value))
-            ->chunkWhile(function (string $value, string $key, Collection $chunk) {
-                return ord($value) === ord((string) $chunk->last()) + 1;
-            })
-            ->first(fn ($value) => $value->count() >= $this->maxSequentialCharacters);
+        $ascending = 1;
+        $descending = 1;
 
-        // 递减字符：
-        // cba / 321
-        if (! $has) {
-            $has = collect(str_split($this->value))
-                ->chunkWhile(function (string $value, string $key, Collection $chunk) {
-                    return ord($value) === ord((string) $chunk->last()) - 1;
-                })
-                ->first(fn ($value) => $value->count() >= $this->maxSequentialCharacters);
+        for ($index = 0, $length = strlen($this->value); $index < $length; $index++) {
+            if ($index > 0) {
+                $difference = ord($this->value[$index]) - ord($this->value[$index - 1]);
+                $ascending = $difference === 1 ? $ascending + 1 : 1;
+                $descending = $difference === -1 ? $descending + 1 : 1;
+            }
+
+            if (
+                $ascending >= $this->maxSequentialCharacters
+                || $descending >= $this->maxSequentialCharacters
+            ) {
+                return $this->addError(Errors::PasswordSequenceTooLong, [
+                    'size' => $this->maxSequentialCharacters,
+                ]);
+            }
         }
 
-        return $has
-            ? $this->addError(Errors::PasswordSequenceTooLong, ['size' => $this->maxSequentialCharacters])
-            : 0;
+        return 0;
     }
 }

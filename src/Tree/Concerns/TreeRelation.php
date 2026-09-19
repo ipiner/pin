@@ -7,14 +7,14 @@ namespace Pin\Tree\Concerns;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * TreeRelation
- *
- * 树形结构的关系定义层，负责定义模型之间的“父子关系（Parent-Child Relationship）”。
+ * 树节点关系。
  */
 trait TreeRelation
 {
     /**
-     * 获取当前节点的直接子节点（Direct Children）
+     * 获取直接子节点。
+     *
+     * @return HasMany<static, $this>
      */
     public function children(): HasMany
     {

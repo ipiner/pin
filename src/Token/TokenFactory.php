@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Pin\Token;
 
+use Override;
 use Pin\Token\Contracts\TokenDriver;
+use Pin\Token\Contracts\TokenFactory as FactoryContract;
 
 /**
- * Token 工厂（Token Factory）
+ * Token 工厂。
+ *
+ * @mixin TokenDriver
  */
-class TokenFactory implements Contracts\TokenFactory
+class TokenFactory implements FactoryContract
 {
-    /**
-     * @param  TokenDriver  $driver  Token 驱动实例
-     * @param  array  $config  Token 配置
-     */
     public function __construct(
         protected TokenDriver $driver,
         protected array $config = []
@@ -22,10 +22,7 @@ class TokenFactory implements Contracts\TokenFactory
     }
 
     /**
-     * 动态调用底层驱动方法
-     *
-     * @param  string  $method  方法名
-     * @param  array  $parameters  方法参数
+     * 转发驱动调用。
      */
     public function __call(string $method, array $parameters): mixed
     {
@@ -33,22 +30,17 @@ class TokenFactory implements Contracts\TokenFactory
     }
 
     /**
-     * 编码 Token
+     * 编码 Token。
      *
-     * @param  array|TokenPayload  $payload  Token 载荷
-     * @param  int|null  $expires  过期时间（秒）
+     * @param  int|null  $expires  有效期（秒）
      */
     public function encode(array|TokenPayload $payload, ?int $expires = null): string
     {
-        $payload = is_array($payload) ? new TokenPayload($payload) : $payload;
-
-        return $this->driver->encode($payload, $expires);
+        return $this->driver->encode(TokenPayload::new($payload), $expires);
     }
 
     /**
-     * 解码 Token
-     *
-     * @param  string  $token  Token 字符串
+     * 解码 Token。
      */
     public function decode(string $token): Token
     {
@@ -56,8 +48,9 @@ class TokenFactory implements Contracts\TokenFactory
     }
 
     /**
-     * 获取底层驱动实例
+     * 获取驱动。
      */
+    #[Override]
     public function driver(): TokenDriver
     {
         return $this->driver;

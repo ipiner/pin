@@ -8,16 +8,13 @@ use Pin\Models\Model;
 use Pin\Support\Traits\HasModel;
 
 /**
- * 模型交互能力
- *
- * 提供 Service 与 Model 之间的基础桥接能力
+ * 模型查找
  *
  * @template TModel of Model
- *
- * @use HasModel<TModel>
  */
 trait InteractsWithModel
 {
+    /** @use HasModel<TModel> */
     use HasModel;
 
     /**

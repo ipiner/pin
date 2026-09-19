@@ -6,69 +6,70 @@ namespace Pin\Token\Drivers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Str;
-use Pin\Support\DataBag;
+use Override;
 use Pin\Token\Exceptions\TokenExpiredException;
+use Pin\Token\Exceptions\TokenInvalidException;
 use Pin\Token\Exceptions\TokenMissingException;
 use Pin\Token\Token;
 use Pin\Token\TokenPayload;
 
 /**
- * Session Token 驱动
+ * Session Token 驱动。
  */
 class SessionDriver extends Driver
 {
     use AesHelper;
 
     /**
-     * 驱动配置
+     * 驱动配置。
      */
     protected SessionDriverConfig $config;
 
     public function __construct(protected Repository $cache, array $config)
     {
-        // 如果配置不完整，则与默认配置合并
-        if (count($config) < 3) {
-            $config = array_merge(config('pin.token.drivers.session'), $config);
-        }
-
-        $this->config = new SessionDriverConfig($config);
+        $this->config = new SessionDriverConfig(array_replace(
+            config('pin.token.drivers.session', []),
+            $config,
+        ));
     }
 
     /**
-     * 解码 Token
+     * 解码 Token。
      *
+     * @throws TokenInvalidException
      * @throws TokenExpiredException
      * @throws TokenMissingException
      */
+    #[Override]
     public function decode(string $encodedPayload): Token
     {
         $token = $this->decrypt($encodedPayload);
 
-        // max_age：绝对生命周期控制（不可恢复）
+        if (! isset($token->iat, $token->expires, $token->jti)) {
+            throw new TokenInvalidException($token);
+        }
+
         $this->validateMaxAge($token);
-
-        // 从缓存中重新加载过期时间
         $this->reloadExpiredAt($token);
-
-        // 统一过期校验
         $this->validateExpired($token);
-
-        // 自动续期逻辑
         $this->refresh($token);
 
         return $token;
     }
 
     /**
-     * 生成 Token
+     * 编码 Token。
      *
-     * @param  int|null  $expires  覆盖默认过期时间
+     * @param  int|null  $expires  有效期（秒）
      */
+    #[Override]
     public function encode(TokenPayload $payload, ?int $expires = null): string
     {
+        $now = now()->getTimestamp();
+
         $payload->expires ??= $expires ?? $this->config->expires;
-        $payload->iat ??= now()->getTimestamp();
-        $payload->exp ??= now()->getTimestamp() + $payload->expires;
+        $payload->iat ??= $now;
+        $payload->exp ??= $now + $payload->expires;
         $payload->jti ??= $this->config->cache_prefix.Str::uuid();
 
         $this->persist($payload);
@@ -77,7 +78,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 主动注销 Token
+     * 注销 Token。
      */
     public function forget(Token|string|null $token): bool
     {
@@ -85,19 +86,17 @@ class SessionDriver extends Driver
             return false;
         }
 
-        if (is_string($token)) {
-            return $this->cache->forget($token);
-        }
-
-        return $this->cache->forget($token->jti);
+        return $this->cache->forget(is_string($token) ? $token : $token->jti);
     }
 
     /**
-     * 判断 Token 是否过期
+     * 判断 Token 是否过期。
      */
+    #[Override]
     protected function isExpired(Token $token): bool
     {
         $expired = parent::isExpired($token);
+
         if ($expired) {
             $this->forget($token);
         }
@@ -106,13 +105,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 持久化 token 信息到 cache
-     *
-     * 只存：
-     * - jti => exp
-     *
-     * TTL：
-     * - 2 倍 expires（用于 decode 阶段容错判断）
+     * 缓存 Token 过期时间。
      */
     protected function persist(TokenPayload $payload): bool
     {
@@ -124,7 +117,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 自动刷新入口
+     * 按需续期。
      */
     protected function refresh(Token $token): bool
     {
@@ -132,7 +125,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 判断是否需要刷新
+     * 判断是否需要续期。
      */
     protected function shouldRefresh(Token $token): bool
     {
@@ -144,7 +137,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 刷新 Token（延长 exp）
+     * 延长 Token 有效期。
      */
     protected function touch(Token $token): bool
     {
@@ -154,7 +147,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 验证最大生命周期
+     * 校验最大有效期。
      */
     protected function validateMaxAge(Token $token): void
     {
@@ -167,29 +160,16 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 从缓存中重新加载过期时间
+     * 读取缓存中的过期时间。
      */
     protected function reloadExpiredAt(Token $token): void
     {
-        $exp = $this->cache->get($token->jti);
-        if (! $exp) {
+        $expiresAt = $this->cache->get($token->jti);
+
+        if (! $expiresAt) {
             throw new TokenMissingException($token);
         }
 
-        $token->exp = (int) $exp;
+        $token->exp = (int) $expiresAt;
     }
-}
-
-/**
- * Session 驱动配置对象
- *
- * 用于控制 Session Token 的生命周期与行为策略：
- * - expires        默认过期时间（秒）
- * - cache_prefix    cache key 前缀
- * - max_age         token 最大有效期（绝对生命周期）
- * - refresh_before  距离过期多少秒内自动续期
- */
-class SessionDriverConfig extends DataBag
-{
-    // 仅作为结构定义容器
 }

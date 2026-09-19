@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pin\Services\Results;
 
+use Override;
 use Pin\Models\Model;
 
 /**
@@ -14,18 +15,18 @@ use Pin\Models\Model;
 class DeleteResult extends Result
 {
     /**
-     * 删除结果
-     *
-     * @param  TModel  $model  删除对应模型
-     * @param  bool  $deleted  是否删除成功
+     * @param  TModel  $model
      */
-    public function __construct(public $model, public bool $deleted)
+    public function __construct(public Model $model, public bool $deleted)
     {
     }
 
     /**
-     * 转换为删除结果响应数据
+     * 删除结果数据
+     *
+     * @return array{deleted: bool}
      */
+    #[Override]
     public function toArray(): array
     {
         return [
@@ -36,6 +37,7 @@ class DeleteResult extends Result
     /**
      * 响应消息
      */
+    #[Override]
     public function message(): string
     {
         return __($this->deleted ? 'Delete successfully' : 'Delete failed');

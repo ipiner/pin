@@ -8,10 +8,20 @@ use App\Routes\User\UserRoute;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Pin\Http\ApiResponse;
+use Pin\Route\InteractsWithRoute;
+use Pin\Route\Routable;
 use Pin\Route\RouteRegistrar;
 use Pin\Tests\InteractsWithDatabase;
 
 uses(InteractsWithDatabase::class);
+
+enum ScopedUserRoute: string implements Routable
+{
+    use InteractsWithRoute;
+
+    case Update = 'PUT:/api/teams/{team}/users/{id}';
+    case Delete = 'DELETE:/api/teams/{team}/users/{id}';
+}
 
 beforeEach(function () {
     RouteRegistrar::register(UserRoute::class);
@@ -147,3 +157,26 @@ it('sends update request', function () {
         ->assertJsonPath('data.route.action.as', 'users.update')
         ->assertJsonPath('data.post.name', 'foo');
 });
+
+it('preserves additional route parameters in mutation assertions', function (string $method) {
+    $route = $method === 'updated' ? ScopedUserRoute::Update : ScopedUserRoute::Delete;
+    $route->register(function (Request $request, int $team, int $id) use ($method) {
+        expect($team)->toBe(42);
+        $user = User::findOrFail($id);
+
+        if ($method === 'updated') {
+            $user->update($request->json()->all());
+        } else {
+            $user->delete();
+        }
+
+        return ApiResponse::make(0, '', [$method => true]);
+    });
+
+    $route->testing($this)
+        ->withModel(User::class)
+        ->withFactory(UserFactory::class)
+        ->withRouteParams(['team' => 42, 'id' => -1])
+        ->withPayload(['realname' => 'Updated name'])
+        ->{$method}();
+})->with(['updated', 'deleted']);

@@ -27,3 +27,11 @@ it('replaces the payload entirely', function () {
 it('retrieves nested payload value by key', function () {
     expect($this->action->payload(['user' => ['id' => 1]])->payload('user.id'))->toBe(1);
 });
+
+it('sets explicit null values and clears the payload', function () {
+    $this->action->payload('user.id', null);
+
+    expect($this->action->payload())->toBe(['user' => ['id' => null]])
+        ->and($this->action->payload(null))->toBe($this->action)
+        ->and($this->action->payload())->toBe([]);
+});

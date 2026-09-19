@@ -27,3 +27,31 @@ it('throws exception when encrypting with invalid key', function () {
 
     expect(fn () => Aes::encrypt(uniqid()))->toThrow(CryptException::class);
 });
+
+it('wraps empty ciphertext failures', function () {
+    expect(fn () => Aes::decrypt(''))->toThrow(CryptException::class);
+});
+
+it('keeps plaintext out of encryption error context', function () {
+    config(['pin.crypt.iv' => 'short']);
+
+    try {
+        Aes::encrypt('sensitive-plaintext');
+        $this->fail('Expected encryption to fail.');
+    } catch (CryptException $exception) {
+        expect($exception->getContext())->not->toHaveKey('plain')
+            ->and($exception->getMessage())->not->toContain('sensitive-plaintext');
+    }
+});
+
+it('decrypts existing payload formats', function (string $encrypted) {
+    config([
+        'pin.crypt.key' => '0123456789abcdef',
+        'pin.crypt.iv' => 'fedcba9876543210',
+    ]);
+
+    expect(Aes::decrypt($encrypted))->toBe('兼容旧数据:0');
+})->with([
+    'configured key' => 'akWiG46pvxbD5tD9pWQKqLLlTd8l5kSbEfzN9Oe79nzo=',
+    'random key' => 'A0123456789abcdefnI6zeT6ssi7gFejFqa6aWr5JdAG1Ha4VebNV5EDXAa4=',
+]);

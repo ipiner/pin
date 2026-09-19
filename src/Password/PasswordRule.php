@@ -11,12 +11,12 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 class PasswordRule implements ValidationRule
 {
-    use Concerns\HandlesValidation,
-        Concerns\ValidatesComposition,
-        Concerns\ValidatesLength,
-        Concerns\ValidatesRepetitions,
-        Concerns\ValidatesSequences,
-        Concerns\ValidatesWhitespace;
+    use Concerns\HandlesValidation;
+    use Concerns\ValidatesComposition;
+    use Concerns\ValidatesLength;
+    use Concerns\ValidatesRepetitions;
+    use Concerns\ValidatesSequences;
+    use Concerns\ValidatesWhitespace;
 
     public function __construct(protected bool $withErrorCode = true)
     {

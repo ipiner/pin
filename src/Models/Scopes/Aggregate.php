@@ -6,12 +6,10 @@ namespace Pin\Models\Scopes;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Query\Expression;
 
 /**
- * Aggregate Scopes
- *
- * 提供 Eloquent 查询构建器的聚合函数封装，方便在 group by 查询中使用
+ * 聚合查询宏
  */
 class Aggregate
 {
@@ -20,12 +18,7 @@ class Aggregate
      */
     public function addSelectAvg(): Closure
     {
-        return function (string $column, ?string $alias = null) {
-            /** @var Builder $this */
-            return $this->addSelect(
-                DB::raw("avg($column) as ".($alias ?: "avg_{$column}"))
-            );
-        };
+        return $this->aggregate('avg');
     }
 
     /**
@@ -36,7 +29,7 @@ class Aggregate
         return function (string $column = '*', string $alias = 'total') {
             /** @var Builder $this */
             return $this->addSelect(
-                DB::raw("count($column) as ".($alias ?: "count_{$column}"))
+                new Expression("count($column) as ".($alias ?: "count_{$column}"))
             );
         };
     }
@@ -46,12 +39,7 @@ class Aggregate
      */
     public function addSelectMax(): Closure
     {
-        return function (string $column, ?string $alias = null) {
-            /** @var Builder $this */
-            return $this->addSelect(
-                DB::raw("max($column) as ".($alias ?: "max_{$column}"))
-            );
-        };
+        return $this->aggregate('max');
     }
 
     /**
@@ -59,12 +47,7 @@ class Aggregate
      */
     public function addSelectMin(): Closure
     {
-        return function (string $column, ?string $alias = null) {
-            /** @var Builder $this */
-            return $this->addSelect(
-                DB::raw("min($column) as ".($alias ?: "min_{$column}"))
-            );
-        };
+        return $this->aggregate('min');
     }
 
     /**
@@ -72,10 +55,18 @@ class Aggregate
      */
     public function addSelectSum(): Closure
     {
-        return function (string $column, ?string $alias = null) {
+        return $this->aggregate('sum');
+    }
+
+    /**
+     * 创建聚合字段宏
+     */
+    private function aggregate(string $function): Closure
+    {
+        return function (string $column, ?string $alias = null) use ($function) {
             /** @var Builder $this */
             return $this->addSelect(
-                DB::raw("sum($column) as ".($alias ?: "sum_{$column}"))
+                new Expression("$function($column) as ".($alias ?: "{$function}_{$column}"))
             );
         };
     }

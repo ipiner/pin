@@ -36,7 +36,7 @@ it('lists resources', function (string $name, string $value) {
 ]);
 
 it('validates create payload', function (string $name) {
-    expect(validatesCreatePayload($name))->toBe("validates payload for updating {$name}");
+    expect(validatesCreatePayload($name))->toBe("validates payload for creating {$name}");
 })->with('descriptions');
 
 it('validates create required', function (string $name) {

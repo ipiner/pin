@@ -7,22 +7,17 @@ namespace Pin\Tree\Concerns;
 use WeakMap;
 
 /**
- * HasTree
- *
- * Tree 模型能力的“组合入口层（Facade Trait）”，
- * 将树结构的所有能力模块统一挂载到 Eloquent Model 上。
+ * Pin 模型的树结构能力。
  *
  * @property int $pid
  * @property int $level
  * @property int $sort
  * @property string $name
  * @property string $path
- * @property int[] $paths
+ * @property list<int> $paths
  */
 trait HasTree
 {
-    protected static WeakMap $treeSnapshots;
-
     use TreeIdGenerator,
         TreeLevel,
         TreeNavigation,
@@ -32,7 +27,14 @@ trait HasTree
         TreeRelation;
 
     /**
-     * 自动补齐树节点 id、path、level 和排序值
+     * 移动前的路径。
+     *
+     * @var WeakMap<static, string>
+     */
+    protected static WeakMap $treeSnapshots;
+
+    /**
+     * 注册节点初始化和移动事件。
      */
     public static function bootHasTree(): void
     {
@@ -52,10 +54,11 @@ trait HasTree
         static::updating(function (self $item) {
             if ($item->isDirty('pid')) {
                 $item->pid = (int) $item->pid;
-                static::$treeSnapshots[$item] = $item->getRawOriginal();
+                $item->ensureParentValid();
                 $item->path = static::buildPath($item->id, $item->pid);
                 $item->level = $item->pathLevel();
                 $item->ensureLevelValid();
+                static::$treeSnapshots[$item] = $item->getRawOriginal('path');
             }
 
             if ($item->sort === -1) {
@@ -68,10 +71,11 @@ trait HasTree
                 return;
             }
 
-            $original = static::$treeSnapshots[$item];
-            $item::relocateSubtree($original['path'], $item->path);
-            unset(static::$treeSnapshots[$item]);
-
+            try {
+                $item::relocateSubtree(static::$treeSnapshots[$item], $item->path);
+            } finally {
+                unset(static::$treeSnapshots[$item]);
+            }
         });
     }
 }

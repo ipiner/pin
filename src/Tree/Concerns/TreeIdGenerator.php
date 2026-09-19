@@ -7,16 +7,12 @@ namespace Pin\Tree\Concerns;
 use Pin\IdGenerator\IdGenerator;
 
 /**
- * TreeIdGenerator
- *
- * 树结构节点 ID 生成策略层
+ * 树节点 ID 生成。
  */
 trait TreeIdGenerator
 {
     /**
-     * 生成 Tree 节点唯一 ID
-     *
-     * @return int 唯一节点 ID
+     * 生成节点 ID。
      */
     public function generateNodeId(): int
     {

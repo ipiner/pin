@@ -6,6 +6,7 @@ namespace Pin\Scramble;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Override;
 
 /**
  * 下拉选项响应文档资源
@@ -13,13 +14,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class SelectOption extends JsonResource implements SchemaType
 {
     /**
-     * 定义选项响应结构
+     * 选项响应数据
+     *
+     * @return array{label: string, value: int|string}
      */
+    #[Override]
     public function toArray(Request $request): array
     {
         return [
             'label' => '',
-            // @var int|string
+            /** @var int|string */
             'value' => 0,
         ];
     }

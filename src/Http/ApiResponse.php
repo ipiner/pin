@@ -6,6 +6,7 @@ namespace Pin\Http;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\JsonResponse;
+use Override;
 use Pin\Database\QueryMonitor;
 use Pin\Errors\Errors;
 use Pin\Errors\IError;
@@ -13,9 +14,7 @@ use Pin\Support\Size;
 use Pin\Support\Timer;
 
 /**
- * API 统一响应对象
- *
- * 提供业务状态码、消息、数据、元信息和调试信息
+ * API 统一响应
  *
  * @template TData
  */
@@ -74,40 +73,34 @@ class ApiResponse implements Responsable
         mixed $data = null,
         ?array $meta = null
     ): static {
-        $resp = app()->make(static::class);
-        $resp->code = is_int($code) ? $code : $code->code();
-        $resp->data = $data;
-        $resp->meta = $meta;
-        $resp->message = $message;
-        $resp->message = $resp->resolveMessage();
+        $response = app(static::class);
+        $response->code = is_int($code) ? $code : $code->code();
+        $response->data = $data;
+        $response->meta = $meta;
+        $response->message = $message;
+        $response->message = $response->resolveMessage();
 
-        return $resp;
+        return $response;
     }
 
     /**
-     * 判断响应是否符合 ApiResponse 结构。
+     * 是否符合 API 响应结构
      */
     public static function matches(mixed $data): bool
     {
-        $data = match (true) {
-            $data instanceof JsonResponse => $data->getData(true),
-            is_array($data) => $data,
-            default => null,
-        };
+        if ($data instanceof JsonResponse) {
+            $data = $data->getData(true);
+        }
 
         return is_array($data)
             && isset($data['code'], $data['message'])
             && array_key_exists('data', $data)
-            && is_int($data['code']);
+            && is_int($data['code'])
+            && is_string($data['message']);
     }
 
     /**
-     * 转换为数组
-     *
-     * 此方法仅返回基础响应结构，主要用于Scramble识别
-     * - 不包含 Debug 信息
-     * - 不会移除空字段
-     * - 最终响应结构由 `responseData()` 进一步处理
+     * 转换为基础响应数组。
      *
      * @return array{
      *     code:int,
@@ -144,14 +137,13 @@ class ApiResponse implements Responsable
     /**
      * 转换为 JsonResponse
      */
+    #[Override]
     public function toResponse($request): JsonResponse
     {
         return new JsonResponse(
             $this->responseData(),
             $this->statusCode,
-            [
-                ...$this->headers,
-            ],
+            $this->headers,
             static::JSON_ENCODE_OPTIONS,
         );
     }
@@ -192,8 +184,6 @@ class ApiResponse implements Responsable
     {
         $monitor = app(QueryMonitor::class);
 
-        $duration = Timer::durationSinceStartOfRequest();
-
         return [
             /**
              * 请求唯一 ID
@@ -202,18 +192,13 @@ class ApiResponse implements Responsable
 
             /**
              * 当前运行环境
-             *
-             * 例如：
-             * - local
-             * - testing
-             * - production
              */
             'env' => app()->environment(),
 
             /**
              * 请求耗时（毫秒）
              */
-            'time' => $duration->milliseconds(),
+            'time' => Timer::durationSinceStartOfRequest()->milliseconds(),
 
             /**
              * SQL 执行数量
@@ -251,10 +236,7 @@ class ApiResponse implements Responsable
     }
 
     /**
-     * 构建最终响应数据
-     *
-     * - 移除空 meta
-     * - Debug 环境加入 debug
+     * 构建响应数据。
      *
      * @return array<string, mixed>
      */

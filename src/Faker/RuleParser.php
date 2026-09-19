@@ -7,36 +7,38 @@ namespace Pin\Faker;
 use Pin\Validation\Rules\Enum;
 
 /**
- * FakeRule 解析器
- *
- * 从 Validation Rules 中提取 FakeRule
+ * 生成规则解析器
  */
 class RuleParser
 {
     /**
-     * 提取 FakeRule
+     * 提取或推导生成规则
      */
     public function parse(RuleBag $rules): ?FakeRule
     {
         foreach ($rules->rules() as $rule) {
             $parsed = $this->parseRule($rule);
-            if ($parsed !== null) {
+            if (! $parsed) {
+                continue;
+            }
+
+            if ($parsed->generator() !== 'infer') {
                 return $parsed;
             }
+
+            break;
         }
 
         return app(InferManager::class)->infer($rules);
     }
 
     /**
-     * 解析单个 rule
+     * 解析单条规则
      */
     protected function parseRule(mixed $rule): ?FakeRule
     {
-        // fake:xxx
         if (is_string($rule) && str_starts_with($rule, 'fake:')) {
-            $rule = substr($rule, 5);
-            $arguments = array_map('trim', explode(',', $rule));
+            $arguments = array_map('trim', explode(',', substr($rule, 5)));
             $generator = array_shift($arguments);
 
             return Fake::{$generator}(...$arguments);

@@ -11,17 +11,14 @@ use Illuminate\Redis\Connections\PhpRedisConnection;
  */
 class RedisHashDriver implements HashDriver
 {
-    /**
-     * 创建 PhpRedis Hash 命令适配器
-     */
     public function __construct(protected PhpRedisConnection $connection)
     {
     }
 
     /**
-     * 将未封装的 Redis 命令透传给连接实例
+     * 转发 Redis 命令。
      */
-    public function __call(string $method, mixed $parameters): mixed
+    public function __call(string $method, array $parameters): mixed
     {
         return $this->connection->{$method}(...$parameters);
     }
@@ -71,7 +68,9 @@ class RedisHashDriver implements HashDriver
      */
     public function hMGet(string $key, array $fields): array
     {
-        return $this->connection->hmget($key, ...$fields);
+        $values = $this->connection->command('hmget', [$key, $fields]);
+
+        return array_map(fn ($field) => $values[$field], $fields);
     }
 
     /**
@@ -83,7 +82,15 @@ class RedisHashDriver implements HashDriver
     }
 
     /**
-     * 获取键剩余过期时间
+     * {@inheritDoc}
+     */
+    public function persist(string $key): bool
+    {
+        return (bool) $this->connection->persist($key);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function ttl(string $key): int
     {

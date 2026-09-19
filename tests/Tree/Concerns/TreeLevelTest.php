@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Factories\MenuFactory;
+use App\Models\Menu;
 use Pin\Exceptions\Exception;
 use Pin\Testing\Concerns\InteractsWithRedis;
 use Pin\Tests\InteractsWithDatabase;
@@ -54,4 +55,20 @@ it('cannot move subtree beyond max level', function () {
     expect(fn () => $root->update([
         'pid' => $target->id,
     ]))->toThrow(Exception::class, '层级不能大于2');
+});
+
+it('does not query persisted nodes when validating an unsaved root', function () {
+    $node = new Menu(['id' => 100, 'pid' => 0, 'path' => '100', 'level' => 1]);
+    $connection = $node->getConnection();
+    $connection->enableQueryLog();
+    $connection->flushQueryLog();
+
+    try {
+        $this->invoker($node)->ensureLevelValid();
+
+        expect($connection->getQueryLog())->toBe([]);
+    } finally {
+        $connection->disableQueryLog();
+        $connection->flushQueryLog();
+    }
 });

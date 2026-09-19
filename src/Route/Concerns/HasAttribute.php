@@ -7,12 +7,17 @@ namespace Pin\Route\Concerns;
 use Pin\Attributes\Attribute;
 
 /**
- * 提供 Route Enum Attribute 的读取能力
+ * 路由属性读取
  */
 trait HasAttribute
 {
     /**
-     * 获取当前枚举 case 上指定类型的 Attribute
+     * 获取路由属性
+     *
+     * @template TAttribute of object
+     *
+     * @param  class-string<TAttribute>  $class
+     * @return TAttribute|null
      */
     public function attribute(string $class): mixed
     {

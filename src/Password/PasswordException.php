@@ -7,9 +7,10 @@ namespace Pin\Password;
 use Override;
 use Pin\Errors\Errors;
 use Pin\Exceptions\Exception;
+use Psr\Log\LogLevel;
 
 /**
- * 密码加解密和校验相关异常。
+ * 密码异常
  */
 class PasswordException extends Exception
 {
@@ -18,7 +19,7 @@ class PasswordException extends Exception
     {
         $this->withResponseMessage(Errors::PasswordInvalid->message())
             ->withStatusCode(422)
-            ->withLogLevel('info')
+            ->withLogLevel(LogLevel::INFO)
             ->withReport();
     }
 }

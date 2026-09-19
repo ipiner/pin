@@ -7,17 +7,12 @@ namespace Pin\Errors\Attribute;
 use Attribute;
 
 /**
- * 翻译分组
- *
- * 例如：
- * - pin::errors
- * - errors
+ * 错误消息翻译分组。
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_CLASS_CONSTANT)]
 readonly class Group
 {
-    public function __construct(public string|bool $value)
+    public function __construct(public string|false $value)
     {
-        //
     }
 }

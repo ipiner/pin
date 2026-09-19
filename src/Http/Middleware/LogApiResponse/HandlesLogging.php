@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pin\Http\Middleware\LogApiResponse;
 
 /**
- * 控制是否记录当前请求日志
+ * 响应日志记录策略
  */
 trait HandlesLogging
 {
@@ -24,7 +26,7 @@ trait HandlesLogging
     }
 
     /**
-     * 强制记录模式
+     * 是否强制记录日志
      */
     protected function isForceLogEnabled(): bool
     {
@@ -32,7 +34,7 @@ trait HandlesLogging
 
         return app()->hasDebugModeEnabled()
             || $enabled === true
-            || $enabled !== false && $this->request->isRequest($enabled);
+            || ($enabled !== false && $this->request->isRequest($enabled));
     }
 
     /**

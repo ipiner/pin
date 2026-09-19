@@ -8,85 +8,74 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * 查询作用域引擎（Query Scope Engine）
- *
- * - 将自定义查询 DSL 转换为 Eloquent 查询条件
- * - 动态查询、复杂筛选、前端参数解析
+ * 查询条件作用域
  */
 class QueryableScope
 {
     /**
-     * 查询分发核心
+     * 应用查询条件
      */
     public static function query(
         Builder $builder,
         string $column,
-        string|array|null $value,
+        mixed $value,
         string|QueryableType $type = QueryableType::Eq
     ): Builder {
         if (blank($value)) {
             return $builder;
         }
 
-        [$type, $params] = QueryableType::parse($type);
-
-        // like:title|content
-        if ($params) {
-            $column = implode('|', $params);
-        }
+        [$type, $columns] = QueryableType::parse($type);
+        $column = implode('|', array_map(
+            $builder->getModel()->transformQueryableColumn(...),
+            $columns ?: explode('|', $column)
+        ));
 
         return match (true) {
-            // in
-            is_array($value), $type->isIn() => static::applyIn($builder, $column, $value, $type),
-
-            // > / >= / < / <=
-            $type->comparisonSymbol() !== null => static::applyCompare($builder, $column, $value, $type),
-
-            // like
-            $type->isLike() => static::applyLike($builder, $column, $value, $type),
-
-            // 区间查询
             $type->isRange() => static::applyRange($builder, $column, $value, $type),
-
-            // q:id|name
+            is_array($value), $type->isIn() => static::applyIn($builder, $column, $value, $type),
+            $type->comparisonSymbol() !== null => static::applyCompare(
+                $builder, $column, $value, $type
+            ),
+            $type->isLike() => static::applyLike($builder, $column, $value, $type),
             $type === QueryableType::Ns => static::applyNs($builder, $column, $value),
-
             default => $builder->where($column, static::value($value, $type, false)),
         };
     }
 
     /**
-     * 注册为 Builder 宏入口
+     * 创建查询宏
      */
     public static function queryable(): Closure
     {
         return function (Queryable|QueryableCondition|array|null $queryable) {
-            if ($queryable === null) {
+            /** @var Builder $this */
+            if (! $queryable) {
                 return $this;
             }
 
             if (is_array($queryable)) {
                 $queryable = Queryable::fromRequest($queryable);
             } elseif ($queryable instanceof QueryableCondition) {
-                $condition = $queryable;
-                $queryable = new Queryable([], []);
-                $queryable->conditions[$condition->column] = $condition;
+                return QueryableScope::query(
+                    $this,
+                    $queryable->column,
+                    $queryable->value,
+                    $queryable->type
+                );
             }
 
-            QueryableScope::whereQueryable($this, $queryable);
-
-            return $this;
+            return QueryableScope::whereQueryable($this, $queryable);
         };
     }
 
     /**
-     * 处理 Queryable 对象
+     * 应用查询条件集合
      */
     public static function whereQueryable(Builder $builder, Queryable $queryable): Builder
     {
         foreach ($queryable->conditions as $condition) {
-            $column = $builder->getModel()->transformQueryableColumn($condition->column);
-            static::query($builder, $column, $condition->value, $condition->type);
+            static::query($builder, $condition->column, $condition->value, $condition->type);
         }
 
         return $queryable->apply($builder);
@@ -98,7 +87,7 @@ class QueryableScope
     protected static function applyCompare(
         Builder $builder,
         string $column,
-        string $value,
+        mixed $value,
         QueryableType $type
     ): Builder {
         return $builder->where(
@@ -114,16 +103,14 @@ class QueryableScope
     protected static function applyIn(
         Builder $builder,
         string $column,
-        string|array $value,
+        mixed $value,
         QueryableType $type
     ): Builder {
         return $builder->whereIn($column, static::value($value, $type, true));
     }
 
     /**
-     * LIKE 查询（支持多字段）
-     *
-     * column: title|description
+     * LIKE 查询
      */
     protected static function applyLike(
         Builder $builder,
@@ -131,52 +118,40 @@ class QueryableScope
         mixed $value,
         QueryableType $type
     ): Builder {
-        $value = static::likeValue($value, $type);
+        $value = static::likeValue((string) $value, $type);
 
         if (! str_contains($column, '|')) {
             return $builder->where($column, 'like', $value);
         }
 
-        $builder->where(function (Builder $builder) use ($column, $value) {
+        return $builder->where(static function (Builder $builder) use ($column, $value) {
             foreach (explode('|', $column) as $name) {
                 $builder->orWhere($name, 'like', $value);
             }
         });
-
-        return $builder;
     }
 
     /**
-     * NS 查询（智能匹配）
-     *
-     * 示例：
-     * ns:id|name
-     * ns:id,name
-     *
-     * - 数字 → where id = value
-     * - 字符串 → where name like %value%
+     * 数字精确查询，文本模糊查询
      */
     protected static function applyNs(Builder $builder, string $column, mixed $value): Builder
     {
-        $arr = explode(
-            '|',
-            str_replace(',', '|', $column),
-            2
-        );
+        $columns = explode('|', str_replace(',', '|', $column), 2);
 
-        if (ctype_digit($value)) {
-            $builder->where($arr[0], (int) $value);
-        } else {
-            static::applyLike($builder, $arr[1], $value, QueryableType::Like);
+        if (ctype_digit((string) $value)) {
+            return $builder->where($columns[0], (int) $value);
         }
 
-        return $builder;
+        return static::applyLike(
+            $builder,
+            $columns[1] ?? $columns[0],
+            $value,
+            QueryableType::Like
+        );
     }
 
     /**
      * 区间查询
-     *
-     * value: "start,end"
      */
     protected static function applyRange(
         Builder $builder,
@@ -184,15 +159,17 @@ class QueryableScope
         mixed $value,
         QueryableType $type
     ): Builder {
-        $arr = explode(',', $value);
+        $bounds = is_array($value) ? $value : explode(',', (string) $value);
 
-        return $builder
-            ->when(
-                filled($arr[0] ?? null),
-                fn () => $builder->where($column, '>=', static::value($arr[0], $type, false)))
-            ->when(
-                filled($arr[1] ?? null),
-                fn () => $builder->where($column, '<=', static::value($arr[1], $type, false)));
+        if (filled($bounds[0] ?? null)) {
+            $builder->where($column, '>=', static::value($bounds[0], $type, false));
+        }
+
+        if (filled($bounds[1] ?? null)) {
+            $builder->where($column, '<=', static::value($bounds[1], $type, false));
+        }
+
+        return $builder;
     }
 
     /**
@@ -208,21 +185,29 @@ class QueryableScope
     }
 
     /**
-     * 统一值处理
+     * 转换查询值
      */
     protected static function value(
-        array|string $value,
+        mixed $value,
         QueryableType $type,
         bool $asArray
-    ): array|float|string {
+    ): mixed {
         if (! $asArray) {
-            return $type->isNumeric() ? (float) $value : $value;
+            return $type->isNumeric() ? static::numericValue($value) : $value;
         }
 
-        $value = is_array($value) ? $value : explode(',', $value);
+        $value = is_array($value) ? $value : explode(',', (string) $value);
 
         return $type->isNumeric()
-            ? array_map('floatval', $value)
+            ? array_map(static::numericValue(...), $value)
             : $value;
+    }
+
+    /**
+     * 转换数值
+     */
+    protected static function numericValue(mixed $value): int|float
+    {
+        return is_numeric($value) ? $value + 0 : (float) $value;
     }
 }

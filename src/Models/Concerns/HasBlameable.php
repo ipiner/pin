@@ -26,12 +26,13 @@ trait HasBlameable
      */
     public static function bootHasBlameable(): void
     {
-        static::creating(function ($model) {
-            $model->{static::CREATED_BY} = Actor::id();
-            $model->{static::UPDATED_BY} = Actor::id();
+        static::creating(static function ($model) {
+            $actorId = Actor::id();
+            $model->{static::CREATED_BY} = $actorId;
+            $model->{static::UPDATED_BY} = $actorId;
         });
 
-        static::updating(function ($model) {
+        static::updating(static function ($model) {
             $model->{static::UPDATED_BY} = Actor::id();
         });
     }

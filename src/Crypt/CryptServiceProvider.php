@@ -13,16 +13,16 @@ use Pin\Support\ServiceProvider;
 class CryptServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
-     * Bootstrap the application services.
+     * 注册加解密服务。
      */
-    public function boot(): void
+    public function register(): void
     {
         $this->app->singleton('pin.crypt.aes', Aes::class);
         $this->app->singleton('pin.crypt.rsa', Rsa::class);
     }
 
     /**
-     * Get the services provided by the provider.
+     * 获取延迟加载的服务。
      */
     public function provides(): array
     {

@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace Pin\Tree;
 
 use Illuminate\Database\Eloquent\Builder;
+use Override;
 use Pin\Errors\Errors;
 use Pin\Exceptions\Exception;
 use Pin\Models\Model;
+use Pin\Services\ModelService as BaseModelService;
 
 /**
- * 树结构模型增删改查服务
+ * 树节点服务。
  *
  * @template TModel of Model
  *
- * @extends \Pin\Services\ModelService<TModel>
+ * @extends BaseModelService<TModel>
  */
-class ModelService extends \Pin\Services\ModelService
+class ModelService extends BaseModelService
 {
     /**
      * 资源名称
@@ -24,18 +26,24 @@ class ModelService extends \Pin\Services\ModelService
     public string $resourceName;
 
     /**
-     * 创建查询构建器
+     * 创建有序查询。
+     *
+     * @return Builder<TModel>
      */
+    #[Override]
     protected function queryBuilder(): Builder
     {
         return $this->modelClass::orderedQuery()->queryable($this->queryable);
     }
 
     /**
-     * 删除前置检查
+     * 校验节点能否删除。
+     *
+     * @param  TModel  $model
      *
      * @throws Exception
      */
+    #[Override]
     protected function deleting($model): void
     {
         parent::deleting($model);

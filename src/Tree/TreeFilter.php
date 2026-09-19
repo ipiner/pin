@@ -8,18 +8,16 @@ use Illuminate\Support\Collection;
 use Pin\Models\Model;
 
 /**
- * TreeFilter
- *
- * 树结构过滤器（Structure-aware Tree Filter）。
+ * 树结构过滤器。
  */
 class TreeFilter
 {
     /**
-     * 过滤树结构数据，并自动维护结构完整性。
+     * 过滤节点并修剪空分支。
      *
-     * @param  Collection<Model>  $models
-     * @param  callable(Model):bool  $predicate
-     * @return Collection<Model>
+     * @param  Collection<array-key, Model>  $models
+     * @param  callable(Model): bool  $predicate
+     * @return Collection<int, Model>
      */
     public function filter(Collection $models, callable $predicate): Collection
     {
@@ -31,10 +29,10 @@ class TreeFilter
     }
 
     /**
-     * 收集所有需要隐藏的节点 ID。
+     * 收集隐藏节点。
      *
-     * @param  Collection<Model>  $models
-     * @param  callable(Model):bool  $predicate
+     * @param  Collection<array-key, Model>  $models
+     * @param  callable(Model): bool  $predicate
      * @return array<int, bool>
      */
     protected function collectHiddenIds(Collection $models, callable $predicate): array
@@ -51,9 +49,9 @@ class TreeFilter
     }
 
     /**
-     * 收集原始树中“曾经拥有子节点”的父节点 ID。
+     * 收集原始父节点。
      *
-     * @param  Collection<Model>  $models
+     * @param  Collection<array-key, Model>  $models
      * @return array<int, bool>
      */
     protected function collectParentIds(Collection $models): array
@@ -62,10 +60,10 @@ class TreeFilter
 
         foreach ($models as $model) {
             $paths = $model->paths ?? [];
-            $len = count($paths);
-            if ($len > 1) {
-                $pid = $paths[$len - 2];
-                $parents[$pid] = true;
+            $depth = count($paths);
+
+            if ($depth > 1) {
+                $parents[$paths[$depth - 2]] = true;
             }
         }
 
@@ -73,66 +71,67 @@ class TreeFilter
     }
 
     /**
-     * 修剪所有“空父节点”。
+     * 从叶端逐级修剪空父节点。
      *
-     * @param  Collection<Model>  $models
+     * @param  Collection<array-key, Model>  $models
      * @param  array<int, bool>  $parentIds
-     * @return Collection<Model>
+     * @return Collection<int, Model>
      */
     protected function pruneEmptyParents(Collection $models, array $parentIds): Collection
     {
-        while (true) {
-            $hasChildren = [];
+        $parents = [];
+        $childCounts = [];
 
-            foreach ($models as $model) {
-                $paths = $model->paths ?? [];
-                $len = count($paths);
+        foreach ($models as $model) {
+            $paths = $model->paths ?? [];
+            $depth = count($paths);
 
-                if ($len > 1) {
-                    $pid = $paths[$len - 2];
-                    $hasChildren[$pid] = true;
-                }
-            }
-
-            $removed = false;
-            $models = $models->filter(function (Model $model) use (
-                $parentIds,
-                $hasChildren,
-                &$removed
-            ) {
-                $id = $model->id;
-                $isEmptyParent = isset($parentIds[$id]) && ! isset($hasChildren[$id]);
-
-                if ($isEmptyParent) {
-                    $removed = true;
-
-                    return false;
-                }
-
-                return true;
-            })
-                ->values();
-
-            // 结构稳定后结束循环
-            if (! $removed) {
-                break;
+            if ($depth > 1) {
+                $pid = $paths[$depth - 2];
+                $parents[$model->id] = $pid;
+                $childCounts[$pid] = ($childCounts[$pid] ?? 0) + 1;
             }
         }
 
-        return $models;
+        $pending = [];
+
+        foreach ($models as $model) {
+            if (isset($parentIds[$model->id]) && ! isset($childCounts[$model->id])) {
+                $pending[] = $model->id;
+            }
+        }
+
+        $removed = [];
+
+        while ($pending) {
+            $id = array_pop($pending);
+            $removed[$id] = true;
+            $pid = $parents[$id] ?? null;
+
+            if ($pid !== null && --$childCounts[$pid] === 0 && isset($parentIds[$pid])) {
+                $pending[] = $pid;
+            }
+        }
+
+        return $models->reject(fn (Model $model) => isset($removed[$model->id]))->values();
     }
 
     /**
-     * 删除所有“属于隐藏节点子树”的数据。
+     * 移除隐藏节点及其后代。
      *
-     * @param  Collection<Model>  $models
+     * @param  Collection<array-key, Model>  $models
      * @param  array<int, bool>  $hiddenIds
-     * @return Collection<Model>
+     * @return Collection<int, Model>
      */
     protected function removeHiddenSubtrees(Collection $models, array $hiddenIds): Collection
     {
         return $models->filter(function (Model $model) use ($hiddenIds) {
+            if (isset($hiddenIds[$model->id])) {
+                return false;
+            }
+
             $paths = $model->paths ?? [];
+
             foreach ($paths as $id) {
                 if (isset($hiddenIds[$id])) {
                     return false;

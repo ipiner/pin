@@ -4,54 +4,38 @@ declare(strict_types=1);
 
 namespace Pin\Token\Drivers;
 
+use Override;
 use Pin\Token\Token;
 use Pin\Token\TokenPayload;
 
 /**
- * Aes Token Driver
- *
- * 使用 AES 对 Payload 进行加密生成 Token。
+ * AES Token 驱动。
  */
 class AesDriver extends Driver
 {
     use AesHelper;
 
     /**
-     * 解码 Token
-     *
-     * 流程：
-     * 1. AES 解密
-     * 2. JSON 解析
-     * 3. 构建 Token 对象
-     * 4. 校验是否过期
-     *
-     * @param  string  $encodedPayload  原始 Token
+     * 解码 Token。
      */
+    #[Override]
     public function decode(string $encodedPayload): Token
     {
-        return tap(
-            $this->decrypt($encodedPayload),
-            fn ($token) => $this->validateExpired($token),
-        );
+        $token = $this->decrypt($encodedPayload);
+        $this->validateExpired($token);
+
+        return $token;
     }
 
     /**
-     * 编码 Token
+     * 编码 Token。
      *
-     * 流程：
-     * 1. 自动补充 exp
-     * 2. Payload 转 JSON
-     * 3. AES 加密
-     *
-     * @param  TokenPayload  $payload  Token Payload
-     * @param  int|null  $expires  过期时间（秒）
+     * @param  int|null  $expires  有效期（秒）
      */
+    #[Override]
     public function encode(TokenPayload $payload, ?int $expires = null): string
     {
-        // 自动设置过期时间
-        if (! isset($payload->exp) && $expires) {
-            $payload->exp = now()->getTimestamp() + $expires;
-        }
+        $this->setExpiresAt($payload, $expires);
 
         return $this->encrypt($payload);
     }

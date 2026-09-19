@@ -5,70 +5,70 @@ declare(strict_types=1);
 namespace Pin\Scramble\TypeToSchemaExtensions;
 
 use Dedoc\Scramble\Extensions\TypeToSchemaExtension;
-use Dedoc\Scramble\Support\Type\ArrayItemType_;
-use Dedoc\Scramble\Support\Type\ArrayType;
+use Dedoc\Scramble\Support\Generator\Types\Type as OpenApiType;
 use Dedoc\Scramble\Support\Type\Generic;
+use Dedoc\Scramble\Support\Type\KeyedArrayType;
 use Dedoc\Scramble\Support\Type\ObjectType;
 use Dedoc\Scramble\Support\Type\Type;
+use Dedoc\Scramble\Support\Type\TypeWalker;
 use Override;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use Pin\Scramble\SchemaType;
-use Throwable;
 
 /**
- * 泛型响应类型到 OpenAPI Schema 的转换扩展。
+ * 泛型响应 Schema 转换
  */
 abstract class GenericTypeToSchema extends TypeToSchemaExtension
 {
     /**
-     * 获取泛型对应的返回字段。
+     * 获取泛型对应字段
      */
     abstract protected function getGenericKey(): ?string;
 
     /**
-     * 获取当前扩展处理的类型。
+     * 获取目标类型
+     *
+     * @return class-string
      */
     abstract protected function getHandledType(): string;
 
     /**
-     * 判断当前类型是否包含泛型参数。
+     * 判断是否处理当前类型
      */
     public function shouldHandle(Type $type): bool
     {
         return $type instanceof Generic
-            && $this->getTemplateType($type) !== null
-            && $type->isInstanceOf($this->getHandledType());
-    }
-
-    #[Override]
-    public function toSchema(Type $type)
-    {
-        return $this->openApiTransformer->transform(
-            $this->resolveReturnType(/** @var Generic $type */ $type)
-        );
+            && $type->isInstanceOf($this->getHandledType())
+            && $this->getTemplateType($type) !== null;
     }
 
     /**
-     * 分析需要生成 Schema 的类型。
+     * 转换响应 Schema
+     *
+     * @param  Generic  $type
+     */
+    #[Override]
+    public function toSchema(Type $type): OpenApiType
+    {
+        return $this->openApiTransformer->transform($this->resolveReturnType($type));
+    }
+
+    /**
+     * 分析嵌套文档资源
      */
     protected function analyzeSchemaType(Type $type): void
     {
-        try {
-            if ($type instanceof ObjectType && $type->name instanceof SchemaType) {
+        new TypeWalker()->walk($type, function (Type $type) {
+            if ($type instanceof ObjectType && $type->isInstanceOf(SchemaType::class)) {
                 $this->infer->analyzeClass($type->name);
-
-                return;
             }
-
-            if ($type instanceof ArrayType) {
-                $this->analyzeSchemaType($type->value);
-            }
-        } catch (Throwable) {
-            //
-        }
+        });
     }
 
     /**
-     * 获取泛型类型。
+     * 获取泛型参数
      */
     protected function getTemplateType(Generic $type): ?Type
     {
@@ -78,36 +78,60 @@ abstract class GenericTypeToSchema extends TypeToSchemaExtension
     }
 
     /**
-     * 解析泛型返回类型。
+     * 解析泛型返回类型
      */
     protected function resolveReturnType(Generic $type): Type
     {
-        $returnType = clone $type
-            ->getMethodDefinition('toArray')
-            ->type
-            ->getReturnType();
+        $returnType = clone $type->getMethodDefinition('toArray')->getReturnType();
 
-        $genericKey = $this->getGenericKey();
-        $dataType = $this->getTemplateType($type);
-
-        if ($genericKey === null || $dataType === null) {
+        if (! $returnType instanceof KeyedArrayType) {
             return $returnType;
         }
 
-        $this->analyzeSchemaType($dataType);
+        $genericKey = $this->getGenericKey();
+        $templateType = $this->getTemplateType($type);
 
-        $returnType->items = array_map(
-            fn (ArrayItemType_ $item) => $item->key === $genericKey
-                ? new ArrayItemType_($genericKey, $this->transformTemplateType($dataType))
-                : $item,
-            $returnType->items,
-        );
+        if ($genericKey === null || ! $templateType) {
+            return $returnType;
+        }
+
+        foreach ($returnType->items as $index => $item) {
+            if ($item->key !== $genericKey) {
+                continue;
+            }
+
+            $this->analyzeSchemaType($templateType);
+            $item = clone $item;
+            $item->value = $this->transformTemplateType($templateType);
+            if ($doc = $item->getAttribute('docNode')) {
+                $item->setAttribute('docNode', $this->resolveFieldDoc($doc));
+            }
+            $returnType->items[$index] = $item;
+
+            break;
+        }
 
         return $returnType;
     }
 
     /**
-     * 转换泛型类型。
+     * 保留字段说明，移除泛型类型声明
+     */
+    protected function resolveFieldDoc(PhpDocNode $doc): PhpDocNode
+    {
+        $doc = clone $doc;
+
+        foreach ($doc->children as $index => $node) {
+            if ($node instanceof PhpDocTagNode && $node->name === '@var') {
+                $doc->children[$index] = new PhpDocTextNode($node->value->description);
+            }
+        }
+
+        return $doc;
+    }
+
+    /**
+     * 转换泛型字段类型
      */
     protected function transformTemplateType(Type $type): Type
     {

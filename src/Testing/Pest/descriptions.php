@@ -49,16 +49,14 @@ if (! function_exists('failsToDelete')) {
 if (! function_exists('lists')) {
     function lists(string $name): string
     {
-        $name = Str::plural($name);
-
-        return "lists {$name} successfully";
+        return 'lists '.Str::plural($name).' successfully';
     }
 }
 
 if (! function_exists('validatesCreatePayload')) {
     function validatesCreatePayload(string $name): string
     {
-        return "validates payload for updating {$name}";
+        return "validates payload for creating {$name}";
     }
 }
 

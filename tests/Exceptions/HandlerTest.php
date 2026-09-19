@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\JsonResponse;
@@ -46,6 +47,33 @@ it('renders exceptions', function () {
 
     expect($this->handler->render(app()->request, new Exception()))
         ->toBeInstanceOf(JsonResponse::class);
+});
+
+it('renders a Responsable exception once', function () {
+    $exception = new class extends Exception implements Responsable
+    {
+        public int $calls = 0;
+
+        public function toResponse($request): JsonResponse
+        {
+            return new JsonResponse(['calls' => ++$this->calls], 202, ['X-Custom' => 'value']);
+        }
+    };
+    $request = Request::create('/api/test');
+    $finalized = 0;
+    $this->handler->respondUsing(function ($response) use (&$finalized) {
+        $finalized++;
+
+        return $response;
+    });
+
+    $response = $this->handler->render($request, $exception);
+
+    expect($exception->calls)->toBe(1)
+        ->and($response->getData(true))->toBe(['calls' => 1])
+        ->and($response->getStatusCode())->toBe(202)
+        ->and($response->headers->get('X-Custom'))->toBe('value')
+        ->and($finalized)->toBe(1);
 });
 
 it('maps log levels', function () {

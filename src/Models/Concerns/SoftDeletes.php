@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Pin\Models\Concerns;
 
+use Illuminate\Database\Eloquent\SoftDeletes as BaseSoftDeletes;
 use Pin\Models\Scopes\SoftDeleting;
 
 /**
  * 软删除
- *
- * 使用 `deleted_at unsigned int` 字段标记记录是否被删除
  */
 trait SoftDeletes
 {
-    use \Illuminate\Database\Eloquent\SoftDeletes;
+    use BaseSoftDeletes;
 
     /**
      * 替换 Laravel 默认软删除作用域
@@ -26,7 +25,7 @@ trait SoftDeletes
     /**
      * 初始化 deleted_at 字段类型转换
      */
-    public function initializeSoftDeletes()
+    public function initializeSoftDeletes(): void
     {
         if (! isset($this->casts[$column = $this->getDeletedAtColumn()])) {
             $this->casts[$column] = $this->softDeletedAtValue(false) === null
@@ -36,25 +35,31 @@ trait SoftDeletes
     }
 
     /**
-     * 恢复被软删除的模型
-     *
-     * @return bool
+     * 恢复软删除的模型
      */
-    public function restore()
+    public function restore(): bool
     {
         if ($this->fireModelEvent('restoring') === false) {
-            return false; // @codeCoverageIgnore
+            return false;
         }
 
         $this->exists = true;
-        $columns = $this->softDeletedValuesForUpdate(false);
-        foreach ($columns as $column => $value) {
-            $this->{$column} = $value;
+        $this->forceFill($this->softDeletedValuesForUpdate(false));
+        $result = $this->save();
+
+        if ($result) {
+            $this->fireModelEvent('restored', false);
         }
-        $result = $this->update($columns);
-        $this->fireModelEvent('restored', false);
 
         return $result;
+    }
+
+    /**
+     * 是否已软删除
+     */
+    public function trashed(): bool
+    {
+        return $this->{$this->getDeletedAtColumn()} !== $this->softDeletedAtValue(false);
     }
 
     /**
@@ -68,7 +73,7 @@ trait SoftDeletes
     }
 
     /**
-     * 生成用于 update 的软删除字段数组
+     * 获取软删除更新字段
      *
      * @param  bool  $deleted  是否被标记为已删除
      */
@@ -88,13 +93,9 @@ trait SoftDeletes
         $time = $this->freshTimestamp();
         $columns = $this->softDeletedValuesForUpdate(true);
 
-        foreach ($columns as $column => $value) {
-            $this->{$column} = $value;
-        }
+        $this->forceFill($columns);
 
-        $this->{$this->getDeletedAtColumn()} = $time;
-
-        if ($this->usesTimestamps() && ! is_null($this->getUpdatedAtColumn())) {
+        if ($this->usesTimestamps() && $this->getUpdatedAtColumn()) {
             $this->{$this->getUpdatedAtColumn()} = $time;
             $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
         }

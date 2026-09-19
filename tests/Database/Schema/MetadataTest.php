@@ -10,6 +10,9 @@ use Pin\Tests\Models\Models\Admin;
 
 uses(InteractsWithDatabase::class);
 
+beforeEach(fn () => RuntimeCache::flush());
+afterEach(fn () => RuntimeCache::flush());
+
 it('loads metadata', function () {
     $command = $this->artisan(
         TableSchemasGenerateCommand::class,
@@ -25,4 +28,26 @@ it('loads metadata', function () {
 
     $meta = Metadata::make(Admin::class);
     expect($meta->attributes['created_at'])->toBe('Created At');
+});
+
+it('keeps connection and table cache keys distinct', function () {
+    $first = Metadata::make('schema_a', 'bc');
+    $second = Metadata::make('schema_ab', 'c');
+
+    expect($first->label)->toBe('Bc')
+        ->and($second->label)->toBe('C')
+        ->and($first)->not->toBe($second)
+        ->and(Metadata::make('schema_a', 'bc'))->toBe($first);
+});
+
+it('creates and caches metadata subclasses separately', function () {
+    $base = Metadata::make('schema', 'missing');
+    $subclass = new class('schema', 'missing') extends Metadata
+    {
+    };
+    $metadata = $subclass::make('schema', 'missing');
+
+    expect($metadata)->toBeInstanceOf($subclass::class)
+        ->and($metadata)->not->toBe($base)
+        ->and($subclass::make('schema', 'missing'))->toBe($metadata);
 });

@@ -12,6 +12,8 @@ beforeEach(function () {
 });
 
 it('returns model attributes', function () {
+    expect($this->service->attributes())->toBe([]);
+
     $this->invoker->bootModel();
 
     expect($this->invoker->attributes())->toBe([]);

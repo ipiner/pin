@@ -16,12 +16,12 @@ class QueryableCondition
 
     /**
      * @param  string  $column  查询字段
-     * @param  array|string|null  $value  查询值
-     * @param  string  $type  查询类型
+     * @param  mixed  $value  查询值
+     * @param  string|QueryableType  $type  查询类型
      */
     public function __construct(
         public string $column,
-        public array|string|null $value,
+        public mixed $value,
         string|QueryableType $type,
     ) {
         $this->type = is_string($type) ? $type : $type->value;

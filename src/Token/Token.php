@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pin\Token;
 
 /**
- * Token 实体对象
+ * Token 数据。
  *
  * @property ?int $uid 用户id
  * @property ?int $exp 过期时间
@@ -16,30 +16,19 @@ namespace Pin\Token;
 class Token
 {
     /**
-     * Token 载荷
+     * Token 载荷。
      */
     public protected(set) TokenPayload $payload;
 
-    /**
-     * 原始 Token 字符串
-     */
-    public protected(set) string $raw;
-
-    /**
-     * Token 构造函数
-     *
-     * @param  array|TokenPayload  $payload  支持数组或已封装对象
-     * @param  string  $raw  原始 token 字符串
-     */
-    public function __construct(array|TokenPayload $payload, string $raw)
-    {
-        // 统一转换为 TokenPayload 对象，避免外部结构不一致
-        $this->payload = is_array($payload) ? new TokenPayload($payload) : $payload;
-        $this->raw = $raw;
+    public function __construct(
+        array|TokenPayload $payload,
+        public protected(set) string $raw,
+    ) {
+        $this->payload = TokenPayload::new($payload);
     }
 
     /**
-     * 获取载荷属性
+     * 获取载荷属性。
      */
     public function __get(string $key): mixed
     {
@@ -47,7 +36,7 @@ class Token
     }
 
     /**
-     * 设置载荷属性
+     * 设置载荷属性。
      */
     public function __set(string $key, mixed $value): void
     {
@@ -55,7 +44,7 @@ class Token
     }
 
     /**
-     * 判断载荷属性是否存在
+     * 判断载荷属性是否存在。
      */
     public function __isset(string $key): bool
     {
@@ -63,7 +52,7 @@ class Token
     }
 
     /**
-     * 删除载荷属性
+     * 删除载荷属性。
      */
     public function __unset(string $key): void
     {

@@ -20,20 +20,19 @@ use Pin\Models\Model;
 trait HasCache
 {
     /**
-     * 模型对应的缓存实例池
+     * 模型缓存实例池。
      *
-     * key：模型类名（static::class）
-     * value：SimpleCacher 实例
+     * @var array<class-string<Model>, Cacher>
      */
     protected static array $cacher = [];
 
     /**
-     * Trait 初始化
+     * 注册缓存失效事件
      */
     public static function bootHasCache(): void
     {
-        static::saved(fn (Model $item) => $item->forgetCache());
-        static::deleted(fn (Model $item) => $item->forgetCache());
+        static::saved(static fn (Model $model) => $model->forgetCache());
+        static::deleted(static fn (Model $model) => $model->forgetCache());
     }
 
     /**
@@ -84,7 +83,7 @@ trait HasCache
     {
         if (static::cacheType() === CacheType::CacheAll) {
             return static::findAll()->first(
-                fn ($item) => strcasecmp((string) $item[$column], (string) $value) === 0
+                static fn ($item) => strcasecmp((string) $item[$column], (string) $value) === 0
             );
         }
 
@@ -108,9 +107,7 @@ trait HasCache
     }
 
     /**
-     * 获取单条
-     *
-     * 不存在则抛异常
+     * 获取单条模型，不存在时抛出异常。
      *
      * @throws ModelNotFoundException
      */
@@ -128,8 +125,7 @@ trait HasCache
      */
     protected static function cacher(): Cacher
     {
-        return static::$cacher[static::class]
-            ??= new SimpleCacher(static::class);
+        return static::$cacher[static::class] ??= new SimpleCacher(static::class);
     }
 
     /**

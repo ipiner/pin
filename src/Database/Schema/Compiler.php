@@ -4,53 +4,53 @@ declare(strict_types=1);
 
 namespace Pin\Database\Schema;
 
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 /**
- * 数据库 schema 编译器（DTO 转换层）。
+ * 数据库结构编译器。
  */
 class Compiler
 {
+    protected Builder $schema;
+
     public function __construct(protected string $connection = 'default')
     {
     }
 
     /**
-     * 编译数据库 schema。
+     * 编译数据库结构。
      *
-     * @return Collection<Table>
+     * @return Collection<string, Table>
      */
     public function compile(): Collection
     {
         return collect($this->getTables())
-            ->map(fn ($table) => $this->buildTableSchema($table))
+            ->map($this->buildTableSchema(...))
             ->keyBy('name');
     }
 
     /**
-     * 构建 Table DTO。
+     * 构建数据表结构。
      */
     protected function buildTableSchema(array $table): Table
     {
+        $name = Str::chopStart(
+            $table['name'],
+            $this->schema()->getConnection()->getTablePrefix()
+        );
+
         return new Table([
-            'name' => $table['name'],
-
-            // 表注释（DB comment）
-            // 通常用于生成 label / description
+            'name' => $name,
             'comment' => $table['comment'],
-
-            // 字段集合
-            // key: column name
-            // value: Column DTO
-            'columns' => $this->getColumns($table['name']),
+            'columns' => $this->getColumns($name),
         ]);
     }
 
     /**
      * 获取字段结构。
-     *
-     *  Schema driver 返回原始结构 → Column DTO。
      *
      * @return array<string, Column>
      */
@@ -58,38 +58,8 @@ class Compiler
     {
         $columns = [];
 
-        foreach (Schema::connection($this->connection)->getColumns($table) as $item) {
-            /**
-             * Column DTO
-             * 将原始 schema array 转换为统一对象结构
-             */
-            $columns[$item['name']] = new Column([
-                'name' => $item['name'],
-
-                /**
-                 * 数据类型信息
-                 */
-                'type_name' => $item['type_name'],
-                'type' => $item['type'],
-
-                /**
-                 * 约束信息
-                 */
-                'nullable' => $item['nullable'],
-                'default' => $item['default'],
-                'auto_increment' => $item['auto_increment'],
-
-                /**
-                 * 字符集 / 生成列信息
-                 */
-                'collation' => $item['collation'],
-                'generation' => $item['generation'],
-
-                /**
-                 * DB comment（用于生成 UI label / description）
-                 */
-                'comment' => $item['comment'],
-            ]);
+        foreach ($this->schema()->getColumns($table) as $column) {
+            $columns[$column['name']] = new Column($column);
         }
 
         return $columns;
@@ -98,17 +68,25 @@ class Compiler
     /**
      * 获取数据库表列表。
      *
-     * @return array<int, array{name:string, comment?:string}>
+     * @return list<array{name: string, comment: string|null}>
      */
     protected function getTables(): array
     {
-        return Schema::connection($this->connection)->getTables(
-            $this->getTablesDatabase()
-        );
+        $tables = $this->schema()->getTables($this->getTablesDatabase());
+        $prefix = $this->schema()->getConnection()->getTablePrefix();
+
+        if (! $prefix) {
+            return $tables;
+        }
+
+        return array_values(array_filter(
+            $tables,
+            static fn (array $table) => str_starts_with($table['name'], $prefix)
+        ));
     }
 
     /**
-     * database 参数策略（driver 差异）。
+     * 获取表查询的数据库名。
      */
     protected function getTablesDatabase(): ?string
     {
@@ -118,15 +96,20 @@ class Compiler
     }
 
     /**
-     * driver 是否需要 database 参数。
+     * 是否需要指定数据库名。
      */
     protected function requiresDatabaseParameter(): bool
     {
         $driver = config('database.connections.'.$this->connection.'.driver');
 
-        return ! in_array($driver, [
-            'sqlite',
-            'sqlsrv',
-        ]);
+        return in_array($driver, ['mysql', 'mariadb'], true);
+    }
+
+    /**
+     * 获取结构构建器。
+     */
+    protected function schema(): Builder
+    {
+        return $this->schema ??= Schema::connection($this->connection);
     }
 }

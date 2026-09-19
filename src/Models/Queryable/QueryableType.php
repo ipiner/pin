@@ -99,20 +99,12 @@ enum QueryableType: string
     case RangeNumeric = 'RANGE';
 
     /**
-     * 智能查询
-     *
-     * 适合一个输入框同时查多个字段：
-     * 数字走精确查询，文本走模糊查询。
-     *
-     * 示例：ns:id|name
+     * 数字精确查询，文本模糊查询
      */
     case Ns = 'ns';
 
     /**
-     * 解析查询类型表达式
-     *
-     * 支持把 `ns:id|name`、`ns,id,name` 这类写法统一拆成：
-     * 查询类型 + 关联字段列表。
+     * 解析查询类型与字段。
      *
      * @return array{0: QueryableType, 1: string[]|null}
      */
@@ -122,7 +114,7 @@ enum QueryableType: string
             return [$value, null];
         }
 
-        $value = str_replace([':', ',', '|', ','], ',', $value);
+        $value = str_replace([':', '|'], ',', $value);
 
         if (! str_contains($value, ',')) {
             return [self::from($value), null];
@@ -165,7 +157,7 @@ enum QueryableType: string
      */
     public function isIn(): bool
     {
-        return in_array($this, [self::In, self::InNumeric]);
+        return in_array($this, [self::In, self::InNumeric], true);
     }
 
     /**
@@ -173,7 +165,7 @@ enum QueryableType: string
      */
     public function isLike(): bool
     {
-        return in_array($this, [self::Like, self::StartsWith, self::EndsWith]);
+        return in_array($this, [self::Like, self::StartsWith, self::EndsWith], true);
     }
 
     /**
@@ -189,6 +181,6 @@ enum QueryableType: string
      */
     public function isRange(): bool
     {
-        return in_array($this, [self::Range, self::RangeNumeric]);
+        return in_array($this, [self::Range, self::RangeNumeric], true);
     }
 }

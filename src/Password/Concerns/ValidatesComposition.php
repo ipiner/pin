@@ -143,7 +143,7 @@ trait ValidatesComposition
     {
         return $this->mixedCase
             ? $this->matchPattern(
-                '/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u',
+                '/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/us',
                 Errors::PasswordRequiresMixedCase
             )
             : 0;
@@ -164,29 +164,15 @@ trait ValidatesComposition
      */
     protected function validateRequiredCharacterTypes(): int
     {
-        if ($this->requiredCharacterTypes === null) {
+        if (! $this->requiredCharacterTypes || $this->value === '') {
             return 0;
         }
 
-        $this->numbers()->letters()->symbols();
+        $count = preg_match('/\d/', $this->value)
+            + preg_match('/\pL/u', $this->value)
+            + preg_match('/\p{Z}|\p{S}|\p{P}/u', $this->value);
 
-        $count = count(array_filter([
-            $this->validateNumbers(),
-            $this->validateLetters(),
-            $this->validateSymbols(),
-        ]));
-
-        // 清理单项缺失错误，仅保留组合类型错误
-        unset(
-            $this->errors[Errors::PasswordRequiresNumber->code()],
-            $this->errors[Errors::PasswordRequiresLetter->code()],
-            $this->errors[Errors::PasswordRequiresSymbol->code()],
-        );
-
-        if (
-            $count === 0
-            || $count === 1 && $this->requiredCharacterTypes === 2
-        ) {
+        if ($count === 3 || ($count === 2 && $this->requiredCharacterTypes === 2)) {
             return 0;
         }
 

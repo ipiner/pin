@@ -32,6 +32,30 @@ it('works with custom rules', function () {
     expect($this->action->withRules(['foo' => 'nullable'])->validated())->toBe([]);
 });
 
+it('validates again after changing the payload', function (Closure $change) {
+    $this->action->payload('name', 'foo');
+
+    expect($this->action->validated())->toBe(['name' => 'foo']);
+
+    $change($this->action);
+    $this->action->validated();
+})->with([
+    'single value' => [fn ($action) => $action->payload('name', null)],
+    'multiple values' => [fn ($action) => $action->payload(['name' => null])],
+    'replacement' => [fn ($action) => $action->payload(null, [])],
+    'clear' => [fn ($action) => $action->payload(null)],
+])->throws(ValidationException::class);
+
+it('keeps validated data cached when reading the payload', function () {
+    $this->action->payload('name', 'foo');
+    $validated = $this->action->validated();
+    $this->action->authorize = false;
+
+    expect($this->action->payload())->toBe($validated)
+        ->and($this->action->payload('name'))->toBe('foo')
+        ->and($this->action->validated())->toBe($validated);
+});
+
 /**
  * @internal
  */

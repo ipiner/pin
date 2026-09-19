@@ -8,21 +8,19 @@ use Pin\Models\Model;
 use Pin\Module\ModuleInspector;
 
 /**
- * 为类提供模型绑定与实例化功能
+ * 模型绑定与实例化。
  *
  * @template TModel of Model
  */
 trait HasModel
 {
     /**
-     * 模型类名 (class-string)
-     *
      * @var class-string<TModel>
      */
     public protected(set) string $modelClass;
 
     /**
-     * 获取模型字段 attributes
+     * 获取模型字段名称。
      */
     public function attributes(): array
     {
@@ -32,8 +30,7 @@ trait HasModel
     /**
      * 设置模型类
      *
-     * @param  class-string<TModel>  $modelClass  要绑定的模型类名
-     * @return $this 返回当前对象，支持链式调用
+     * @param  class-string<TModel>  $modelClass
      */
     public function withModel(string $modelClass): static
     {
@@ -45,7 +42,7 @@ trait HasModel
     /**
      * 初始化模型类
      *
-     * @param  class-string<TModel>|null  $modelClass  可选的模型类名
+     * @param  class-string<TModel>|null  $modelClass
      */
     protected function bootModel(?string $modelClass = null): void
     {
@@ -57,7 +54,7 @@ trait HasModel
      */
     protected function hasModel(): bool
     {
-        return class_exists($this->modelClass);
+        return isset($this->modelClass) && class_exists($this->modelClass);
     }
 
     /**

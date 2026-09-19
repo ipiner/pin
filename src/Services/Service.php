@@ -12,19 +12,19 @@ use Pin\Support\Traits\HasModel;
  * 基础服务类
  *
  * @template TModel of Model
- *
- * @use HasModel<TModel>
  */
 class Service
 {
-    use HasContext, HasModel;
+    use HasContext;
+
+    /** @use HasModel<TModel> */
+    use HasModel;
 
     /**
-     * @param  class-string<TModel>  $model  模型类
+     * @param  class-string<TModel>|null  $model
      */
     public function __construct(?string $model = null)
     {
-        $this->context([]);
         $this->bootModel($model);
     }
 }

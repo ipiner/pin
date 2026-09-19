@@ -8,7 +8,9 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * @method static HashDriver getDriver()
+ * Hash 缓存入口。
+ *
+ * @method HashDriver getDriver()
  *
  * @mixin HashDriver
  * @mixin HashStore
@@ -17,7 +19,7 @@ use Illuminate\Support\Facades\Cache;
 class HashCache
 {
     /**
-     * 代理到 Redis Hash Store
+     * 转发缓存调用。
      */
     public function __call(string $method, array $arguments): mixed
     {
@@ -25,7 +27,19 @@ class HashCache
     }
 
     /**
-     * 获取 Redis Hash 缓存实例
+     * 按输入顺序获取缓存值。
+     *
+     * @param  list<string>  $keys
+     */
+    public function many(array $keys): array
+    {
+        $values = $this->store()->many($keys);
+
+        return array_map(fn ($key) => $values[$key], $keys);
+    }
+
+    /**
+     * 获取 Hash 缓存仓库。
      */
     public function store(): Repository
     {

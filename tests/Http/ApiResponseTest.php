@@ -62,6 +62,10 @@ it('matches api response', function ($response, bool $expected) {
         'string',
         false,
     ],
+    'invalid message' => [
+        ['code' => 0, 'message' => [], 'data' => null],
+        false,
+    ],
 ]);
 
 it('makes a JsonpResponse', function () {

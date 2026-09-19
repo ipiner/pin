@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pin\Tree;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Override;
 use Pin\Support\ServiceProvider;
 
 /**
@@ -13,9 +14,10 @@ use Pin\Support\ServiceProvider;
 class TreeServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
-     * Bootstrap the application services.
+     * 注册树服务。
      */
-    public function boot(): void
+    #[Override]
+    public function register(): void
     {
         $this->app->singleton('pin.tree', Tree::class);
         $this->app->singleton('pin.tree.checker', TreePathChecker::class);
@@ -24,8 +26,11 @@ class TreeServiceProvider extends ServiceProvider implements DeferrableProvider
     }
 
     /**
-     * Get the services provided by the provider.
+     * 获取延迟加载的服务。
+     *
+     * @return list<string>
      */
+    #[Override]
     public function provides(): array
     {
         return [

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Factories\UserFactory;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Pin\Models\Queryable\Queryable;
 use Pin\Services\ModelService;
@@ -54,6 +55,30 @@ it('returns all results when paging is disabled', function () {
 
     expect($data['total'])->toBe(1)
         ->and($data['total_page'])->toBe(1)
+        ->and($data['items'])->toHaveCount(1)
+        ->and($data['items'][0]->username)->toBe($this->username);
+});
+
+it('clears previous query conditions when given empty rules', function (bool $paging) {
+    $this->service->context('paging', $paging);
+    $queryable = Queryable::fromPayload(['username' => $this->username], ['username' => 'eq']);
+
+    expect($this->service->pagination($queryable)->toArray()['total'])->toBe(1)
+        ->and($this->service->pagination([])->toArray()['total'])->toBe(2);
+})->with([true, false]);
+
+it('applies custom query constraints when paging is disabled', function () {
+    $queryable = new class(['username' => $this->username], []) extends Queryable
+    {
+        public function apply(Builder $builder): Builder
+        {
+            return $builder->where('username', $this->payload['username']);
+        }
+    };
+
+    $data = $this->service->context('paging', false)->pagination($queryable)->toArray();
+
+    expect($data['total'])->toBe(1)
         ->and($data['items'])->toHaveCount(1)
         ->and($data['items'][0]->username)->toBe($this->username);
 });

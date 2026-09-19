@@ -11,7 +11,7 @@ use Pin\Database\QueryMonitor\QueryResponse;
 use Pin\Database\QueryMonitor\QuerySql;
 
 /**
- * SQL 监控入口（QueryExecuted 事件处理器）
+ * SQL 查询监控。
  */
 class QueryMonitor
 {
@@ -20,19 +20,21 @@ class QueryMonitor
         public QueryLogger $logger,
         public QueryResponse $response,
     ) {
-        //
     }
 
     /**
-     * 入口
+     * 记录查询。
      */
     public function handle(QueryExecuted $event): void
     {
         $this->profile->record($event);
 
-        $sql = QuerySql::raw($event);
+        $sql = null;
+        $resolveSql = static function () use ($event, &$sql): string {
+            return $sql ??= QuerySql::raw($event);
+        };
 
-        $this->response->push($event, $sql);
-        $this->logger->push($event, $sql);
+        $this->response->push($event, $resolveSql);
+        $this->logger->push($event, $resolveSql);
     }
 }

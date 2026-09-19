@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pin\Support\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Override;
 
 /**
  * @method static string decrypt(string $encrypted)
@@ -15,9 +16,10 @@ use Illuminate\Support\Facades\Facade;
 class Aes extends Facade
 {
     /**
-     * Get the registered name of the component.
+     * 获取服务名称。
      */
-    protected static function getFacadeAccessor()
+    #[Override]
+    protected static function getFacadeAccessor(): string
     {
         return 'pin.crypt.aes';
     }

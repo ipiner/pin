@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Pin\Http\ApiResponse;
 use Pin\Http\Middleware\LogApiResponse;
+use Pin\Support\Str;
 
 it('extracts response data from request attribute', function () {
     $middleware = app(LogApiResponse::class);
@@ -83,3 +85,56 @@ it('truncates response data when max length is exceeded', function () {
     expect($result)->toBeString()
         ->and($result)->toContain('(...');
 });
+
+it('skips scalar JSON responses', function (mixed $data) {
+    $logger = Log::getFacadeRoot();
+    $middleware = app(LogApiResponse::class);
+
+    try {
+        Log::shouldReceive('channel')->never();
+        $middleware->terminate($this->app['request'], new JsonResponse($data));
+    } finally {
+        Log::swap($logger);
+    }
+
+    expect($this->invoker($middleware)->extractResponseData())->toBeNull();
+})->with(['text', 0, false]);
+
+it('skips masking ignored response data', function () {
+    config(['pin.logging.response.ignore_response_data' => ['*']]);
+    $response = new JsonResponse([
+        'code' => 0,
+        'message' => 'ok',
+        'data' => ['large' => str_repeat('a', 10000)],
+    ]);
+    $middleware = app(LogApiResponse::class);
+    $middleware->terminate($this->app['request'], $response);
+
+    Str::setSensitiveValueMasker(function ($value, $key) {
+        if ($key === 'large') {
+            throw new LogicException('Ignored data should not be processed.');
+        }
+
+        return $key === 'message' ? 'masked' : $value;
+    });
+
+    try {
+        expect($this->invoker($middleware)->normalizeResponse())->toBe([
+            'code' => 0,
+            'message' => 'masked',
+            'data' => '...',
+        ]);
+    } finally {
+        Str::setSensitiveValueMasker(null);
+    }
+});
+
+it('truncates response data by character length', function (int $maxLength, mixed $expected) {
+    config(['pin.logging.response.max_length' => $maxLength]);
+
+    expect($this->invoker(app(LogApiResponse::class))->truncateResponseData(['a' => '中文']))
+        ->toBe($expected);
+})->with([
+    [10, ['a' => '中文']],
+    [8, '{"a":"中文(...2)'],
+]);

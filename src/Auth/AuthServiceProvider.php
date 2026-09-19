@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace Pin\Auth;
 
+use Illuminate\Auth\AuthManager;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Cache;
+use InvalidArgumentException;
 use Pin\Support\ServiceProvider;
 use Pin\Token\Drivers\SessionDriver;
 use Pin\Token\TokenFactory;
+use Pin\Token\TokenManager;
 
 /**
- * 认证服务提供者。
- *
- * 负责向应用注册认证 Guard、用户提供器以及认证 Token Driver，
- * 使应用可以通过 Laravel Auth 体系使用 Pin 的 Token 认证能力。
+ * 注册 Guard、用户提供器和认证 Token 驱动。
  */
 class AuthServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap the application services.
+     * 注册认证服务。
      */
-    public function boot(): void
+    public function register(): void
     {
         $this->configureGuard(Guard::NAME);
         $this->configureUserProvider(UsersProvider::NAME);
@@ -33,47 +32,61 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function configureGuard(string $name): void
     {
-        $this->app['auth']->extend($name, function (Application $app, string $name, array $config) {
-            return $app->make(
-                Guard::class,
-                [
-                    'provider' => $app['auth']->createUserProvider($config['provider']),
-                    'tokenResolver' => new TokenResolver(),
-                ]
-            );
+        $this->callAfterResolving('auth', function (AuthManager $auth) use ($name) {
+            $auth->extend($name, function (Application $app, string $name, array $config): Guard {
+                $provider = $app['auth']->createUserProvider($config['provider'] ?? null)
+                    ?? throw new InvalidArgumentException(
+                        "User provider for guard [{$name}] is not configured.",
+                    );
+
+                $guard = $app->make(Guard::class, [
+                    'provider' => $provider,
+                    'tokenResolver' => $app->make(TokenResolver::class, [
+                        'request' => $app['request'],
+                        'tokenKey' => $config['token_key'] ?? 'token',
+                    ]),
+                ]);
+
+                $app->refresh('request', $guard, 'setRequest');
+
+                return $guard;
+            });
         });
     }
 
     /**
      * 注册认证 Token Driver。
-     *
-     * 默认使用缓存驱动存储会话 Token，并为认证 Token 设置独立缓存前缀。
      */
     protected function configureTokenDriver(string $name): void
     {
-        $this->app['pin.token']->extend($name, function () {
-            return new TokenFactory(new SessionDriver(
-                Cache::store(),
-                ['cache_prefix' => 'auth-token:']
-            ));
+        $this->callAfterResolving('pin.token', function (TokenManager $tokens) use ($name) {
+            $tokens->extend($name, function (Application $app, array $config): TokenFactory {
+                $config = array_replace(
+                    $app['config']->get('pin.token.drivers.session', []),
+                    ['cache_prefix' => 'auth-token:'],
+                    $config,
+                );
+
+                return new TokenFactory(new SessionDriver(
+                    $app['cache']->store($config['cacheStore'] ?? null),
+                    $config,
+                ));
+            });
         });
     }
 
     /**
      * 注册用户提供器。
-     *
-     * 用户提供器负责根据认证结果加载应用用户模型。
      */
     protected function configureUserProvider(string $name): void
     {
-        $this->app['auth']->provider($name, function (Application $app, array $config) {
-            return $app->make(
-                UsersProvider::class,
-                [
+        $this->callAfterResolving('auth', function (AuthManager $auth) use ($name) {
+            $auth->provider($name, function (Application $app, array $config): UsersProvider {
+                return $app->make(UsersProvider::class, [
                     'hasher' => $app['hash'],
-                    'model' => $config['model'],
-                ]
-            );
+                    'model' => $config['model'] ?? null,
+                ]);
+            });
         });
     }
 }

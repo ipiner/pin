@@ -8,10 +8,7 @@ use Pin\Models\Model;
 use Pin\Support\Arr;
 
 /**
- * Trait HandlesSave
- *
- * 为 Service 提供统一的保存前 / 保存后扩展点，
- * 用于封装 create / update 生命周期中的公共逻辑。
+ * 保存操作
  *
  * @template TModel of Model
  */
@@ -23,10 +20,10 @@ trait HandlesSave
     protected bool $convertNullToEmptyString = true;
 
     /**
-     * 保存前生命周期钩子
+     * 保存前处理
      *
-     * @param  TModel|null  $model  当前模型实例（create 时可能为 null）
-     * @param  array<string, mixed>  $data  待保存数据（引用传递）
+     * @param  TModel|null  $model
+     * @param  array<string, mixed>  $data
      */
     protected function saving($model, array &$data): void
     {
@@ -36,10 +33,10 @@ trait HandlesSave
     }
 
     /**
-     * 保存后生命周期钩子
+     * 保存后处理
      *
-     * @param  TModel  $model  已保存模型
-     * @param  array<string, mixed>  $data  保存数据
+     * @param  TModel  $model
+     * @param  array<string, mixed>  $data
      */
     protected function saved($model, array $data): void
     {
@@ -50,10 +47,7 @@ trait HandlesSave
      */
     protected function shouldConvertNullToEmptyString(): bool
     {
-        if ($this->context('convertNullToEmptyString') === false) {
-            return false;
-        }
-
-        return $this->convertNullToEmptyString;
+        return $this->convertNullToEmptyString
+            && $this->context('convertNullToEmptyString') !== false;
     }
 }

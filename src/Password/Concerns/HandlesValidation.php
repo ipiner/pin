@@ -13,32 +13,30 @@ use Pin\Errors\IError;
 trait HandlesValidation
 {
     /**
-     * 验证错误集合
+     * 验证错误。
      *
      * @var array<int, string>
      */
     protected array $errors = [];
 
     /**
-     * 当前待验证的密码值
+     * 待验证密码
      */
     protected string $value;
 
     /**
-     * 验证入口
-     *
-     * @param  string  $attribute  当前验证字段名
-     * @param  mixed  $value  当前待验证值
-     * @param  Closure  $fail  Laravel 验证失败回调
+     * 验证密码
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $this->value = (string) $value;
 
-        if (! $this->passes()) {
-            foreach ($this->errors as $code => $message) {
-                $fail($this->withErrorCode ? $code.'|'.$message : $message);
-            }
+        if ($this->passes()) {
+            return;
+        }
+
+        foreach ($this->errors as $code => $message) {
+            $fail($this->withErrorCode ? $code.'|'.$message : $message);
         }
     }
 
@@ -47,36 +45,29 @@ trait HandlesValidation
      */
     protected function passes(): bool
     {
-        $check = [
-            $this->validateMinLength(),
-            $this->validateMaxLength(),
-            $this->validateWhitespace(),
-            $this->validateMaxSequentialCharacters(),
-            $this->validateMaxRepeatedCharacters(),
-        ];
+        $this->errors = [];
+        $this->validateMinLength();
+        $this->validateMaxLength();
+        $this->validateWhitespace();
+        $this->validateMaxSequentialCharacters();
+        $this->validateMaxRepeatedCharacters();
 
-        // 字符类型组合校验
         if ($this->requiredCharacterTypes > 1) {
-            $check[] = $this->validateRequiredCharacterTypes();
+            $this->validateRequiredCharacterTypes();
         } else {
-            $check = array_merge($check, [
-                $this->validateNumbers(),
-                $this->validateLetters(),
-                $this->validateLowercase(),
-                $this->validateUppercase(),
-                $this->validateMixedCase(),
-                $this->validateSymbols(),
-            ]);
+            $this->validateNumbers();
+            $this->validateLetters();
+            $this->validateLowercase();
+            $this->validateUppercase();
+            $this->validateMixedCase();
+            $this->validateSymbols();
         }
 
-        return empty(array_filter(array_merge($check)));
+        return ! $this->errors;
     }
 
     /**
      * 验证正则规则
-     *
-     * @param  string  $pattern  正则表达式
-     * @param  IError  $error  错误定义
      */
     protected function matchPattern(string $pattern, IError $error): int
     {
@@ -86,9 +77,8 @@ trait HandlesValidation
     }
 
     /**
-     * 添加验证错误
+     * 添加验证错误。
      *
-     * @param  IError  $error  错误定义
      * @param  array<string, mixed>  $replacements  错误消息替换参数
      */
     protected function addError(IError $error, array $replacements = []): int

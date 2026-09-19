@@ -8,45 +8,35 @@ use Illuminate\Support\Collection;
 use Pin\Models\Model;
 
 /**
- * TreeStructureChecker
- *
- * Tree 结构完整性校验器。
- *
- * 用于校验 Materialized Path（路径枚举）树结构是否合法。
+ * 树路径校验器。
  */
 class TreePathChecker
 {
     /**
      * 校验树结构完整性。
      *
-     * @param  Collection<Model>  $models
-     * @return array<int, array{
-     *     id:int,
-     *     rule:string,
-     *     message:string
-     * }>
+     * @param  Collection<array-key, Model>  $models
+     * @return list<array{id: int, rule: string, message: string}>
      */
     public function check(Collection $models): array
     {
         $errors = [];
 
-        /** @var Collection<int, Model> $idMap */
         $idMap = $this->buildIdMap($models);
 
         foreach ($models as $model) {
-            $errors = [
-                ...$errors,
-                ...$this->checkModel($model, $idMap),
-            ];
+            foreach ($this->checkModel($model, $idMap) as $error) {
+                $errors[] = $error;
+            }
         }
 
         return $errors;
     }
 
     /**
-     * 构建 id => model 映射。
+     * 按节点 ID 建立索引。
      *
-     * @param  Collection<Model>  $models
+     * @param  Collection<array-key, Model>  $models
      * @return Collection<int, Model>
      */
     protected function buildIdMap(Collection $models): Collection
@@ -77,58 +67,46 @@ class TreePathChecker
      * 校验单个节点结构。
      *
      * @param  Collection<int, Model>  $idMap
-     * @return array<int, array{
-     *     id:int,
-     *     rule:string,
-     *     message:string
-     * }>
+     * @return list<array{id: int, rule: string, message: string}>
      */
     protected function checkModel(Model $model, Collection $idMap): array
     {
         $errors = [];
 
         $paths = $model->paths ?? [];
-        $level = $model->level;
         $pid = $model->pid;
         $id = $model->id;
 
-        // paths 不能为空
-        if ($err = $this->checkPathsNotEmpty($id, $paths)) {
-            $errors[] = $err;
-
-            return $errors;
+        if ($error = $this->checkPathsNotEmpty($id, $paths)) {
+            return [$error];
         }
 
-        // level 必须等于 paths 长度
-        if ($err = $this->checkLevelConsistency($id, $level, $paths)) {
-            $errors[] = $err;
+        if ($error = $this->checkLevelConsistency($id, $model->level, $paths)) {
+            $errors[] = $error;
         }
 
-        // paths 最后一位必须是自身 id
-        if ($err = $this->checkSelfReference($id, $paths)) {
-            $errors[] = $err;
+        if ($error = $this->checkSelfReference($id, $paths)) {
+            $errors[] = $error;
         }
 
-        // 根节点校验
         if ($pid == 0) {
-            if ($err = $this->checkRootNode($id, $paths)) {
-                $errors[] = $err;
+            if ($error = $this->checkRootNode($id, $paths)) {
+                $errors[] = $error;
             }
 
             return $errors;
         }
 
-        // 父节点必须存在
         $parent = $idMap->get($pid);
-        if ($err = $this->checkParentExists($id, $pid, $parent)) {
-            $errors[] = $err;
+
+        if ($error = $this->checkParentExists($id, $pid, $parent)) {
+            $errors[] = $error;
 
             return $errors;
         }
 
-        // paths 必须等于：父 paths + 当前 id
-        if ($err = $this->checkParentPathConsistency($id, $parent->paths ?? [], $paths)) {
-            $errors[] = $err;
+        if ($error = $this->checkParentPathConsistency($id, $parent->paths ?? [], $paths)) {
+            $errors[] = $error;
         }
 
         return $errors;
@@ -158,13 +136,13 @@ class TreePathChecker
         array $parentPaths,
         array $paths
     ): ?array {
-        $expect = [...$parentPaths, $id];
+        $expected = [...$parentPaths, $id];
 
-        if ($expect !== $paths) {
+        if ($expected !== $paths) {
             return $this->error(
                 $id,
                 'path_mismatch',
-                sprintf('expect=%s got=%s', json_encode($expect), json_encode($paths))
+                sprintf('expect=%s got=%s', json_encode($expected), json_encode($paths))
             );
         }
 
@@ -185,10 +163,6 @@ class TreePathChecker
 
     /**
      * 校验根节点结构。
-     *
-     * 根节点必须：
-     * - pid = 0
-     * - paths 长度 = 1
      */
     protected function checkRootNode(int $id, array $paths): ?array
     {
@@ -224,11 +198,7 @@ class TreePathChecker
     /**
      * 构建统一错误结构。
      *
-     * @return array{
-     *     id:int,
-     *     rule:string,
-     *     message:string
-     * }
+     * @return array{id: int, rule: string, message: string}
      */
     protected function error(int $id, string $rule, string $message): array
     {

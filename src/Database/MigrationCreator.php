@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Pin\Database;
 
+use Illuminate\Filesystem\Filesystem;
+
 /**
  * 使用 Pin 自定义 stub 的迁移文件创建器。
  */
 class MigrationCreator extends \Illuminate\Database\Migrations\MigrationCreator
 {
     /**
-     * MigrationCreator constructor.
+     * 设置迁移模板。
      */
-    public function __construct()
+    public function __construct(Filesystem $files)
     {
-        parent::__construct(app('files'), __DIR__.'/stubs');
+        parent::__construct($files, __DIR__.'/stubs');
     }
 }

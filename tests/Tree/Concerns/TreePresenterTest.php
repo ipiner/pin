@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Factories\MenuFactory;
+use App\Models\Menu;
 use Pin\Testing\Concerns\InteractsWithRedis;
 use Pin\Tests\InteractsWithDatabase;
 
@@ -20,3 +21,11 @@ it('builds full name', function () {
     expect(str_contains($item->fullName, '不存在或已删除'))->toBeTrue();
     expect(in_array('不存在或已删除', $item->namePath(null)))->toBeTrue();
 });
+
+it('returns an empty name for a node without a path', function (?string $path) {
+    $node = new Menu(['path' => $path]);
+
+    expect($node->namePath())->toBe('')
+        ->and($node->namePath(null))->toBe([])
+        ->and($node->fullName)->toBe('');
+})->with([null, '']);

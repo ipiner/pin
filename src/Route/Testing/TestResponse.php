@@ -8,28 +8,23 @@ use Illuminate\Testing\TestResponse as BaseResponse;
 use Pin\Errors\IError;
 
 /**
- * Pin TestResponse
- *
- * 对 Laravel TestResponse 的轻量包装，提供统一的业务响应断言能力
+ * 业务响应断言
  *
  * @mixin BaseResponse
  */
 class TestResponse
 {
-    use Assertions\AssertMessage,
-        Assertions\AssertMutation,
-        Assertions\AssertPagination,
-        Assertions\AssertValidation;
+    use Assertions\AssertMessage;
+    use Assertions\AssertMutation;
+    use Assertions\AssertPagination;
+    use Assertions\AssertValidation;
 
-    /**
-     * Laravel 原生 TestResponse 实例。
-     */
     public function __construct(public protected(set) BaseResponse $response)
     {
     }
 
     /**
-     * 转发未定义方法到底层 Laravel TestResponse。
+     * 转发响应方法
      */
     public function __call(string $method, array $arguments): mixed
     {
@@ -41,7 +36,7 @@ class TestResponse
     /**
      * 业务码断言
      *
-     * @param  int  $code  业务状态码
+     * @param  int|IError  $code  业务状态码
      * @param  int|null  $status  HTTP 状态码
      */
     public function assertCode(int|IError $code, ?int $status = null): static

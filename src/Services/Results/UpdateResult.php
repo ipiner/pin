@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pin\Services\Results;
 
+use Override;
 use Pin\Models\Model;
 
 /**
@@ -14,29 +15,34 @@ use Pin\Models\Model;
 class UpdateResult extends Result
 {
     /**
-     * 更新结果
-     *
-     * @param  TModel  $model  更新后的模型
-     * @param  bool  $updated  是否更新成功
+     * @param  TModel  $model
      */
-    public function __construct(public $model, public bool $updated)
+    public function __construct(public Model $model, public bool $updated)
     {
     }
 
     /**
-     * @return array{updated: bool, v: int|null}
+     * 更新结果数据
+     *
+     * @return array{updated: bool, v?: int}
      */
+    #[Override]
     public function toArray(): array
     {
-        return array_filter([
-            'updated' => $this->updated,
-            'v' => $this->model->v,
-        ], fn ($value) => $value !== null);
+        $data = ['updated' => $this->updated];
+        $version = $this->model->v;
+
+        if ($version !== null) {
+            $data['v'] = $version;
+        }
+
+        return $data;
     }
 
     /**
      * 响应消息
      */
+    #[Override]
     public function message(): string
     {
         return __($this->updated ? 'Update successfully' : 'Update failed');

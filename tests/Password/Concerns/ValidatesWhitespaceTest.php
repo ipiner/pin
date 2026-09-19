@@ -11,3 +11,9 @@ it('validates whitespace', function () {
     $this->rule->allowWhitespace();
     expect($this->invoker->validateWhiteSpace())->toBe(0);
 });
+
+it('rejects trailing newlines', function () {
+    $this->rule->value("password\n");
+
+    expect($this->invoker->validateWhitespace())->toBe(Errors::PasswordContainsWhitespace->code());
+});

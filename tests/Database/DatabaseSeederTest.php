@@ -26,3 +26,21 @@ it('discovers seeder classes from filesystem', function () {
         'Database\\Seeders\\Content\\ArticleSeeder'
     )->not->toContain('Database\\Seeders\\Exclude');
 });
+
+it('skips missing seeder directories', function () {
+    $seeder = $this->invoker(new DatabaseSeeder());
+
+    expect($seeder->seeders(__DIR__.'/missing-seeders'))->toBe([]);
+});
+
+it('resolves nested seeders from relative and trailing slash paths', function (string $path) {
+    $seeder = $this->invoker(new DatabaseSeeder());
+
+    expect($seeder->seeders($path))->toContain(
+        'Database\\Seeders\\UserSeeder',
+        'Database\\Seeders\\Content\\ArticleSeeder'
+    );
+})->with([
+    'relative path' => 'tests/Database/seeders',
+    'trailing slash' => __DIR__.'/seeders/',
+]);

@@ -6,6 +6,8 @@ namespace Pin\Models;
 
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model as BaseModel;
+use Override;
 use Pin\Models\Concerns\HasCache;
 use Pin\Models\Concerns\HasEvents;
 use Pin\Models\Concerns\HasMetadata;
@@ -13,19 +15,10 @@ use Pin\Models\Concerns\HasQueryable;
 use Pin\Models\Queryable\Queryable;
 use Pin\Models\Queryable\QueryableCondition;
 use Pin\Pagination\Pagination;
-use Pin\Support\Facades\RuntimeCache;
-use Pin\Support\Json;
 use Pin\Tree\Concerns\HasTree;
 
 /**
- * Base Model
- *
- * 自定义 Eloquent 基类，扩展了 Laravel 原生 Model 功能：
- * - 自动添加缓存和事件支持（Cache, HasEvents）
- * - 提供树结构支持（Tree）和查询封装（Queryable、Aggregate）
- * - 支持动态排序（Sort）和分页（Pagination）
- * - JSON 字段序列化统一封装（Json::encode）
- * - 自定义时间字段序列化格式（Y-m-d H:i:s）
+ * 模型基类
  *
  * @property int|null $id
  * @property int|null $v
@@ -38,14 +31,17 @@ use Pin\Tree\Concerns\HasTree;
  * @method static Builder|static addSelectMin(string $column, string $alias = null)
  * @method static Builder|static queryable(Queryable|QueryableCondition|array $queryable)
  * @method static Builder|static sort(array|string|null $value, array|string $allows)
- * @method static Pagination pagination(?int $page = null, int|null $pageSize = null, array $columns = ['*'])
+ * @method static Pagination pagination(?int $page = null, ?int $pageSize = null, array $columns = ['*'])
  *
  * @mixin Builder
  * @mixin HasTree
  */
-class Model extends \Illuminate\Database\Eloquent\Model
+class Model extends BaseModel
 {
-    use HasCache, HasEvents, HasMetadata, HasQueryable;
+    use HasCache;
+    use HasEvents;
+    use HasMetadata;
+    use HasQueryable;
 
     /**
      * 默认数据库连接
@@ -53,7 +49,7 @@ class Model extends \Illuminate\Database\Eloquent\Model
     public const string CONNECTION_DEFAULT = 'default';
 
     /**
-     * 允许批量赋值的字段，[] 表示全部可填充
+     * 禁止批量赋值的字段。
      *
      * @var string[]|bool
      */
@@ -67,21 +63,19 @@ class Model extends \Illuminate\Database\Eloquent\Model
     /**
      * 获取每页分页数量
      */
-    public function getPerPage()
+    #[Override]
+    public function getPerPage(): int
     {
-        if ($this->perPage !== null) {
-            return parent::getPerPage();
-        }
-
-        return $this->perPage = Pagination::getPageSize();
+        return $this->perPage ??= Pagination::getPageSize();
     }
 
     /**
-     * {@inheritDoc}
+     * 获取表名
      */
-    public function getTable()
+    #[Override]
+    public function getTable(): string
     {
-        return RuntimeCache::rememberForever(static::class.'.table', fn () => parent::getTable());
+        return $this->table ??= parent::getTable();
     }
 
     /**
@@ -94,16 +88,14 @@ class Model extends \Illuminate\Database\Eloquent\Model
      */
     public function transaction(callable $callback)
     {
-        $connection = $this->getConnection();
-        $connection->beginTransaction();
-
-        return tap($callback($this), fn () => $connection->commit());
+        return $this->getConnection()->transaction(fn () => $callback($this));
     }
 
     /**
      * 序列化日期字段
      */
-    protected function serializeDate(DateTimeInterface $date)
+    #[Override]
+    protected function serializeDate(DateTimeInterface $date): string
     {
         return $date->format('Y-m-d H:i:s');
     }

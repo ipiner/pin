@@ -5,35 +5,30 @@ declare(strict_types=1);
 namespace Pin\IdGenerator;
 
 /**
- * ID 生成策略枚举
- *
- *  内置生成策略：
- *  - Timestamp：基于时间戳的趋势递增 ID
- *  - Redis：基于 Redis INCR 的全局递增 ID
- *  - Snowflake：基于 Snowflake 算法的分布式 ID
+ * 内置 ID 生成器
  */
 enum IdGenerator: string
 {
     /**
-     * 基于时间戳生成趋势递增 ID
+     * 时间戳 ID
      */
     case Timestamp = 'timestamp';
 
     /**
-     * 基于 Redis INCR 生成全局递增 ID
+     * Redis 自增 ID
      */
     case Redis = 'redis';
 
     /**
-     * 基于 Snowflake 算法生成分布式 ID
+     * Snowflake ID
      */
     case Snowflake = 'snowflake';
 
     /**
-     * 使用当前生成策略生成 ID
+     * 生成一个或多个 ID。
      *
      * @param  int  $count  生成数量
-     * @return int|string|array 单个 ID 或 ID 列表
+     * @return int|string|list<int|string>
      */
     public function generate(int $count = 1): array|int|string
     {
@@ -41,7 +36,7 @@ enum IdGenerator: string
     }
 
     /**
-     * 生成器名称
+     * 容器绑定名称
      */
     public function name(): string
     {

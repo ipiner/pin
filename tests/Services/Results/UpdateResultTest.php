@@ -18,3 +18,9 @@ it('returns correct update result when updated is false', function () {
     expect(json_encode($result))->toBe('{"updated":false}')
         ->and($result->message())->toBe('Update failed');
 });
+
+it('preserves zero versions and failed update flags', function () {
+    $result = new UpdateResult(new User(['v' => 0]), false);
+
+    expect($result->toArray())->toBe(['updated' => false, 'v' => 0]);
+});

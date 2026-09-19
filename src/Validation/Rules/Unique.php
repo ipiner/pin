@@ -5,43 +5,38 @@ declare(strict_types=1);
 namespace Pin\Validation\Rules;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Override;
+use Pin\Models\Model;
 
 /**
- * Unique 唯一性验证规则（增强版）
- *
- * 基于 Eloquent Model 的唯一性校验规则，用于替代 Laravel 原生 unique 规则
+ * 唯一性验证。
  *
  * @template TModel of Model
  */
 class Unique extends ValidationRule
 {
+    protected string $message = 'validation.unique';
+
     /**
      * 附加查询条件
      *
-     * @var array<string, array{0:string,1:string,2:mixed}>
+     * @var array<string, array{string, string, mixed}>
      */
     protected array $wheres = [];
 
     /**
-     * 构造函数
-     *
      * @param  class-string<TModel>  $modelClass  目标模型类
      */
-    public function __construct(protected $modelClass)
+    public function __construct(protected string $modelClass)
     {
-        $this->message('validation.unique');
     }
 
     /**
-     * 判断指定值是否已存在
-     *
-     * @param  string  $attribute  字段名
-     * @param  mixed  $value  字段值
+     * 判断字段值是否已存在。
      */
     public function exists(string $attribute, mixed $value): bool
     {
-        return $this->buildQuery($attribute, $value)->select('id')->first() !== null;
+        return $this->buildQuery($attribute, $value)->exists();
     }
 
     /**
@@ -57,51 +52,46 @@ class Unique extends ValidationRule
     }
 
     /**
-     * 执行验证
+     * 验证唯一性。
      */
+    #[Override]
     protected function handle(string $attribute, mixed $value): bool
     {
         return ! $this->exists($attribute, $value);
     }
 
     /**
-     * 添加 where 条件
+     * 设置查询条件。
      *
-     * @param  string|array{0:string,1:string,2:mixed}  $column
+     * @param  string|array{string, string, mixed}  $column
      */
     public function where(string|array $column, mixed $value = null): static
     {
-        if (is_array($column)) {
-            $this->wheres[$column[0]] = $column;
-        } else {
-            $this->wheres[$column] = [$column, '=', $value];
-        }
+        $where = is_array($column) ? $column : [$column, '=', $value];
+        $this->wheres[$where[0]] = $where;
 
         return $this;
     }
 
     /**
-     * 添加 where != 条件
+     * 设置不等于条件。
      */
     public function whereNot(string $column, mixed $value): static
     {
-        $this->wheres[$column] = [$column, '!=', $value];
-
-        return $this;
+        return $this->where([$column, '!=', $value]);
     }
 
     /**
-     * 构建唯一性查询
+     * 构建唯一性查询。
      *
-     * @param  string  $attribute  字段名
-     * @param  mixed  $value  字段值
+     * @return Builder<TModel>
      */
     protected function buildQuery(string $attribute, mixed $value): Builder
     {
-        $query = $this->modelClass::where($attribute, $value);
+        $query = $this->modelClass::query()->where($attribute, $value);
 
-        foreach ($this->wheres as [$column, $operator, $value]) {
-            $query->where($column, $operator, $value);
+        foreach ($this->wheres as $where) {
+            $query->where(...$where);
         }
 
         return $query;

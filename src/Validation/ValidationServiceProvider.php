@@ -8,15 +8,15 @@ use Illuminate\Support\Facades\Validator;
 use Pin\Support\ServiceProvider;
 
 /**
- * 自定义验证规则服务提供者
+ * 验证服务提供者。
  */
 class ValidationServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap the application services.
+     * 注册查询标记规则。
      */
     public function boot(): void
     {
-        Validator::extend('q', fn () => true);
+        Validator::extend('q', static fn (): bool => true);
     }
 }

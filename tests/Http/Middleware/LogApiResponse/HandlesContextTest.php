@@ -28,7 +28,10 @@ it('builds log context', function () {
     expect($invoker->buildLogContext())->not->toHaveKey('payload');
 
     config(['pin.logging.response.include_request_payload' => true]);
-    expect($invoker->buildLogContext()['payload']['username'])->toBe('admin');
+    expect($invoker->buildLogContext()['payload'])->toBe([
+        'username' => 'admin',
+        'password' => '123******',
+    ])->and($request->post('password'))->toBe('123456');
 });
 
 it('resolves slow threshold', function () {

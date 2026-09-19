@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Pin\Support;
 
 use Illuminate\Support\Fluent;
+use Override;
 use RuntimeException;
 
 /**
- * 轻量级数据容器
- *
- * 继承于 `Laravel\Support\Fluent` 实现，在获取数据时，严格模式（不存在 key ）下会抛异常
+ * 支持严格读取的数据容器。
  */
 class DataBag extends Fluent
 {
@@ -24,23 +23,25 @@ class DataBag extends Fluent
     }
 
     /**
-     * 统一解析输入类型
-     *
-     * @param  mixed  $context  上下文输入
+     * 创建或复用数据容器。
      */
     public static function new($context): static
     {
-        return match (true) {
-            $context === null => new static(),
-            is_array($context) => new static($context),
-            ! $context instanceof static => new static($context->toArray()),
-            default => $context
-        };
+        if ($context instanceof static) {
+            return $context;
+        }
+
+        if (is_object($context) && method_exists($context, 'toArray')) {
+            $context = $context->toArray();
+        }
+
+        return new static($context ?? []);
     }
 
     /**
-     * 获取值
+     * 获取值。
      */
+    #[Override]
     public function value($key, mixed $default = null): mixed
     {
         if (array_key_exists($key, $this->attributes)) {

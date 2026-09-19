@@ -16,9 +16,8 @@ class RouteRegistrar
      */
     public static function register(array|string $routes): void
     {
-        foreach ((array) $routes as $enum) {
-            /** @var Routable $enum */
-            $enum::registerRoutes();
+        foreach ((array) $routes as $route) {
+            $route::registerRoutes();
         }
     }
 }

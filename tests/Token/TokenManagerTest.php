@@ -2,9 +2,14 @@
 
 declare(strict_types=1);
 
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Repository;
+use Illuminate\Support\Facades\Cache;
 use Pin\Support\Facades\Token;
 use Pin\Token\Drivers\AesDriver;
 use Pin\Token\TokenFactory;
+use Pin\Token\TokenManager;
 
 it('manages token drivers', function () {
     $driver = Token::driver();
@@ -44,4 +49,23 @@ it('throws exception when driver is not supported', function () {
 
     $this->expectExceptionMessage('Token driver [s] is not supported.');
     Token::driver('s');
+});
+
+it('uses the cache binding from the manager application', function () {
+    Cache::getFacadeRoot();
+
+    $cache = new Repository(new ArrayStore());
+    $manager = Mockery::mock(CacheManager::class, [$this->app])->makePartial();
+    $manager->shouldReceive('store')->once()->with('token-tests')->andReturn($cache);
+    $this->app->instance('cache', $manager);
+
+    $factory = (new TokenManager($this->app))->build([
+        'driver' => 'session',
+        'cacheStore' => 'token-tests',
+        'refresh_before' => 0,
+    ]);
+    $token = $factory->decode($factory->encode(['uid' => 1], 60));
+
+    expect($token->uid)->toBe(1)
+        ->and($cache->get($token->jti))->toBe($token->exp);
 });

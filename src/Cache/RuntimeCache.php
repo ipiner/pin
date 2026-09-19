@@ -8,33 +8,24 @@ use Closure;
 use Illuminate\Cache\Repository;
 
 /**
- * 进程内缓存
- *
- * 数据仅在当前 PHP 进程生命周期内有效。
+ * 进程内缓存。
  */
 class RuntimeCache
 {
     /**
-     * 缓存 TTL（秒）
-     *
-     * 默认 1 天
-     *
-     * @var int
+     * 默认缓存时间（秒）。
      */
     protected const int TTL = 86400;
 
     /**
-     * 内部缓存存储仓库 `Repository`
-     *
-     * 进程级共享（static）
+     * 进程共享的缓存仓库。
      */
-    protected static Repository $repo;
+    protected static Repository $repository;
 
     /**
-     * 获取当前缓存中的所有数据（支持按前缀过滤）
+     * 获取未过期的缓存。
      *
-     * @param  string|null  $prefix  key 前缀（如 "menus:"）
-     * @return array<string, mixed> 返回 key => value 结构
+     * @return array<array-key, mixed>
      */
     public function all(?string $prefix = null): array
     {
@@ -42,7 +33,7 @@ class RuntimeCache
     }
 
     /**
-     * 删除缓存
+     * 删除缓存。
      */
     public function delete(string $key): bool
     {
@@ -50,7 +41,7 @@ class RuntimeCache
     }
 
     /**
-     * 清空缓存
+     * 清空缓存。
      */
     public function flush(): bool
     {
@@ -58,7 +49,7 @@ class RuntimeCache
     }
 
     /**
-     * 获取缓存
+     * 获取缓存。
      */
     public function get(string $key, mixed $default = null): mixed
     {
@@ -66,25 +57,24 @@ class RuntimeCache
     }
 
     /**
-     * 获取缓存（带懒加载）
-     *
-     * 类似 Laravel -> Cache::remember()
+     * 获取或生成缓存。
      */
     public function remember(string $key, Closure $callback, ?int $ttl = self::TTL): mixed
     {
         $value = $this->repo()->get($key);
 
-        // 命中
         if ($value !== null) {
             return $value;
         }
 
-        // 未命中 → 执行回调
-        return tap($callback(), fn ($value) => $this->put($key, $value, $ttl));
+        $value = $callback();
+        $this->put($key, $value, $ttl);
+
+        return $value;
     }
 
     /**
-     * 永久缓存
+     * 获取或生成永久缓存。
      */
     public function rememberForever(string $key, Closure $callback): mixed
     {
@@ -92,20 +82,23 @@ class RuntimeCache
     }
 
     /**
-     * 获取存储仓库 `Repository`
+     * 获取缓存仓库。
      */
     public function repo(): Repository
     {
-        return static::$repo ??= new Repository(new ArrayStore(), ['store' => 'memoize']);
+        return static::$repository ??= new Repository(new ArrayStore(), ['store' => 'memoize']);
     }
 
     /**
-     * 设置缓存
+     * 写入缓存。
      */
     public function put(array|string $key, mixed $value = null, ?int $ttl = self::TTL): bool
     {
         return tap(
-            $this->repo()->put($key, $value, $ttl),
-            fn () => $this->repo()->getStore()->gc());
+            is_array($key)
+                ? $this->repo()->putMany($key, $value ?? $ttl)
+                : $this->repo()->put($key, $value, $ttl),
+            fn () => $this->repo()->getStore()->gc(),
+        );
     }
 }

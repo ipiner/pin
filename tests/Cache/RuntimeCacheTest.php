@@ -57,3 +57,12 @@ it('remembers values only once', function () {
     expect($count)->toBe(1)
         ->and(RuntimeCache::get('key'))->toBe('value');
 });
+
+it('applies the ttl to bulk writes', function () {
+    RuntimeCache::put(['first' => 1, 'second' => 2], ttl: 1);
+
+    $this->travel(2)->seconds();
+
+    expect(RuntimeCache::get('first'))->toBeNull()
+        ->and(RuntimeCache::get('second'))->toBeNull();
+});

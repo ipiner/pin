@@ -17,6 +17,16 @@ it('logs query response data', function () {
     // ignore
     config(['pin.logging.response.include_sql' => false]);
     config(['app.debug' => false]);
+    $resp->push($event, $event->sql);
 
     expect($resp->all())->toHaveCount(1);
+});
+
+it('returns query durations as integer milliseconds', function () {
+    $response = new QueryResponse();
+    $event = $this->getQueryExecuted(time: 0.25);
+
+    $response->push($event, $event->sql);
+
+    expect($response->all())->toBe([['sql' => $event->sql, 'time' => 0]]);
 });

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Pin\Application;
 use Pin\Exceptions\Handler;
 use Pin\Http\Middleware\ThrottleRequestsWithRedis;
@@ -42,4 +43,23 @@ it('configures middleware', function () {
 
     $aliases = (app(Kernel::class)->getMiddlewareAliases());
     expect($aliases['throttle'])->toBe(ThrottleRequestsWithRedis::class);
+});
+
+it('preserves explicitly configured routes when creating the application', function () {
+    $routes = fn () => null;
+
+    $app = $this->builder->withRouting(using: $routes)->create();
+
+    expect($this->invoker(RouteServiceProvider::class)->alwaysLoadRoutesUsing)->toBe($routes)
+        ->and($this->builder->create())->toBe($app)
+        ->and($this->invoker(RouteServiceProvider::class)->alwaysLoadRoutesUsing)->toBe($routes);
+});
+
+it('registers default routes only once', function () {
+    $app = $this->builder->create();
+    $routes = $this->invoker(RouteServiceProvider::class)->alwaysLoadRoutesUsing;
+
+    expect($routes)->toBeInstanceOf(Closure::class)
+        ->and($this->builder->create())->toBe($app)
+        ->and($this->invoker(RouteServiceProvider::class)->alwaysLoadRoutesUsing)->toBe($routes);
 });

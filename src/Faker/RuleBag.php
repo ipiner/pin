@@ -4,31 +4,27 @@ declare(strict_types=1);
 
 namespace Pin\Faker;
 
-use Illuminate\Contracts\Validation\ValidationRule;
-
 /**
- * Validation Rule 容器
- *
- * 用于解析 Laravel Validation Rules
+ * 验证规则容器
  */
 class RuleBag
 {
     /**
-     * 原始 Validation Rules
+     * 原始验证规则。
      *
-     * @var array<int, string>
+     * @var array<int, mixed>
      */
     protected array $rules;
 
     /**
      * 已解析的规则缓存。
      *
-     * @var array<string, array<int, string>>|null
+     * @var array<string, array<int, string>>
      */
     protected array $parsedRules;
 
     /**
-     * @var string|array<int, string|ValidationRule> 原始 Validation Rules
+     * @param  string|array<int, mixed>  $rules  验证规则
      */
     public function __construct(string|array $rules)
     {
@@ -40,11 +36,11 @@ class RuleBag
      */
     public function has(string $rule): bool
     {
-        return array_key_exists($rule, $this->parsedRules());
+        return isset($this->parsedRules()[$rule]);
     }
 
     /**
-     * 是否 nullable
+     * 是否允许空值
      */
     public function isNullable(): bool
     {
@@ -52,7 +48,7 @@ class RuleBag
     }
 
     /**
-     * 是否 required
+     * 是否必填
      */
     public function isRequired(): bool
     {
@@ -60,16 +56,7 @@ class RuleBag
     }
 
     /**
-     * 获取规则的第一个参数。
-     *
-     * 示例：
-     *
-     * ```
-     * integer|max:255
-     *
-     * $rules->parameter('max'); // 255
-     * $rules->parameter('min'); // null
-     * ```
+     * 获取规则的第一个参数
      */
     public function parameter(string $name, mixed $default = null): mixed
     {
@@ -77,7 +64,7 @@ class RuleBag
     }
 
     /**
-     * 获取全部参数
+     * 获取规则的全部参数。
      *
      * @return array<int, string>
      */
@@ -87,9 +74,9 @@ class RuleBag
     }
 
     /**
-     * 获取原始 Validation Rules。
+     * 获取原始验证规则。
      *
-     * @return array<int, string|ValidationRule>
+     * @return array<int, mixed>
      */
     public function rules(): array
     {
@@ -97,9 +84,7 @@ class RuleBag
     }
 
     /**
-     * 解析 Validation Rules。
-     *
-     * 仅解析 string rule
+     * 解析字符串规则。
      *
      * @return array<string, array<int, string>>
      */
@@ -112,24 +97,18 @@ class RuleBag
         $parsed = [];
 
         foreach ($this->rules as $rule) {
-            // 忽略对象规则
             if (! is_string($rule)) {
                 continue;
             }
 
-            // 无参数规则
             if (! str_contains($rule, ':')) {
                 $parsed[$rule] = [];
 
                 continue;
             }
 
-            // 解析参数规则
             [$name, $parameters] = explode(':', $rule, 2);
-            $parsed[$name] = array_map(
-                'trim',
-                explode(',', $parameters),
-            );
+            $parsed[$name] = array_map('trim', explode(',', $parameters));
         }
 
         return $this->parsedRules = $parsed;

@@ -10,7 +10,7 @@ use Pin\Token\Token;
 use Throwable;
 
 /**
- * Token 已过期异常。
+ * Token 已过期。
  */
 class TokenExpiredException extends TokenException implements ShouldntReport
 {

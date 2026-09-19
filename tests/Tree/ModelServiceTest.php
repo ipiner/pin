@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Factories\MenuFactory;
 use App\Models\Menu;
 use App\Services\MenuService;
+use Illuminate\Validation\ValidationException;
 use Pin\Errors\Errors;
 use Pin\Testing\Concerns\InteractsWithRedis;
 use Pin\Tests\InteractsWithDatabase;
@@ -99,6 +100,54 @@ it('builds query sql as expected', function () {
         ->toRawSql();
 
     expect($sql)->toBe(
-        'select * from "menus" where "menus"."deleted_at" = 0 order by "level" asc, "sort" asc, "id" asc'
+        'select * from "menus" where "menus"."deleted_at" = 0'
+        .' order by "level" asc, "sort" asc, "id" asc'
     );
+});
+
+it('validates sibling names using the action payload', function () {
+    $parent = MenuFactory::new()->create();
+    MenuFactory::new()->create(['name' => 'duplicate', 'pid' => $parent->id]);
+    $action = new class(new MenuService()) extends Action
+    {
+        protected function rules(): array
+        {
+            return $this->basicRules();
+        }
+    };
+    $action->context('id', 0)->payload([
+        'name' => 'duplicate',
+        'pid' => $parent->id,
+        'sort' => 0,
+    ]);
+
+    expect(fn () => $action->validated())->toThrow(ValidationException::class);
+});
+
+it('builds tree rules before context has been initialized', function () {
+    $action = new class(new MenuService()) extends Action
+    {
+    };
+
+    expect($this->invoker($action)->basicRules())->toHaveKeys(['name', 'pid', 'sort']);
+});
+
+it('rolls back a subtree move when a descendant update is cancelled', function () {
+    $root = MenuFactory::new()->create(['id' => 1]);
+    MenuFactory::new()->create(['id' => 2, 'pid' => 1]);
+    MenuFactory::new()->create(['id' => 3]);
+    $events = Menu::getEventDispatcher();
+    Menu::setEventDispatcher(clone $events);
+    Menu::updating(fn (Menu $node) => $node->id === 2 ? false : null);
+
+    try {
+        expect(fn () => (new MenuService())->update($root, ['pid' => 3]))
+            ->toThrow(Errors::UpdateFailed->exception());
+
+        expect(Menu::query()->find(1)->path)->toBe('1')
+            ->and(Menu::query()->find(1)->pid)->toBe(0)
+            ->and(Menu::query()->find(2)->path)->toBe('1/2');
+    } finally {
+        Menu::setEventDispatcher($events);
+    }
 });

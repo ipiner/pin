@@ -4,57 +4,56 @@ declare(strict_types=1);
 
 namespace Pin\Http\Middleware;
 
+use Illuminate\Foundation\Http\Middleware\TransformsRequest as BaseTransformsRequest;
 use Illuminate\Support\Facades\Request;
 use Override;
 
 /**
  * 请求字段转换基类
- *
- * 用于在请求进入业务层之前对指定字段进行标准化处理
  */
-abstract class TransformsRequest extends \Illuminate\Foundation\Http\Middleware\TransformsRequest
+abstract class TransformsRequest extends BaseTransformsRequest
 {
     /**
-     * 需要进行转换的字段列表
+     * 待转换字段。
      *
      * @var string[]
      */
     protected array $fields = [];
 
     /**
-     * 解析明文输入
-     *
-     * 满足以下条件之一时，支持使用 `plain:` 明文输入
-     *
-     * - 非生产环境
-     * - API 文档
+     * 解析非生产环境或 API 文档的明文输入
      */
     public static function resolvePlainValue(string $input): ?string
     {
-        if (
-            str_starts_with($input, 'plain:')
-            && (Request::isFromApiDocument() || ! app()->isProduction())
-        ) {
-            return substr($input, 6);
+        if (! str_starts_with($input, 'plain:')) {
+            return null;
         }
 
-        return null;
+        if (app()->isProduction() && ! Request::isFromApiDocument()) {
+            return null;
+        }
+
+        return substr($input, 6);
     }
 
     /**
-     * 字段标准化处理逻辑
+     * 转换字段值
      */
     abstract protected function normalize(string $value): string;
 
     /**
-     * 请求字段转换入口
+     * 转换指定字段
      */
     #[Override]
     protected function transform($key, $value)
     {
+        if (! in_array($key, $this->fields, true)) {
+            return $value;
+        }
+
         $value = (string) $value;
 
-        if (! in_array($key, $this->fields) || $value === '') {
+        if ($value === '') {
             return $value;
         }
 

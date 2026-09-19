@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pin\Services\Results;
 
+use Override;
 use Pin\Models\Model;
 
 /**
@@ -14,17 +15,18 @@ use Pin\Models\Model;
 class CreateResult extends Result
 {
     /**
-     * 创建后的模型实例
-     *
      * @param  TModel  $model
      */
-    public function __construct(public $model)
+    public function __construct(public Model $model)
     {
     }
 
     /**
-     * 转换为创建结果响应数据
+     * 创建结果数据
+     *
+     * @return array{id: int|null}
      */
+    #[Override]
     public function toArray(): array
     {
         return [
@@ -35,6 +37,7 @@ class CreateResult extends Result
     /**
      * 响应消息
      */
+    #[Override]
     public function message(): string
     {
         return __('Create successfully');

@@ -9,61 +9,52 @@ use Pin\Models\Model;
 use Pin\Support\Facades\RuntimeCache;
 
 /**
- * 表 Metadata 解析器。
- *
- * 从 schema 文件加载表级元数据。
+ * 数据表元数据。
  */
 class Metadata
 {
     /**
-     * 表显示名称
+     * 表名称。
      */
     public protected(set) string $label;
 
     /**
-     * 字段元数据
+     * 字段名称映射。
+     *
+     * @var array<string, string>
      */
     public protected(set) array $attributes;
 
-    /**
-     * 创建 Metadata 实例
-     */
     public function __construct(protected string $connection, protected string $table)
     {
-        $schemas = $this->load();
-        $this->label = $schemas['label'] ?? Str::title($this->table);
-        $this->attributes = $schemas['attributes'] ?? [];
+        $metadata = $this->load();
+        $this->label = $metadata['label'] ?? Str::title($this->table);
+        $this->attributes = $metadata['attributes'] ?? [];
     }
 
     /**
-     * 加载 schema 文件。
+     * 获取表元数据。
      *
-     * @param  string|class-string<Model>
+     * @param  string|class-string<Model>  $connection
      */
     public static function make(string $connection, ?string $table = null): static
     {
         return RuntimeCache::rememberForever(
-            $connection.$table.'.meta',
-            function () use ($connection, $table) {
+            static::class.":{$connection}:{$table}",
+            static function () use ($connection, $table) {
                 if (! $table) {
                     $model = new $connection();
                     $connection = $model->getConnectionName() ?: config('database.default');
                     $table = $model->getTable();
                 }
 
-                return new Metadata($connection, $table);
+                return new static($connection, $table);
             }
         );
     }
 
     /**
-     * 加载 schema 文件
-     *
-     * 文件路径：
-     *
-     * ```txt
-     * database/schemas/{connection}/{table}.php
-     * ```
+     * 加载元数据文件。
      */
     protected function load(): array
     {

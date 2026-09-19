@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Monolog\Formatter\LineFormatter;
 use Pin\Log\Config;
 
 it('builds daily log config', function () {
@@ -26,4 +27,13 @@ it('resolves log paths', function () {
 
     expect($invoker->resolveLogPath('app'))->toBe(storage_path('testing-logs/app.log'))
         ->and($invoker->resolveLogPath('app', 'production'))->toBe(storage_path('logs/app.log'));
+});
+
+it('uses a subclass default formatter', function () {
+    $config = new class extends Config
+    {
+        public static ?string $defaultFormatter = LineFormatter::class;
+    };
+
+    expect($config::single('app')['formatter'])->toBe(LineFormatter::class);
 });

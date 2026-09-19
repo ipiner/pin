@@ -12,7 +12,7 @@ it('retrieves the caller', function () {
 
     $caller = (new Exception())->getCaller('file', 123);
     expect($caller['line'])->toBe(123)
-        ->and('file')->toBe('file');
+        ->and($caller['file'])->toBe('file');
 });
 
 it('initializes exception', function () {

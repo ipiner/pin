@@ -36,3 +36,45 @@ it('memoizes inspectors by class string', function () {
 
     expect($second)->toBe($first);
 });
+
+it('shares inspectors across route instances and normalized class names', function () {
+    $inspector = ModuleInspector::make(UserRoute::class);
+
+    expect(ModuleInspector::make(UserRoute::Create))->toBe($inspector)
+        ->and(ModuleInspector::make('\\'.UserRoute::class))->toBe($inspector)
+        ->and((new ModuleInspector('\\'.UserRoute::class))->toArray())
+        ->toBe($inspector->toArray());
+});
+
+it('isolates inspector caches from other runtime values', function () {
+    RuntimeCache::put(UserRoute::class, 'other value');
+
+    expect(ModuleInspector::make(UserRoute::class))->toBeInstanceOf(ModuleInspector::class)
+        ->and(RuntimeCache::get(UserRoute::class))->toBe('other value');
+});
+
+it('isolates inspector subclasses', function () {
+    $base = ModuleInspector::make(UserRoute::class);
+    $extension = new class(UserRoute::class) extends ModuleInspector
+    {
+        public function domain(): string
+        {
+            return 'Custom';
+        }
+    };
+    $custom = $extension::make(UserRoute::class);
+
+    expect($custom)->toBeInstanceOf($extension::class)->not->toBe($base)
+        ->and($custom->domain())->toBe('Custom')
+        ->and($extension::make(UserRoute::Create))->toBe($custom);
+});
+
+it('resolves existing candidates and falls back to the last class', function () {
+    $inspector = $this->invoker(new ModuleInspector(UserRoute::class));
+
+    expect($inspector->resolveFirstExistingClass(['MissingClass', User::class, 'Fallback']))
+        ->toBe(User::class)
+        ->and($inspector->resolveFirstExistingClass(['MissingClass', 'Fallback']))
+        ->toBe('Fallback')
+        ->and($inspector->resolveFirstExistingClass([]))->toBeNull();
+});

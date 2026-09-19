@@ -7,35 +7,37 @@ namespace Pin\Tree\Concerns;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 /**
- * TreePresenter
- *
- * 树形结构的“展示层（Presentation Layer）”，将 path 结构转换为用户可读的展示数据。
+ * 树路径展示。
  */
 trait TreePresenter
 {
     /**
-     * fullName 访问器
+     * 获取完整名称。
      *
-     * @return Attribute<string>
+     * @return Attribute<string, never>
      */
     public function fullName(): Attribute
     {
-        return Attribute::get(
-            fn () => $this->namePath()
-        );
+        return Attribute::get(fn () => $this->namePath());
     }
 
     /**
-     * 将 path 转换为“名称路径字符串或数组”
+     * 获取名称路径。
      */
     public function namePath(?string $separator = ' / '): array|string
     {
-        $ids = explode('/', $this->path);
+        $ids = $this->paths();
+
+        if (! $ids) {
+            return $separator === null ? [] : '';
+        }
+
         $items = static::findMany($ids);
-        $names = collect($ids)->map(
-            fn ($id) => $items->get($id)?->name ?? '不存在或已删除'
+        $names = array_map(
+            fn ($id) => $items->get($id)?->name ?? '不存在或已删除',
+            $ids,
         );
 
-        return $separator === null ? $names->toArray() : $names->join($separator);
+        return $separator === null ? $names : implode($separator, $names);
     }
 }

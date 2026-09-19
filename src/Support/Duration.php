@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Pin\Support;
 
 /**
- * Duration
- *
- * 执行耗时与内存使用统计工具
+ * 执行耗时与内存变化。
  */
 class Duration
 {
@@ -17,10 +15,8 @@ class Duration
     protected int $memory;
 
     /**
-     * 构造函数
-     *
-     * @param  float  $start  开始时间（microtime(true)）
-     * @param  float  $end  结束时间（microtime(true)）
+     * @param  float  $start  开始时间戳（秒）
+     * @param  float  $end  结束时间戳（秒）
      */
     public function __construct(
         protected readonly float $start,
@@ -31,8 +27,6 @@ class Duration
 
     /**
      * 获取执行耗时（秒）
-     *
-     * @param  int  $decimals  保留小数位数，默认 4 位
      */
     public function seconds(int $decimals = 4): float
     {

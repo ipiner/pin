@@ -6,16 +6,15 @@ namespace Pin\Auth;
 
 use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Guard as GuardContract;
+use Illuminate\Http\Request;
+use Pin\Token\Exceptions\TokenException;
 use Throwable;
 
 /**
  * 基于 Token 的认证 Guard。
- *
- * Guard 负责从当前请求中解析 Token，并通过用户提供器加载认证用户。
- * 在 HTTP 场景中，它会读取请求 Token；在控制台场景中，它会创建
- * 一个代表当前运行环境的用户上下文。
  */
-class Guard implements \Illuminate\Contracts\Auth\Guard
+class Guard implements GuardContract
 {
     use GuardHelpers;
 
@@ -25,12 +24,12 @@ class Guard implements \Illuminate\Contracts\Auth\Guard
     public const string NAME = 'pin';
 
     /**
-     * 请求属性中用于保存未认证原因的键名。
+     * 未认证原因的请求属性键名。
      */
     public const string UNAUTHENTICATED_CODE = 'unauthenticated.code';
 
     /**
-     * 标记当前请求是否已经完成用户解析。
+     * 是否已解析用户。
      */
     protected bool $userResolved = false;
 
@@ -42,57 +41,95 @@ class Guard implements \Illuminate\Contracts\Auth\Guard
     }
 
     /**
-     * 注销当前认证用户。
-     *
-     * 该操作会清理当前用户状态，并使当前请求关联的 Token 失效。
+     * 清理用户解析状态。
+     */
+    public function forgetUser(): static
+    {
+        $this->user = null;
+        $this->userResolved = false;
+        $this->tokenResolver->getRequest()->attributes->remove(static::UNAUTHENTICATED_CODE);
+
+        return $this;
+    }
+
+    /**
+     * 注销请求 Token。
      */
     public function logout(): void
     {
-        $this->forgetUser();
-        $this->tokenResolver->forgetToken();
+        try {
+            $this->revokeToken();
+        } finally {
+            $this->forgetUser();
+            $this->userResolved = true;
+        }
+    }
 
-        $this->userResolved = false;
+    /**
+     * 设置当前请求。
+     */
+    public function setRequest(Request $request): static
+    {
+        $this->tokenResolver->setRequest($request);
+
+        return $this->forgetUser();
+    }
+
+    public function setUser(Authenticatable $user): static
+    {
+        $this->user = $user;
+        $this->userResolved = true;
+        $this->tokenResolver->getRequest()->attributes->remove(static::UNAUTHENTICATED_CODE);
+
+        return $this;
     }
 
     /**
      * 获取当前认证用户。
-     *
-     * 用户只会在首次访问时解析一次，解析结果会在当前请求生命周期内复用。
-     * 如果认证失败，将返回 null，并把失败原因交由异常处理器统一处理。
      */
     public function user(): ?Authenticatable
     {
-        // 已解析过，直接返回（包括 null）
+        // 复用解析结果（包括 null）。
         if ($this->userResolved || $this->user) {
             return $this->user;
         }
 
         $this->userResolved = true;
+        $this->tokenResolver->getRequest()->attributes->remove(static::UNAUTHENTICATED_CODE);
 
         try {
             return $this->user = $this->resolveUser();
         } catch (Throwable $e) {
-            // 重要：不能抛异常，否则可能导致中间件链中断
-            // 如：Sanctum 的 AuthenticateSession 会调用 $request->user()
-
+            // 保存认证错误码。
+            $this->tokenResolver->getRequest()->attributes->set(
+                static::UNAUTHENTICATED_CODE,
+                $e->getCode(),
+            );
             report($e);
-
-            // 将错误码写入 request，由 `Exception Handler` 统一处理
-            app()->request->attributes->set(static::UNAUTHENTICATED_CODE, $e->getCode());
 
             return null;
         }
     }
 
     /**
-     * 校验给定凭证是否可以解析为有效用户。
+     * 校验认证凭证。
      */
     public function validate(array $credentials = []): bool
     {
-        $key = config('auth.guards.pin.token_key', 'token');
+        $token = $credentials[$this->tokenResolver->getTokenKey()] ?? null;
+
+        if (! is_string($token) || trim($token) === '') {
+            return false;
+        }
 
         $resolver = clone $this->tokenResolver;
-        $resolver->resolve($credentials[$key]);
+
+        try {
+            $resolver->resolve($token);
+        } catch (TokenException) {
+            return false;
+        }
+
         $id = $resolver->getUid();
 
         return $id > 0 && $this->provider->retrieveById($id);
@@ -100,9 +137,6 @@ class Guard implements \Illuminate\Contracts\Auth\Guard
 
     /**
      * 在非生产环境中解析调试登录用户。
-     *
-     * 支持通过用户 ID 或用户名快速获取用户。生产环境以及 Sanctum Token
-     * 不会进入该流程。
      *
      * @throws AuthenticationException
      */
@@ -183,5 +217,22 @@ class Guard implements \Illuminate\Contracts\Auth\Guard
         }
 
         return $this->resolveTokenUser($token);
+    }
+
+    /**
+     * 注销请求 Token。
+     */
+    protected function revokeToken(): void
+    {
+        if (! $this->tokenResolver->getResolvedToken()) {
+            try {
+                $this->tokenResolver->resolve($this->tokenResolver->getRequestToken());
+            } catch (TokenException) {
+                // 已失效或非法的 Token 无需再注销。
+                return;
+            }
+        }
+
+        $this->tokenResolver->forgetToken();
     }
 }

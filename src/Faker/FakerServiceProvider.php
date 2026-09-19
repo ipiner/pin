@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Validator;
 use Pin\Support\ServiceProvider;
 
 /**
- * Fake 数据生成服务提供者
+ * 测试数据服务提供者
  */
 class FakerServiceProvider extends ServiceProvider
 {
     /**
-     * Fake 数据生成相关单例
+     * 单例服务
      */
     public $singletons = [
         Faker::class,
@@ -23,10 +23,10 @@ class FakerServiceProvider extends ServiceProvider
     ];
 
     /**
-     * Bootstrap the application services.
+     * 注册占位验证规则
      */
     public function boot(): void
     {
-        Validator::extend('fake', fn () => true);
+        Validator::extend('fake', static fn () => true);
     }
 }

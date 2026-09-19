@@ -22,3 +22,8 @@ it('parses many hash keys', function (array $input, array $expected) {
         ['users', ['1', '2']],
     ],
 ]);
+
+it('rejects keys belonging to different hashes', function () {
+    expect(fn () => HashKey::parseMany(['users:1', 'teams:1']))
+        ->toThrow(InvalidArgumentException::class);
+});

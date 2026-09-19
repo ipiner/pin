@@ -9,26 +9,17 @@ use Illuminate\Http\JsonResponse;
 use Pin\Http\ApiResponse;
 
 /**
- * Fake Response 异常
- *
- * 用于中断当前请求并返回模拟数据响应：
- * - API Mock 数据
- * - Action 调试模式
- * - 接口预览 / Playground
- *
- * 该异常不会进入错误上报系统
+ * 模拟数据响应异常。
  */
 class FakeResponseException extends Exception implements Responsable
 {
     /**
-     * 不上报异常
-     *
-     * Fake Response 属于正常控制流
+     * 不记录日志。
      */
     public ?bool $report = false;
 
     /**
-     * Mock 数据
+     * 设置模拟数据。
      */
     public function __construct(protected array $data)
     {
@@ -36,7 +27,7 @@ class FakeResponseException extends Exception implements Responsable
     }
 
     /**
-     * 转换为 JSON Response
+     * 输出模拟数据。
      */
     public function toResponse($request): JsonResponse
     {

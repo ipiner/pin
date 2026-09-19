@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Pin\Validation\Rules;
 
 use Closure;
+use Illuminate\Contracts\Validation\ValidationRule as ValidationRuleContract;
+use Override;
 
 /**
- * 自定义验证规则
+ * 验证规则基类。
  */
-abstract class ValidationRule implements \Illuminate\Contracts\Validation\ValidationRule
+abstract class ValidationRule implements ValidationRuleContract
 {
     /**
      * 验证失败提示信息
@@ -22,12 +24,11 @@ abstract class ValidationRule implements \Illuminate\Contracts\Validation\Valida
     abstract protected function handle(string $attribute, mixed $value): bool;
 
     /**
-     * 验证入口
+     * 执行验证。
      *
-     * @param  string  $attribute  当前验证字段
-     * @param  mixed  $value  当前字段值
-     * @param  Closure(string):void  $fail  验证失败回调
+     * @param  Closure(string): mixed  $fail  失败回调
      */
+    #[Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! $this->handle($attribute, $value)) {

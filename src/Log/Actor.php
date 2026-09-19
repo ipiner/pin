@@ -8,12 +8,12 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Pin\Auth\ConsoleUser;
 
 /**
- * 当前执行主体（Actor）解析器
+ * 日志操作用户
  */
 class Actor
 {
     /**
-     * 获取 Actor 的唯一标识 ID
+     * 获取用户 ID
      */
     public function id(): int
     {
@@ -21,7 +21,7 @@ class Actor
     }
 
     /**
-     * 获取 Actor 类型标识
+     * 获取用户类型
      */
     public function type(): string
     {
@@ -29,25 +29,27 @@ class Actor
 
         return match (true) {
             $user instanceof ConsoleUser => 'console',
-            $user === null => 'guest',
+            ! $user => 'guest',
             default => strtolower(class_basename($user)),
         };
     }
 
     /**
-     * 获取当前 Actor 用户对象
+     * 获取当前用户
      */
     public function user(): Authenticatable|ConsoleUser|null
     {
+        $guard = auth()->guard();
+
         return match (true) {
-            auth()->hasUser() => auth()->user(),   // Web 已登录用户
-            app()->runningInHttp() => null,        // HTTP 请求未登录用户（guest）
-            default => app(ConsoleUser::class),    // CLI 执行用户
+            $guard->hasUser() => $guard->user(),
+            app()->runningInHttp() => null,
+            default => app(ConsoleUser::class),
         };
     }
 
     /**
-     * 获取 Actor 名称
+     * 获取用户名
      */
     public function username(): string
     {

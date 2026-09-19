@@ -7,19 +7,19 @@ namespace Pin\Log;
 use Illuminate\Log\Logger;
 
 /**
- * 日志扩展 Tap 回调
+ * 日志处理器注册回调
  */
 class ExtraTapper
 {
     /**
-     * 构造方法
+     * 构造函数
      */
     public function __construct(protected ExtraProcessor $processor)
     {
     }
 
     /**
-     * Tap 回调方法
+     * 注册上下文处理器
      */
     public function __invoke(Logger $logger): void
     {

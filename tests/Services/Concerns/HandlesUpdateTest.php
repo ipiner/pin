@@ -57,3 +57,47 @@ it('handles updating version checks', function () {
     $this->expectExceptionCode(Errors::DataVersionMismatch->code());
     $service->updating(new User(['v' => 20]), $data);
 });
+
+it('skips success hooks and callbacks when an update is cancelled', function () {
+    $service = new class extends UserService
+    {
+        public array $events = [];
+
+        protected function updated($model, array $data): void
+        {
+            $this->events[] = 'updated';
+        }
+
+        protected function saved($model, array $data): void
+        {
+            $this->events[] = 'saved';
+        }
+    };
+    $user = $service->create(['username' => Str::random()])->model;
+    $service->events = [];
+
+    $result = $service->update(
+        $user->id,
+        ['username' => User::REJECTED_USERNAME],
+        function () use ($service) {
+            $service->events[] = 'callback';
+        }
+    );
+
+    expect($result->updated)->toBeFalse()
+        ->and($service->events)->toBeEmpty()
+        ->and(User::query()->find($user->id)->username)->toBe($user->username);
+});
+
+it('rolls back an update when the callback fails', function () {
+    $service = new UserService();
+    $user = $service->create(['username' => Str::random()])->model;
+
+    expect(fn () => $service->update(
+        $user->id,
+        ['username' => 'rollback-update'],
+        fn () => throw new RuntimeException('callback failed')
+    ))->toThrow(RuntimeException::class, 'callback failed');
+
+    expect(User::query()->find($user->id)->username)->toBe($user->username);
+});

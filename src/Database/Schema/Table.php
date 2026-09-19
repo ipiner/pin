@@ -9,31 +9,34 @@ use Illuminate\Support\Str;
 use Pin\Support\DataBag;
 
 /**
- * 数据表 Schema DTO。
+ * 数据表结构。
  *
  * @property string $name 表名
  * @property string|null $comment 表备注
- * @property string|null $label 表展示名称，由 comment 自动解析生成（派生字段）
- * @property array<string, array> $columns 原始字段集合
+ * @property string $label 表名称
+ * @property array<string, Column|array> $columns 字段集合
  */
 class Table extends DataBag
 {
     public function __construct(array $attributes)
     {
         parent::__construct($attributes);
+
         $this->label = $this->parseLabel();
+        $this->columns = array_map($this->resolveColumn(...), $attributes['columns'] ?? []);
     }
 
     /**
-     * 字段 label 映射。
+     * 获取字段名称映射。
      *
      * @return array<string, string>
      */
     public function attributes(): array
     {
-        return $this->columns()
-            ->map(fn (Column $column) => $column->label)
-            ->toArray();
+        return array_map(
+            fn (Column|array $column) => $this->resolveColumn($column)->label,
+            $this->columns
+        );
     }
 
     /**
@@ -47,19 +50,17 @@ class Table extends DataBag
     }
 
     /**
-     * 获取所有字段
+     * 获取所有字段。
      *
      * @return Collection<string, Column>
      */
     public function columns(): Collection
     {
-        return collect($this->columns)->map(
-            fn ($item) => $this->resolveColumn($item)
-        );
+        return collect($this->columns)->map($this->resolveColumn(...));
     }
 
     /**
-     * 是否存在字段
+     * 是否存在字段。
      */
     public function hasColumn(string $name): bool
     {
@@ -67,19 +68,19 @@ class Table extends DataBag
     }
 
     /**
-     * label 派生
-     *
-     * comment → label fallback
+     * 解析表名称。
      */
     protected function parseLabel(): string
     {
-        return $this->comment
-            ? str_replace('表', '', explode('|', $this->comment)[0])
-            : Str::headline(Str::singular($this->name));
+        if ($comment = $this->comment ?? null) {
+            return Str::replaceEnd('表', '', explode('|', $comment, 2)[0]);
+        }
+
+        return Str::headline(Str::singular($this->name));
     }
 
     /**
-     * Column 标准化。
+     * 转换字段结构。
      */
     protected function resolveColumn(Column|array $column): Column
     {

@@ -6,6 +6,7 @@ namespace Pin\Scramble;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Override;
 
 /**
  * 创建成功响应文档资源
@@ -13,8 +14,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class Created extends JsonResource implements SchemaType
 {
     /**
-     * 定义创建响应结构
+     * 创建响应数据
+     *
+     * @return array{id: int}
      */
+    #[Override]
     public function toArray(Request $request): array
     {
         return [

@@ -4,34 +4,48 @@ declare(strict_types=1);
 
 namespace Pin\Tree\Concerns;
 
+use Pin\Errors\Errors;
+use Pin\Exceptions\Exception;
+
 /**
- * TreePath（物化路径层）
- *
- * 对树结构中 path 的生成与解析
+ * 树路径读写。
  */
 trait TreePath
 {
     /**
-     * @var string[]
+     * @var list<string>
      */
     protected $appends = ['paths'];
 
     /**
-     * 根据父节点生成当前节点的 Materialized Path（物化路径）
+     * 根据父节点生成路径。
      *
-     * @param  int  $id  当前节点 ID
      * @param  int  $pid  父节点 ID（0 表示根节点）
-     * @return string 物化路径字符串
      */
     public static function buildPath(int $id, int $pid): string
     {
-        return $pid
-            ? static::find($pid)->path.'/'.$id
-            : (string) $id;
+        if (! $pid) {
+            return (string) $id;
+        }
+
+        return static::findOrFail($pid)->path.'/'.$id;
     }
 
     /**
-     * 追加祖先路径 ID 数组，方便前端树控件回显。
+     * 校验移动目标。
+     */
+    protected function ensureParentValid(): void
+    {
+        if (
+            $this->pid
+            && in_array($this->id, static::findOrFail($this->pid)->paths(), true)
+        ) {
+            throw new Exception('不能以自身或子节点作为父节点', 422)->withStatusCode(422);
+        }
+    }
+
+    /**
+     * 获取路径 ID 数组。
      */
     public function getPathsAttribute(): array
     {
@@ -39,9 +53,9 @@ trait TreePath
     }
 
     /**
-     * 解析当前节点的路径为 ID 数组
+     * 解析路径 ID。
      *
-     * @return int[] 节点路径 ID 列表（从根到当前节点）
+     * @return list<int>
      */
     public function paths(): array
     {
@@ -51,35 +65,21 @@ trait TreePath
     }
 
     /**
-     * 更新子树路径
+     * 更新后代节点的路径和层级。
      */
     protected static function relocateSubtree(string $oldPath, string $newPath): int
     {
-        /**
-         * 移动前：
-         * id   path
-         * 1    1
-         * 2    1/2
-         * 10   1/10
-         * 11   1/10/11
-         *
-         * 执行：
-         * relocateSubtree('1/10', '1/2')
-         *
-         * 移动后：
-         * id   path
-         * 1    1
-         * 2    1/2
-         * 10   1/2/10
-         * 11   1/2/10/11
-         */
         $items = static::descendantsOf($oldPath);
-        $len = strlen($oldPath);
+        $prefixLength = strlen($oldPath);
+
         foreach ($items as $item) {
             /** @var static $item */
-            $item->path = $newPath.substr($item->path, $len);
+            $item->path = $newPath.substr($item->path, $prefixLength);
             $item->level = $item->pathLevel();
-            $item->save();
+
+            if (! $item->save()) {
+                Errors::UpdateFailed->throw();
+            }
         }
 
         return $items->count();

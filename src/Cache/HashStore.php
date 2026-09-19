@@ -7,19 +7,17 @@ namespace Pin\Cache;
 use Illuminate\Contracts\Cache\Store;
 
 /**
- * 支持 Hash 字段级读取和整表删除的缓存 Store。
+ * Hash 缓存存储。
  */
 interface HashStore extends Store
 {
     /**
-     * 物理删除缓存 key（整表删除）
-     *
-     * @param  array|string  $key  缓存键
+     * 删除整个 Hash。
      */
     public function del(array|string $key): bool;
 
     /**
-     * 获取整个 hash 的所有字段与值
+     * 获取全部字段值。
      *
      * @return array<string, mixed>
      */

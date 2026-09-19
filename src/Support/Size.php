@@ -29,8 +29,6 @@ class Size
 
     /**
      * 将字节数格式化为可读字符串
-     *
-     * @param  int  $bytes  字节数
      */
     public static function format(int $bytes): string
     {
@@ -45,13 +43,12 @@ class Size
     /**
      * 将带单位的字符串转换为字节数
      *
-     * @throws InvalidArgumentException 当单位不合法时抛出异常
+     * @throws InvalidArgumentException
      */
     public static function toBytes(string $value): int
     {
         $value = strtolower($value);
 
-        // 提取数值部分（支持浮点）
         $size = (float) $value;
 
         return (int) match (true) {

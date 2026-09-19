@@ -18,3 +18,18 @@ it('encodes json', function () {
 
     Json::encode('中'[0]);
 })->throws(Exception::class);
+
+it('wraps encoding errors when custom options are supplied', function () {
+    try {
+        Json::encode("\xFF", JSON_UNESCAPED_UNICODE);
+        $this->fail('Expected an encoding exception.');
+    } catch (Exception $exception) {
+        expect($exception->getPrevious())->toBeInstanceOf(JsonException::class)
+            ->and($exception->getCode())->toBe(JSON_ERROR_UTF8);
+    }
+});
+
+it('preserves custom JSON encoding options', function () {
+    expect(Json::encode('中国', 0))->toBe('"\\u4e2d\\u56fd"')
+        ->and(Json::encode("\xFF", JSON_INVALID_UTF8_SUBSTITUTE))->toBe('"\\ufffd"');
+});

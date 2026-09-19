@@ -1,31 +1,31 @@
 <?php
 
-/** @noinspection PhpParamsInspection */
-
 declare(strict_types=1);
 
 namespace Pin\Cache;
 
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Repository;
 use Pin\Support\ServiceProvider;
 
 /**
- * 缓存服务提供者
+ * 缓存服务提供者。
  */
 class CacheServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap the application services.
+     * 注册缓存服务。
      */
-    public function boot(): void
+    public function register(): void
     {
         $this->app->singleton('pin.cache.hash', HashCache::class);
         $this->app->singleton('pin.cache.runtime', RuntimeCache::class);
 
-        Cache::extend('redis-hash', function () {
-            $config = config('cache.stores.redis-hash');
-
-            return Cache::repository(new RedisStore($config['connection'], $config['ttl']), $config);
+        $this->callAfterResolving('cache', function (CacheManager $cache) {
+            $cache->extend('redis-hash', fn ($app, array $config): Repository => $cache->repository(
+                new RedisStore($config['connection'] ?? 'cache', $config['ttl'] ?? null),
+                $config,
+            ));
         });
     }
 }

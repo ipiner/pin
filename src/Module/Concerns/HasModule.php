@@ -7,14 +7,14 @@ namespace Pin\Module\Concerns;
 trait HasModule
 {
     /**
-     * 缓存当前类解析出的模块信息。
+     * 模块信息。
      *
-     * @var array{name: string|null, namespace: string|null}|null
+     * @var array{name: string|null, namespace: string|null}
      */
     protected array $module;
 
     /**
-     * 从 `App\Modules\...` 类或嵌套路由类解析所属模块。
+     * 解析所属模块。
      *
      * @return array{name: string|null, namespace: string|null}
      */
@@ -24,11 +24,13 @@ trait HasModule
             return $this->module;
         }
 
-        // `App\Modules\Product\ProductService` 和
-        // `App\Routes\Product\ProductRoute` 都会映射到 `App\Modules\Product`。
         if (
-            str_starts_with($this->class, 'App\\Modules')
-            || (str_ends_with($this->basename, 'Route') && count($this->parts) > 3)
+            str_starts_with($this->class, 'App\\Modules\\')
+            || (
+                str_starts_with($this->class, 'App\\Routes\\')
+                && str_ends_with($this->basename, 'Route')
+                && count($this->parts) > 3
+            )
         ) {
             return $this->module = [
                 'name' => $this->parts[2],

@@ -9,7 +9,7 @@ use Pin\Route\Routable;
 use Pin\Support\Json;
 
 /**
- * HTTP 测试请求输出 Reporter
+ * HTTP 测试请求输出
  */
 class Reporter
 {
@@ -45,8 +45,6 @@ class Reporter
     protected $stream;
 
     /**
-     * 创建 Reporter 实例
-     *
      * @param  resource|null  $stream
      */
     public function __construct($stream = null)
@@ -62,13 +60,13 @@ class Reporter
         string $uri,
         TestResponse $response,
     ): bool {
-        $enabled = $this->reportRequestEnabled();
-
-        if ($enabled) {
-            fwrite($this->stream, $this->formatRequest($route, $uri, $response));
+        if (! $this->reportRequestEnabled()) {
+            return false;
         }
 
-        return $enabled;
+        fwrite($this->stream, $this->formatRequest($route, $uri, $response));
+
+        return true;
     }
 
     /**
@@ -84,7 +82,7 @@ class Reporter
     }
 
     /**
-     *  格式化 HTTP 请求测试输出
+     * 格式化请求输出
      */
     protected function formatRequest(
         Routable $route,
@@ -92,16 +90,27 @@ class Reporter
         TestResponse $response,
     ): string {
         $status = $response->status();
-        $method = str_pad($route->method(), 6);
+        $method = $route->method();
 
         return sprintf(
             "\n[%-20s] [%s] %s %-40s %s",
             Str::limit($route->title() ?? $route->name(), 20),
             $this->color((string) $status, $this->statusColor($status)),
-            $this->color($method, $this->methodColor($route->method())),
+            $this->color(str_pad($method, 6), $this->methodColor($method)),
             Str::limit($uri, 40),
-            Str::limit(Json::encode($response->json()), 80)
+            Str::limit($this->formatResponse($response), 80)
         );
+    }
+
+    /**
+     * 格式化响应内容
+     */
+    protected function formatResponse(TestResponse $response): string
+    {
+        $content = (string) $response->getContent();
+        $data = json_decode($content, true);
+
+        return json_last_error() === JSON_ERROR_NONE ? Json::encode($data) : $content;
     }
 
     /**

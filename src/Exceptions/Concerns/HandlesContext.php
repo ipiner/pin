@@ -11,19 +11,12 @@ use Pin\Support\Caller;
 use Throwable;
 
 /**
- * 异常上下文增强 Trait
- *
- * 用于扩展异常日志信息，统一补充：
- * - 异常发生位置（file / line）
- * - 自定义 context 数据
- * - 请求上下文信息
- *
- * 作为异常日志系统的上下文补充层（logging context enhancer）
+ * 异常日志上下文。
  */
 trait HandlesContext
 {
     /**
-     * 解析异常发生位置
+     * 获取异常位置。
      */
     protected function resolveCaller(Throwable $e): array
     {
@@ -35,7 +28,7 @@ trait HandlesContext
     }
 
     #[Override]
-    protected function buildExceptionContext(Throwable $e)
+    protected function buildExceptionContext(Throwable $e): array
     {
         return array_merge(
             parent::buildExceptionContext($e),
@@ -45,7 +38,7 @@ trait HandlesContext
     }
 
     #[Override]
-    protected function context()
+    protected function context(): array
     {
         return array_filter([
             'post' => app()->request->post(),

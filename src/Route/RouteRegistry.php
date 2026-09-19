@@ -15,11 +15,7 @@ class RouteRegistry
     /**
      * 路由映射表
      *
-     * ```
-     * [
-     *   'user.index' => RouteRegistryItem
-     * ]
-     * ```
+     * @var array<string, RouteRegistryItem>
      */
     protected static array $items = [];
 
@@ -39,12 +35,5 @@ class RouteRegistry
     public static function items(): Collection
     {
         return collect(static::$items);
-    }
-}
-
-class RouteRegistryItem
-{
-    public function __construct(public Routable $case, public Route $route)
-    {
     }
 }

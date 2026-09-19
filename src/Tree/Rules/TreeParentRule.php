@@ -6,10 +6,11 @@ namespace Pin\Tree\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Override;
 use Pin\Tree\TreeGuard;
 
 /**
- * Tree 父节点合法性校验规则（Tree Parent Rule）
+ * 父节点验证规则。
  */
 class TreeParentRule implements ValidationRule
 {
@@ -21,11 +22,13 @@ class TreeParentRule implements ValidationRule
     }
 
     /**
-     * {@inheritDoc}
+     * 校验父节点。
      */
+    #[Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $result = $this->guard->validatePid($this->id, (int) $value);
+
         if ($result !== true) {
             $fail($result);
         }

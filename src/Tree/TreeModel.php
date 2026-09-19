@@ -10,7 +10,7 @@ use Pin\Models\Model;
 use Pin\Tree\Concerns\HasTree;
 
 /**
- * 树结构基础模型
+ * 树节点模型。
  */
 class TreeModel extends Model
 {

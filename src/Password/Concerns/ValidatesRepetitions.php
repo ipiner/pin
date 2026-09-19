@@ -4,18 +4,10 @@ declare(strict_types=1);
 
 namespace Pin\Password\Concerns;
 
-use Illuminate\Support\Collection;
 use Pin\Errors\Errors;
 
 /**
  * 连续重复字符验证
- *
- * 用于限制密码中连续重复字符的最大长度。
- *
- * 支持检测：
- * - 连续重复字母
- * - 连续重复数字
- * - 连续重复符号
  */
 trait ValidatesRepetitions
 {
@@ -39,14 +31,20 @@ trait ValidatesRepetitions
      */
     protected function validateMaxRepeatedCharacters(): int
     {
-        $has = collect(str_split($this->value))
-            ->chunkWhile(function (string $value, string $key, Collection $chunk) {
-                return $value === $chunk->last();
-            })
-            ->first(fn ($value) => $value->count() >= $this->maxRepeatedCharacters);
+        $repeated = 0;
 
-        return $has
-            ? $this->addError(Errors::PasswordTooManyRepeats, ['size' => $this->maxRepeatedCharacters])
-            : 0;
+        for ($index = 0, $length = strlen($this->value); $index < $length; $index++) {
+            $repeated = $index > 0 && $this->value[$index] === $this->value[$index - 1]
+                ? $repeated + 1
+                : 1;
+
+            if ($repeated >= $this->maxRepeatedCharacters) {
+                return $this->addError(Errors::PasswordTooManyRepeats, [
+                    'size' => $this->maxRepeatedCharacters,
+                ]);
+            }
+        }
+
+        return 0;
     }
 }

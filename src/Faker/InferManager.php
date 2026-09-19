@@ -5,17 +5,12 @@ declare(strict_types=1);
 namespace Pin\Faker;
 
 /**
- * FakeRule 推导管理器
- *
- * 用于根据 Validation Rules 推导 FakeRule
+ * 生成规则推导器
  */
 class InferManager
 {
     /**
-     * 已注册的 infer 回调。
-     *
-     * - key: Validation Rule 名称
-     * - value: FakeRule 推导回调
+     * 已注册的推导回调。
      *
      * @var array<string, callable(RuleBag): FakeRule>
      */
@@ -27,7 +22,9 @@ class InferManager
     }
 
     /**
-     * 注册 infer 规则
+     * 注册规则推导器。
+     *
+     * @param  callable(RuleBag): FakeRule  $callback
      */
     public function register(string $rule, callable $callback): void
     {
@@ -35,7 +32,7 @@ class InferManager
     }
 
     /**
-     * 推导 FakeRule
+     * 推导生成规则
      */
     public function infer(RuleBag $rules): ?FakeRule
     {
@@ -49,60 +46,62 @@ class InferManager
     }
 
     /**
-     * 注册内置 infer 规则。
+     * 注册内置推导器
      */
     protected function registerBuiltins(): void
     {
         $this->registerInInfer();
         $this->registerIntegerInfer();
-        // email 必须优先于 string 注册，否则会被 string infer 提前匹配
+        // 邮箱规则优先于字符串规则。
         $this->registerEmailInfer();
         $this->registerStringInfer();
     }
 
     /**
-     * 注册 string infer
+     * 注册字符串推导器
      */
     protected function registerStringInfer(): void
     {
         $this->register(
             'string',
-            fn (RuleBag $rules) => Fake::string(
-                (int) $rules->parameter('max', 16),
+            static fn (RuleBag $rules) => Fake::string(
+                (int) $rules->parameter('max', max(16, (int) $rules->parameter('min', 0))),
             ),
         );
     }
 
     /**
-     * 注册 email infer
+     * 注册邮箱推导器
      */
     protected function registerEmailInfer(): void
     {
-        $this->register('email', fn () => Fake::safeEmail());
+        $this->register('email', static fn () => Fake::safeEmail());
     }
 
     /**
-     * 注册 in infer
+     * 注册候选值推导器
      */
     protected function registerInInfer(): void
     {
         $this->register(
             'in',
-            fn (RuleBag $rules) => Fake::in(...$rules->parameters('in')),
+            static fn (RuleBag $rules) => Fake::in(...$rules->parameters('in')),
         );
     }
 
     /**
-     * 注册 integer infer
+     * 注册整数推导器
      */
     protected function registerIntegerInfer(): void
     {
-        $this->register(
-            'integer',
-            fn (RuleBag $rules) => Fake::integer(
-                (int) $rules->parameter('min', 1),
-                (int) $rules->parameter('max', 10000),
-            ),
-        );
+        $this->register('integer', static function (RuleBag $rules) {
+            $min = $rules->parameter('min');
+            $max = $rules->parameter('max');
+
+            return Fake::integer(
+                (int) ($min ?? min(1, $max ?? 1)),
+                (int) ($max ?? max(10000, $min ?? 10000)),
+            );
+        });
     }
 }

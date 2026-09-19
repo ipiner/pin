@@ -34,13 +34,26 @@ it('resolves route names', function () {
     $route = new Route('GET', '/users', fn () => true);
     $route->name('user.list');
     expect(ExtraProcessor::getRoute($route))->toBe('user.list');
+
+    $route = new Route('GET', '/users', fn () => true);
+    $route->name('user.generated::list');
+    expect(ExtraProcessor::getRoute($route))->toBe('user.generated::list');
 });
 
 it('invokes the processor and returns extra fields', function () {
-    $record = new LogRecord(new DateTimeImmutable(), 'channel', Level::Info, '');
+    $record = new LogRecord(
+        new DateTimeImmutable(),
+        'channel',
+        Level::Info,
+        '',
+        extra: ['custom' => 'kept', 'request_id' => 'outdated']
+    );
     $result = (new ExtraProcessor())($record);
 
-    expect($result['extra'])->toHaveKey('uid');
+    expect($result)->toBe($record)
+        ->and($result->extra)->toHaveKey('uid')
+        ->and($result->extra['custom'])->toBe('kept')
+        ->and($result->extra['request_id'])->toBe(app()->getRequestId());
 });
 
 describe('resolves uid', function () {

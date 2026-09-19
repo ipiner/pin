@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Pin\Route\Attributes;
 
 use Attribute;
-use Pin\Support\Str;
+use Pin\Route\Testing\TestingMethod as TestingMethodEnum;
 
 /**
- * 指定 Route Testing 批量测试时使用的测试方法。
+ * 指定批量测试方法
  */
 #[Attribute(Attribute::TARGET_CLASS_CONSTANT)]
 readonly class TestingMethod
@@ -18,8 +18,8 @@ readonly class TestingMethod
      */
     public string $value;
 
-    public function __construct(string|\Pin\Route\Testing\TestingMethod $name)
+    public function __construct(string|TestingMethodEnum $name)
     {
-        $this->value = Str::string($name);
+        $this->value = $name instanceof TestingMethodEnum ? $name->value : $name;
     }
 }

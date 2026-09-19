@@ -31,16 +31,13 @@ trait HasReporter
      */
     public function withReportRequestEnabled(bool $enabled = true): static
     {
-        $report = $this->reporter();
-        $report->reportRequestEnabled = $enabled;
+        $this->reporter()->reportRequestEnabled = $enabled;
 
         return $this;
     }
 
     /**
      * 获取 Reporter 实例
-     *
-     * 默认自动创建 {@see Reporter}。
      */
     protected function reporter(): Reporter
     {

@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace Pin\Log;
 
+use Monolog\Formatter\JsonFormatter as BaseJsonFormatter;
+use Monolog\LogRecord;
 use Monolog\Utils;
 use Override;
 use Throwable;
 
 /**
  * JSON 日志格式化器
- *
- * 基于 Monolog\JsonFormatter 扩展，用于生成统一、结构化、可观测的 JSON 日志。
  */
-class JsonFormatter extends \Monolog\Formatter\JsonFormatter
+class JsonFormatter extends BaseJsonFormatter
 {
-    public function __construct(string $dateFormat = 'Y-m-d H:i:s', ?int $addJsonEncodeOption = null)
-    {
+    public function __construct(
+        string $dateFormat = 'Y-m-d H:i:s',
+        ?int $addJsonEncodeOption = null
+    ) {
         parent::__construct();
         $this->dateFormat = $dateFormat;
-
-        // 使用自定义 trace normalizer
-        $this->includeStacktraces = false;
 
         if (config('pin.logging.json_pretty_print')) {
             $this->setJsonPrettyPrint(true);
@@ -33,7 +32,7 @@ class JsonFormatter extends \Monolog\Formatter\JsonFormatter
     }
 
     /**
-     * 标准化异常对象。
+     * 标准化异常。
      *
      * @return array<string, mixed>
      */
@@ -44,7 +43,7 @@ class JsonFormatter extends \Monolog\Formatter\JsonFormatter
     }
 
     /**
-     * 标准化 Throwable
+     * 构建异常数据。
      *
      * @return array<string, mixed>
      */
@@ -59,7 +58,7 @@ class JsonFormatter extends \Monolog\Formatter\JsonFormatter
         ];
 
         if (method_exists($e, 'getContext') && ($context = $e->getContext())) {
-            $data['context'] = $context;
+            $data['context'] = $this->normalize($context, $depth + 1);
         }
 
         if (app(StackTracePolicy::class)->shouldInclude($e)) {
@@ -67,13 +66,17 @@ class JsonFormatter extends \Monolog\Formatter\JsonFormatter
         }
 
         $previous = $e->getPrevious();
+
         if (! $previous) {
             return $data;
         }
 
-        if ($depth > $this->maxNormalizeDepth) {
+        if ($depth >= $this->maxNormalizeDepth) {
             $data['previous'] = [
-                'message' => 'Over '.$this->maxNormalizeDepth.' levels deep, aborting normalization',
+                'message' => sprintf(
+                    'Over %d levels deep, aborting normalization',
+                    $this->maxNormalizeDepth
+                ),
             ];
         } else {
             $data['previous'] = $this->normalizeThrowable($previous, $depth + 1);
@@ -83,20 +86,17 @@ class JsonFormatter extends \Monolog\Formatter\JsonFormatter
     }
 
     /**
-     * 将日志数据编码为 JSON。
+     * 标准化日志记录
      */
     #[Override]
-    protected function toJson($data, bool $ignoreErrors = false): string
+    protected function normalizeRecord(LogRecord $record): array
     {
-        // 将 datetime 提前到 JSON 开头
+        $data = parent::normalizeRecord($record);
         $data = ['datetime' => $data['datetime']] + $data;
-
-        // level & level_code
-        $level = $data['level'];
+        $data['level_code'] = $data['level'];
         $data['level'] = $data['level_name'];
-        $data['level_code'] = $level;
         unset($data['level_name']);
 
-        return parent::toJson($data, $ignoreErrors);
+        return $data;
     }
 }

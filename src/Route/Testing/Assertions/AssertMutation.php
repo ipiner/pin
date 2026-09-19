@@ -25,8 +25,7 @@ trait AssertMutation
         );
 
         if ($assert) {
-            $id = $this->response->json('data.id');
-            $assert($id, $this);
+            $assert($this->response->json('data.id'), $this);
         }
 
         return $this;

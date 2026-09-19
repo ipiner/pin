@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pin\Http\Middleware\LogApiResponse;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Pin\Http\ApiResponse;
-use Pin\Http\Middleware\LogApiResponse;
 use Pin\Support\Arr;
 use Pin\Support\Json;
 
 /**
- * API 响应处理模块
- *
- * 用于提取与规范化 API 响应数据
+ * 响应日志数据处理
  */
 trait HandlesResponse
 {
@@ -26,17 +25,19 @@ trait HandlesResponse
      */
     protected function extractResponseData(): ?array
     {
-        $attr = $this->request->attributes->get(LogApiResponse::API_RESPONSE);
+        $response = $this->request->attributes->get(static::API_RESPONSE);
 
-        if ($attr && $attr instanceof JsonResponse) {
-            return $attr->getData(true);
+        if (! $response instanceof JsonResponse) {
+            $response = $this->response;
         }
 
-        if ($this->response instanceof JsonResponse) {
-            return $this->response->getData(true);
+        if (! $response instanceof JsonResponse) {
+            return null;
         }
 
-        return null;
+        $data = $response->getData(true);
+
+        return is_array($data) ? $data : null;
     }
 
     /**
@@ -52,24 +53,21 @@ trait HandlesResponse
      */
     protected function normalizeResponse(): array
     {
-        // 对响应数据进行敏感字段脱敏（如 password / token 等）
-        $data = Arr::maskSensitive($this->responseData);
+        $response = Arr::maskSensitive([
+            'code' => $this->responseData['code'],
+            'message' => $this->responseData['message'],
+        ]);
+        $response['data'] = '...';
 
-        $code = $data['code'] ?? null;
-        $message = $data['message'] ?? null;
+        if (! $this->shouldIncludeData()) {
+            return $response;
+        }
 
-        // 从 data 中移除
+        $data = $this->responseData;
         unset($data['code'], $data['message']);
+        $response['data'] = $this->truncateResponseData(Arr::maskSensitive($data));
 
-        return [
-            'code' => $code,
-            'message' => $message,
-
-            // 根据策略决定是否记录完整 data
-            'data' => $this->shouldIncludeData()
-                ? $this->truncateResponseData($data)
-                : '...',
-        ];
+        return $response;
     }
 
     /**
@@ -78,17 +76,18 @@ trait HandlesResponse
     protected function truncateResponseData(array $data): string|array
     {
         $json = Json::encode($data);
-        $length = Str::length($json, 'UTF-8');
+        $maxLength = (int) config('pin.logging.response.max_length', 10240);
 
-        $maxLength = config('pin.logging.response.max_length', 10240);
-        $exceed = $length - $maxLength;
-
-        // 未超限，直接返回原结构
-        if ($exceed <= 0) {
+        if (strlen($json) <= $maxLength) {
             return $data;
         }
 
-        // 超限则截断并标记损失长度
-        return Str::substr($json, 0, $maxLength).'(...'.$exceed.')';
+        $length = Str::length($json, 'UTF-8');
+
+        if ($length <= $maxLength) {
+            return $data;
+        }
+
+        return Str::substr($json, 0, $maxLength).'(...'.($length - $maxLength).')';
     }
 }

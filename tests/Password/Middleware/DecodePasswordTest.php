@@ -30,3 +30,12 @@ it('encodes plain value in non production', function () {
     $result = $this->middleware->transform('password', 'plain:123456');
     expect($result)->toBe(Password::encode('123456'));
 });
+
+it('decodes empty and zero plain values', function (string $plain) {
+    $value = $this->middleware->transform('password', 'plain:'.$plain);
+
+    expect($value)->toBe($plain === '' ? '' : Password::encode($plain))
+        ->and($value)->toBe(
+            $this->middleware->transform('password', Password::encodeToRequest($plain))
+        );
+})->with(['', '0']);

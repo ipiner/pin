@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pin\IdGenerator;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Override;
 use Pin\Support\ServiceProvider;
 
 /**
@@ -13,31 +14,31 @@ use Pin\Support\ServiceProvider;
 class IdGeneratorServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
-     * Bootstrap the application services.
+     * 注册 ID 生成器
      */
-    public function boot(): void
+    #[Override]
+    public function register(): void
     {
-        // 时间戳生成器
         $this->app->singleton(
             IdGenerator::Timestamp->name(),
-            fn () => new TimestampId(config('pin.id-generator.timestamp.start_timestamp')));
-
-        // Redis 自增生成器
-        $this->app->singleton(
-            IdGenerator::Redis->name(),
-            fn () => new RedisId(config('pin.id-generator.redis'))
+            static fn () => new TimestampId(config('pin.id-generator.timestamp.start_timestamp'))
         );
 
-        // Snowflake 算法生成器
+        $this->app->singleton(
+            IdGenerator::Redis->name(),
+            static fn () => new RedisId(config('pin.id-generator.redis'))
+        );
+
         $this->app->singleton(
             IdGenerator::Snowflake->name(),
-            fn () => new SnowflakeId(config('pin.id-generator.snowflake'))
+            static fn () => new SnowflakeId(config('pin.id-generator.snowflake'))
         );
     }
 
     /**
-     * Get the services provided by the provider.
+     * 获取延迟加载的服务
      */
+    #[Override]
     public function provides(): array
     {
         return [

@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Pin\Testing;
 
 /**
- * Pest 测试增强
+ * Pest 测试辅助。
  *
  * @codeCoverageIgnore
  */
 class Pest
 {
     /**
-     * 启动 Pest 测试
+     * 加载测试描述函数。
      */
     public static function boot(): void
     {

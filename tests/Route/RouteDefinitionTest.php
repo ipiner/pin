@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Pin\Route\Attributes\Name;
+use Pin\Route\Attributes\Prefix;
 use Pin\Route\InteractsWithRoute;
 use Pin\Route\Routable;
 use Pin\Route\RouteDefinition;
@@ -18,6 +20,22 @@ enum Routes: string implements Routable
     case NameInAttribute = 'GET:/api/users/name | name.in.attribute';
     case NoApiPrefix = 'GET:/users';
     case V1 = 'GET:/api/v1/users/';
+    case NestedApi = 'GET:/api/users/api/tokens';
+    case InternalApi = 'GET:/users/api/tokens';
+    #[Name('attribute.name')]
+    case AttributeName = 'GET:/attribute';
+    #[Name('attribute.name')]
+    case ExplicitName = 'GET:/explicit|explicit.name';
+    case ZeroName = 'GET:/zero|0';
+}
+
+#[Prefix('/api/prefix/')]
+enum PrefixedRoutes: string implements Routable
+{
+    use InteractsWithRoute;
+
+    case Index = 'GET:/users/';
+    case Root = 'GET:/';
 }
 
 it('resolves route definition into route metadata', function (
@@ -41,4 +59,11 @@ it('resolves route definition into route metadata', function (
     [Routes::NameInAttribute, 'GET', '/api/users/name', 'name.in.attribute'],
     [Routes::NoApiPrefix, 'GET', '/users', 'users'],
     [Routes::V1, 'GET', '/api/v1/users', 'v1.users'],
+    [Routes::NestedApi, 'GET', '/api/users/api/tokens', 'users.api.tokens'],
+    [Routes::InternalApi, 'GET', '/users/api/tokens', 'users.api.tokens'],
+    [Routes::AttributeName, 'GET', '/attribute', 'attribute.name'],
+    [Routes::ExplicitName, 'GET', '/explicit', 'explicit.name'],
+    [Routes::ZeroName, 'GET', '/zero', '0'],
+    [PrefixedRoutes::Index, 'GET', '/api/prefix/users', 'prefix.users'],
+    [PrefixedRoutes::Root, 'GET', '/api/prefix', 'prefix'],
 ]);

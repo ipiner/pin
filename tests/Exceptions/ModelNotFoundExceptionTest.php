@@ -19,6 +19,28 @@ it('gets caller information', function () {
     expect($caller['file'])->not()->toBe(__FILE__);
 });
 
+it('allows overriding model caller information', function () {
+    $caller = $this->e->getCaller();
+
+    expect($this->e->getCaller('custom.php', 123))
+        ->toBe(['file' => 'custom.php', 'line' => 123])
+        ->and($this->e->getCaller(line: 123))
+        ->toBe(['file' => $caller['file'], 'line' => 123]);
+});
+
+it('uses the original location when the trace is empty', function () {
+    $previous = new Illuminate\Database\Eloquent\ModelNotFoundException();
+    $previous->setModel(User::class);
+    new ReflectionProperty(Exception::class, 'trace')->setValue($previous, []);
+
+    $exception = new ModelNotFoundException($previous);
+
+    expect($exception->getCaller())->toBe([
+        'file' => $previous->getFile(),
+        'line' => $previous->getLine(),
+    ]);
+});
+
 it('initializes model not found exception', function () {
     expect($this->e->getStatusCode())->toBe(404)
         ->and($this->e->getCode())->toBe(Errors::ModelNotFound->code())

@@ -47,7 +47,10 @@ it('builds queryable sql', function () {
         ['"q" >= 1 and "q" <= 2', 'q', '1,2', QueryableType::RangeNumeric],
 
         ['"uid" = 1', 'q', '1', 'ns:uid|username|realname'],
-        ['"username" like \'%s%\' or "realname" like \'%s%\'', 'q', 's', 'ns:uid,username|realname'],
+        [
+            '"username" like \'%s%\' or "realname" like \'%s%\'',
+            'q', 's', 'ns:uid,username|realname',
+        ],
     ];
 
     foreach ($cases as $case) {
@@ -81,4 +84,51 @@ it('creates queryable from request', function () {
     expect(
         Queryable::fromRequest(['q' => '-'], $request)->conditions['q']->value
     )->toBe('foo');
+});
+
+it('accepts scalar payload values', function (mixed $value) {
+    $queryable = Queryable::fromPayload(['value' => $value], ['value' => QueryableType::Eq]);
+    $query = User::withoutGlobalScopes()->queryable($queryable);
+
+    expect($query->getBindings())->toBe([$value]);
+})->with([0, 12, 1.5, false]);
+
+it('keeps large numeric identifiers precise', function () {
+    $id = '9007199254740993';
+    $query = User::withoutGlobalScopes()->queryable(
+        new QueryableCondition('id', $id, QueryableType::EqNumeric)
+    );
+
+    expect($query->getBindings())->toBe([(int) $id]);
+});
+
+it('treats array ranges as lower and upper bounds', function () {
+    $query = User::withoutGlobalScopes()->queryable(
+        new QueryableCondition('age', ['0', '10'], QueryableType::RangeNumeric)
+    );
+
+    expect($query->toSql())->toContain('"age" >= ? and "age" <= ?')
+        ->and($query->getBindings())->toBe([0, 10]);
+});
+
+it('transforms columns supplied by query type parameters', function () {
+    $model = new class extends User
+    {
+        protected $table = 'users';
+
+        public function transformQueryableColumn(string $column): string
+        {
+            return match ($column) {
+                'uid' => 'id',
+                'displayName' => 'realname',
+                default => parent::transformQueryableColumn($column),
+            };
+        }
+    };
+
+    $query = $model->newQueryWithoutScopes()->queryable(
+        new QueryableCondition('q', 'foo', 'like:displayName|username')
+    );
+
+    expect($query->toSql())->toContain('"realname" like ? or "username" like ?');
 });

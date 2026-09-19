@@ -17,6 +17,16 @@ it('records query events', function () {
         ->and($profile->time)->toBe(1010);
 });
 
+it('truncates each query duration to integer milliseconds', function () {
+    $profile = new QueryProfile();
+
+    $profile->record($this->getQueryExecuted(time: 1.75));
+    $profile->record($this->getQueryExecuted(time: 2.75));
+
+    expect($profile->count)->toBe(2)
+        ->and($profile->time)->toBe(3);
+});
+
 it('determines slow queries', function () {
     $profile = new QueryProfile();
     $event = $this->getQueryExecuted(time: -1);

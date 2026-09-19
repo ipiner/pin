@@ -8,23 +8,16 @@ use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Request;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
+use Override;
 use Throwable;
 
 /**
- * Monolog 日志额外处理器
- *
- * 为每条日志注入额外上下文信息（extra）：
- * - 当前用户 ID
- * - 请求 ID、IP、方法、URL
- * - 当前路由名称或 URI
- *
- * 注册方式：
- * 在 Monolog channel 的 processors 配置中使用。
+ * 日志上下文处理器
  */
 class ExtraProcessor implements ProcessorInterface
 {
     /**
-     * 获取额外上下文
+     * 获取日志上下文。
      *
      * @return array{
      *     uid:int|null,
@@ -32,7 +25,7 @@ class ExtraProcessor implements ProcessorInterface
      *     request_method:string,
      *     request_url:string,
      *     route:string,
-     *     ip:string
+     *     ip:string|null
      * }
      */
     public static function getExtra(): array
@@ -46,28 +39,29 @@ class ExtraProcessor implements ProcessorInterface
     public static function getRoute(?Route $route = null): string
     {
         $route ??= app()->request->route();
+
         if (! $route) {
             return '';
         }
 
         $name = $route->getName();
 
-        // 优先返回路由名称，自动忽略自动生成的路由名
-        return $name && ! str_contains($name, 'generated::') ? $name : $route->uri();
+        return $name && ! str_starts_with($name, 'generated::') ? $name : $route->uri();
     }
 
     /**
-     * Monolog Processor 接口
+     * 补充日志上下文
      */
+    #[Override]
     public function __invoke(LogRecord $record): LogRecord
     {
-        $record['extra'] = array_merge($record['extra'], static::getExtra());
+        $record->extra = array_merge($record->extra, static::getExtra());
 
         return $record;
     }
 
     /**
-     * 基础 extra
+     * 基础上下文
      */
     protected static function basicExtra(): array
     {
@@ -80,7 +74,7 @@ class ExtraProcessor implements ProcessorInterface
     }
 
     /**
-     * CLI 上下文
+     * 命令行上下文
      */
     protected static function extraForConsole(): array
     {

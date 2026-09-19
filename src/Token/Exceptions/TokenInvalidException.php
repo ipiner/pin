@@ -9,7 +9,7 @@ use Pin\Token\Token;
 use Throwable;
 
 /**
- * Token 内容非法或签名校验失败异常。
+ * Token 无效。
  */
 class TokenInvalidException extends TokenException
 {

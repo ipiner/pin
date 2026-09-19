@@ -7,19 +7,14 @@ namespace Pin\Auth;
 use Illuminate\Http\Request;
 
 /**
- * 控制台用户上下文。
- *
- * 在命令行、队列任务或其他非 HTTP 场景中，为认证系统提供一个
- * 可识别的用户上下文，使相关流程可以复用统一的用户模型。
+ * 命令行和队列任务的操作用户信息。
  */
 class ConsoleUser
 {
     /**
      * 默认控制台用户名。
-     *
-     * 当运行环境无法提供系统用户名时使用。
      */
-    public const DEFAULT_USERNAME = 'console';
+    public const string DEFAULT_USERNAME = 'console';
 
     /**
      * 当前系统用户 ID。
@@ -41,7 +36,7 @@ class ConsoleUser
     }
 
     /**
-     * 解析当前运行环境的用户 ID。
+     * 解析系统用户 ID。
      */
     protected function resolveUid(): int
     {
@@ -49,9 +44,7 @@ class ConsoleUser
     }
 
     /**
-     * 从服务器环境变量中解析当前用户名。
-     *
-     * Linux 通常使用 USER，Windows 通常使用 USERNAME。
+     * 解析系统用户名。
      */
     protected function resolveUsername(Request $request): string
     {

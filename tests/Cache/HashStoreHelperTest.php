@@ -63,26 +63,15 @@ it('deletes hash keys', function (
     ],
 ]);
 
-it('expires hash keys', function (
-    int $ttl,
-    bool $overwrite,
-    bool $expected,
-) {
-    $store = $this->invoker(HashCache::store()->getStore());
+it('preserves an existing expiry when writing another field', function () {
+    HashCache::put('users:1', 1, 90);
 
-    HashCache::set('users:1', '1');
-    if ($ttl === 0) {
-        // 模拟 $this->driver->ttl($key) !== -1
-        expect($store->expire('users', 86400, $overwrite))->toBe($expected);
-    }
+    expect(HashCache::ttl('users'))->toBeBetween(89, 90);
 
-    expect($store->expire('users', $ttl, $overwrite))->toBe($expected);
+    HashCache::put('users:2', 2, 3600);
 
-})->with([
-    'skip ttl update' => [1000, false, false],
-    'set ttl' => [90, true, true],
-    'refresh ttl' => [0, true, true],
-]);
+    expect(HashCache::ttl('users'))->toBeBetween(89, 90);
+});
 
 it('stores values forever', function () {
     HashCache::forever('users:1', 1);
@@ -193,7 +182,7 @@ it('returns empty prefix', function () {
 });
 
 it('resolves ttl', function (
-    int $ttl,
+    ?int $ttl,
     int $expected,
 ) {
     $store = $this->invoker(HashCache::store()->getStore());
@@ -201,7 +190,8 @@ it('resolves ttl', function (
     expect($store->getTTL($ttl))->toBe($expected);
 
 })->with([
-    'default ttl' => [0, 604800],
+    'default ttl' => [null, 604800],
+    'forever' => [0, 0],
     'custom ttl' => [10, 10],
 ]);
 
@@ -229,4 +219,72 @@ it('touches hash ttl', function () {
     HashCache::forever('users:1', 1);
 
     expect(HashCache::touch('users:', 1000))->toBeTrue();
+});
+
+it('reads a single field through many', function () {
+    HashCache::forever('users:1', 1);
+
+    expect(HashCache::many(['users:1']))->toBe([1])
+        ->and(HashCache::many(['users:1', 'users:1']))->toBe([1, 1]);
+});
+
+it('returns keyed values and defaults through the cache repository', function () {
+    HashCache::forever('users:1', false);
+    $repository = HashCache::store();
+
+    expect($repository->many(['users:1', 'users:missing']))->toBe([
+        'users:1' => false,
+        'users:missing' => null,
+    ])->and($repository->getMultiple(['users:1', 'users:missing'], 'default'))->toBe([
+        'users:1' => false,
+        'users:missing' => 'default',
+    ]);
+});
+
+it('handles empty batches', function () {
+    $store = HashCache::getStore();
+
+    expect($store->putMany([]))->toBeTrue()
+        ->and($store->many([]))->toBe([])
+        ->and($store->forget([]))->toBeFalse();
+});
+
+it('forgets multiple hashes', function () {
+    HashCache::forever('users:1', 1);
+    HashCache::forever('teams:1', 2);
+
+    expect(HashCache::getStore()->forget(['users', 'teams']))->toBeTrue()
+        ->and(HashCache::get('users:1'))->toBeNull()
+        ->and(HashCache::get('teams:1'))->toBeNull();
+});
+
+it('rejects mixed hashes before writing any values', function () {
+    expect(fn () => HashCache::getStore()->putMany(['users:1' => 1, 'teams:1' => 2], 60))
+        ->toThrow(InvalidArgumentException::class);
+
+    expect(HashCache::getAll('users'))->toBe([])
+        ->and(HashCache::getAll('teams'))->toBe([]);
+});
+
+it('sets the ttl on the full hash key', function () {
+    expect(HashCache::put('tests:users:1', 1, 90))->toBeTrue()
+        ->and(HashCache::ttl('tests:users'))->toBeBetween(89, 90);
+});
+
+it('removes the hash ttl when writing forever', function () {
+    HashCache::forever('users:1', 1);
+    HashCache::getDriver()->expire('users', 60);
+
+    expect(HashCache::forever('users:1', 2))->toBeTrue()
+        ->and(HashCache::ttl('users'))->toBe(-1)
+        ->and(HashCache::get('users:1'))->toBe(2);
+});
+
+it('refreshes an existing hash ttl', function () {
+    HashCache::forever('tests:users:1', 1);
+    HashCache::getDriver()->expire('tests:users', 60);
+
+    expect(HashCache::touch('tests:users:', 300))->toBeTrue()
+        ->and(HashCache::ttl('tests:users'))->toBeBetween(299, 300)
+        ->and(HashCache::touch('missing:', 300))->toBeFalse();
 });

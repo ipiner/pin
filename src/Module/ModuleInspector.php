@@ -4,31 +4,34 @@ declare(strict_types=1);
 
 namespace Pin\Module;
 
-use Illuminate\Support\Arr;
+use Pin\Module\Concerns\HasAction;
+use Pin\Module\Concerns\HasController;
+use Pin\Module\Concerns\HasDomain;
+use Pin\Module\Concerns\HasFactory;
+use Pin\Module\Concerns\HasModel;
+use Pin\Module\Concerns\HasModule;
 use Pin\Route\Routable;
 use Pin\Support\Facades\RuntimeCache;
 
 /**
- * 解析应用类名并推导 Pin 模块元信息。
- *
- * 当调用方只需要按约定生成控制器、模型、工厂类名时，目标类本身不必真实存在。
+ * 模块信息解析器
  */
 class ModuleInspector
 {
-    use Concerns\HasAction,
-        Concerns\HasController,
-        Concerns\HasDomain,
-        Concerns\HasFactory,
-        Concerns\HasModel,
-        Concerns\HasModule;
+    use HasAction;
+    use HasController;
+    use HasDomain;
+    use HasFactory;
+    use HasModel;
+    use HasModule;
 
     /**
-     * 不含命名空间的短类名。
+     * 短类名
      */
     protected string $basename;
 
     /**
-     * 按 `\` 拆分后的命名空间片段。
+     * 类名片段。
      *
      * @var list<string>
      */
@@ -40,33 +43,30 @@ class ModuleInspector
     protected string $class;
 
     /**
-     * @param  class-string|string  $class
+     * 构造函数
      */
     public function __construct(string|Routable $class)
     {
-        $this->class = is_string($class) ? $class : get_class($class);
-        $this->basename = class_basename($this->class);
+        $this->class = is_string($class) ? ltrim($class, '\\') : $class::class;
         $this->parts = explode('\\', $this->class);
-
+        $this->basename = array_last($this->parts);
     }
 
     /**
-     * 为相同类名创建可复用的检查器实例。
-     *
-     * @param  class-string|Routable  $class
+     * 获取类名对应的解析器
      */
     public static function make(string|Routable $class): static
     {
-        $key = $class instanceof Routable ? get_class($class) : $class;
+        $class = is_string($class) ? ltrim($class, '\\') : $class::class;
 
         return RuntimeCache::rememberForever(
-            $key,
-            fn () => app(static::class, ['class' => $class])
+            static::class.':'.$class,
+            static fn () => app(static::class, ['class' => $class])
         );
     }
 
     /**
-     * 导出已解析的全部模块元信息。
+     * 导出模块信息。
      *
      * @return array{
      *     basename: string,
@@ -92,14 +92,18 @@ class ModuleInspector
     }
 
     /**
-     * 从候选类列表中解析第一个存在的类名
+     * 返回首个存在的类，未找到时取最后一个候选。
      *
-     * 如果全部不存在，则返回候选列表的最后一个作为兜底值
+     * @param  string[]  $candidates
      */
     protected function resolveFirstExistingClass(array $candidates): ?string
     {
-        $res = Arr::first($candidates, fn ($class) => class_exists($class));
+        foreach ($candidates as $class) {
+            if (class_exists($class)) {
+                return $class;
+            }
+        }
 
-        return $res ?? array_last($candidates);
+        return array_last($candidates);
     }
 }

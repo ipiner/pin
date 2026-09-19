@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Pin\Log;
 
+use Override;
 use Pin\Support\ServiceProvider;
 
 /**
- * 操作日志服务提供者
+ * 日志服务提供者
  */
 class LogServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap the application services.
+     * 注册日志服务
      */
-    public function boot(): void
+    #[Override]
+    public function register(): void
     {
         $this->app->singleton('pin.log.actor', Actor::class);
     }

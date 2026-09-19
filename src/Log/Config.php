@@ -12,7 +12,7 @@ use Monolog\Formatter\NormalizerFormatter;
 class Config
 {
     /**
-     * 默认日志格式化器
+     * 默认日志格式化器。
      *
      * @var class-string<NormalizerFormatter>|null
      */
@@ -23,13 +23,11 @@ class Config
      */
     public static function daily(string $name, array $options = []): array
     {
-        $options = [
+        return static::single($name, [
             'driver' => 'daily',
             'days' => 14,
             ...$options,
-        ];
-
-        return static::single($name, $options);
+        ]);
     }
 
     /**
@@ -39,28 +37,13 @@ class Config
     {
         return [
             'driver' => 'single',
-
-            // 日志文件路径
             'path' => static::resolveLogPath($name),
-
-            // 日志等级
             'level' => env('LOG_'.strtoupper($name).'_LEVEL') ?: 'debug',
-
-            // 文件权限
             'permission' => 0777,
-
-            // JSON 日志格式化
-            'formatter' => self::$defaultFormatter,
-
-            // 日志扩展处理器
+            'formatter' => static::$defaultFormatter,
             'tap' => [ExtraTapper::class],
-
-            // 替换占位符
             'replace_placeholders' => true,
-
-            // Channel 名称
             'name' => $name,
-
             ...$options,
         ];
     }
@@ -72,7 +55,6 @@ class Config
     {
         $env ??= env('APP_ENV');
 
-        // testing 环境使用独立日志目录
         $path = $env === 'testing' ? 'testing-logs' : 'logs';
 
         return storage_path("{$path}/{$name}.log");

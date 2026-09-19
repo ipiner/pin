@@ -17,6 +17,8 @@ use Pin\Http\Middleware\ThrottleRequestsWithRedis;
 use Pin\Providers\PinServiceProvider;
 
 /**
+ * Pin 应用构建器。
+ *
  * @mixin Builder
  */
 class ApplicationBuilder
@@ -24,10 +26,10 @@ class ApplicationBuilder
     /**
      * @var array<string, bool>
      */
-    protected array $called = [];
+    protected array $configured = [];
 
     /**
-     * Application 实例
+     * 应用实例。
      */
     protected Application $app;
 
@@ -37,34 +39,32 @@ class ApplicationBuilder
     }
 
     /**
-     * 调用转发
+     * 转发构建器调用。
      */
     public function __call(string $name, array $arguments): static
     {
-        $this->called[$name] = true;
-
         $this->builder->{$name}(...$arguments);
+        $this->configured[$name] = true;
 
         return $this;
     }
 
     /**
-     * 返回 `Application` 实例
+     * 创建应用。
      */
     public function create(): Application
     {
         foreach (['withMiddleware', 'withProviders', 'withExceptions'] as $method) {
-            if (! isset($this->called[$method])) {
+            if (! isset($this->configured[$method])) {
                 $this->{$method}();
             }
         }
 
-        if (! isset($this->call['withRouting'])) {
-            $path = $this->app->basePath();
-            $this->builder->withRouting(
-                web: is_file($file = $path.'/routes/web.php') ? $file : null,
-                api: is_file($file = $path.'/routes/api.php') ? $file : null,
-                commands: is_file($file = $path.'/routes/console.php') ? $file : null,
+        if (! isset($this->configured['withRouting'])) {
+            $this->withRouting(
+                web: $this->routePath('web'),
+                api: $this->routePath('api'),
+                commands: $this->routePath('console'),
                 health: '/up',
                 apiPrefix: '',
             );
@@ -74,17 +74,15 @@ class ApplicationBuilder
     }
 
     /**
-     * 异常处理器配置
+     * 配置异常处理器。
      *
-     * @param  string|(callable(Exceptions): mixed)|null  $handler  = null
+     * @param  class-string|(Closure(Exceptions): mixed)|null  $handler
      * @param  (callable(Exceptions): mixed)|null  $using
      */
     public function withExceptions(
         string|Closure|null $handler = null,
-        ?callable $using = null
+        ?callable $using = null,
     ): static {
-        $this->called['withExceptions'] = true;
-
         if ($handler instanceof Closure) {
             $using = $handler;
             $handler = null;
@@ -95,17 +93,16 @@ class ApplicationBuilder
             ExceptionHandler::class,
             $handler ?? Handler::class,
         );
+        $this->configured['withExceptions'] = true;
 
         return $this;
     }
 
     /**
-     * 中间件配置
+     * 配置中间件。
      */
     public function withMiddleware(?callable $callback = null): static
     {
-        $this->called['withMiddleware'] = true;
-
         $this->builder->withMiddleware(function (Middleware $middleware) use ($callback) {
             $middleware->redirectGuestsTo(null)
                 ->append([
@@ -120,19 +117,18 @@ class ApplicationBuilder
                 $callback($middleware);
             }
         });
+        $this->configured['withMiddleware'] = true;
 
         return $this;
     }
 
     /**
-     * 服务提供者配置
+     * 配置服务提供者。
      */
     public function withProviders(
         array $providers = [],
-        bool $withBootstrapProviders = true
+        bool $withBootstrapProviders = true,
     ): static {
-        $this->called['withProviders'] = true;
-
         $this->builder->withProviders(
             [
                 ...PinServiceProvider::PROVIDERS,
@@ -140,7 +136,18 @@ class ApplicationBuilder
             ],
             $withBootstrapProviders,
         );
+        $this->configured['withProviders'] = true;
 
         return $this;
+    }
+
+    /**
+     * 获取路由文件路径。
+     */
+    protected function routePath(string $name): ?string
+    {
+        $path = $this->app->basePath("routes/{$name}.php");
+
+        return is_file($path) ? $path : null;
     }
 }

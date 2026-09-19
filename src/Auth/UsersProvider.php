@@ -11,12 +11,9 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Pin\Models\Model;
 
 /**
- * 用户提供器。
+ * Pin 用户提供器。
  *
- * 基于 Laravel EloquentUserProvider 扩展，负责根据认证结果加载
- * 应用用户模型，并为 Guard 提供用户查询能力。
- *
- * @template TModel of Model
+ * @template TModel of Model&Authenticatable
  */
 class UsersProvider extends EloquentUserProvider
 {
@@ -34,8 +31,7 @@ class UsersProvider extends EloquentUserProvider
 
     public function __construct(Hasher $hasher, ?string $model = null)
     {
-        parent::__construct($hasher, null);
-        $this->model = $model ?: User::class;
+        parent::__construct($hasher, $model ?: User::class);
 
         $this->initialize();
     }
@@ -57,9 +53,7 @@ class UsersProvider extends EloquentUserProvider
     }
 
     /**
-     * 初始化用户提供器扩展点。
-     *
-     * 子类可重写该方法以完成自定义初始化逻辑。
+     * 初始化用户提供器。
      */
     protected function initialize(): void
     {

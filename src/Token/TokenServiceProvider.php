@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Pin\Token;
 
+use Override;
 use Pin\Application;
 use Pin\Support\ServiceProvider;
 
 /**
- * Token服务提供者
+ * Token 服务提供者。
  */
 class TokenServiceProvider extends ServiceProvider
 {
     /**
-     * Register the service provider.
+     * 注册 Token 管理器。
      */
+    #[Override]
     public function register(): void
     {
         $this->app->singleton(

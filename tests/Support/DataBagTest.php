@@ -27,3 +27,16 @@ it('throws exception when accessing missing key in strict mode', function () {
 
     $bag->missing_key;
 })->throws(RuntimeException::class);
+
+it('creates data bags from iterable and arrayable values', function () {
+    $data = ['id' => 1];
+    $bag = new DataBag($data);
+    $generator = (function () use ($data) {
+        yield from $data;
+    })();
+
+    expect(DataBag::new($bag))->toBe($bag)
+        ->and(DataBag::new(new ArrayIterator($data))->toArray())->toBe($data)
+        ->and(DataBag::new($generator)->toArray())->toBe($data)
+        ->and(DataBag::new(collect($data))->toArray())->toBe($data);
+});

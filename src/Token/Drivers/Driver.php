@@ -7,14 +7,15 @@ namespace Pin\Token\Drivers;
 use Pin\Token\Contracts\TokenDriver;
 use Pin\Token\Exceptions\TokenExpiredException;
 use Pin\Token\Token;
+use Pin\Token\TokenPayload;
 
 /**
- * Token Driver 抽象基类
+ * Token 驱动基类。
  */
 abstract class Driver implements TokenDriver
 {
     /**
-     * 校验 Token 是否已过期
+     * 校验 Token 过期时间。
      *
      * @throws TokenExpiredException
      */
@@ -26,22 +27,28 @@ abstract class Driver implements TokenDriver
     }
 
     /**
-     * 判断 Token 是否过期
+     * 判断 Token 是否过期。
      */
     protected function isExpired(Token $token): bool
     {
-        $now = now()->getTimestamp();
-
-        // JWT 标准过期时间
         if (isset($token->exp)) {
-            return $token->exp < $now;
+            return $token->exp < now()->getTimestamp();
         }
 
-        // 相对生命周期模式
         if (isset($token->expires)) {
-            return $token->iat + $token->expires < $now;
+            return $token->iat + $token->expires < now()->getTimestamp();
         }
 
         return false;
+    }
+
+    /**
+     * 补充 Token 过期时间。
+     */
+    protected function setExpiresAt(TokenPayload $payload, ?int $expires): void
+    {
+        if (! isset($payload->exp) && $expires) {
+            $payload->exp = now()->getTimestamp() + $expires;
+        }
     }
 }

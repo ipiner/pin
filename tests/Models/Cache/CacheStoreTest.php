@@ -10,6 +10,7 @@ use Pin\Models\Model;
 use Pin\Support\Json;
 use Pin\Testing\Concerns\InteractsWithRedis;
 use Pin\Tests\Models\Models\Admin;
+use Pin\Tests\Models\Models\User;
 
 uses(InteractsWithRedis::class);
 
@@ -83,7 +84,8 @@ it('remembers all cache items', function () {
     $store->repo()->put('testing-all-L2:1', new Menu(['id' => 1]), 600);
 
     expect($store->rememberAll('testing-all-L2', 10, fn () => null)[1]->id)->toBe(1);
-    expect($store->rememberAll('empty-callback', 10, fn () => new Menu()->newCollection()))->toBeEmpty();
+    expect($store->rememberAll('empty-callback', 10, fn () => new Menu()->newCollection()))
+        ->toBeEmpty();
     expect($store->rememberAll('callback', 10, fn () => new Menu()->newCollection([
         new Menu(['id' => 1]),
     ]))[1]->id)->toBe(1);
@@ -96,6 +98,52 @@ it('remembers all cache items', function () {
     ]))[1]->id)->toBe(1);
 
     expect($store->repo()->has('cache-item:1'))->toBeFalse();
+});
+
+it('caches empty collections locally', function () {
+    $store = store(new Menu());
+    $loads = 0;
+    $load = function () use (&$loads) {
+        $loads++;
+
+        return new Menu()->newCollection();
+    };
+
+    expect($store->rememberAll('menus-all', 10, $load))->toBeEmpty()
+        ->and($store->rememberAll('menus-all', 10, $load))->toBeEmpty()
+        ->and($loads)->toBe(1);
+});
+
+it('invalidates local collection caches for every cache type', function (string $modelClass) {
+    $model = new $modelClass();
+    $store = new CacheStore($model, null);
+    $key = $model->getTable().'-all';
+    $load = fn () => $model->newCollection([new $modelClass(['id' => 1])]);
+
+    expect($store->rememberAll($key, 10, $load))->toHaveCount(1);
+    $store->forget($model->getTable().':1');
+
+    expect($store->rememberAll($key, 10, fn () => $model->newCollection()))->toBeEmpty();
+})->with([[User::class], [Admin::class]]);
+
+it('honors the TTL for missing records', function () {
+    $store = new CacheStore(new Admin(), null);
+
+    expect($store->remember('admins:1', 10, fn () => null))->toBeNull();
+    $this->travel(10)->seconds();
+
+    expect($store->remember('admins:1', 10, fn () => new Admin(['id' => 1]))?->id)->toBe(1);
+});
+
+it('expires locally refilled records', function () {
+    $store = store();
+    $store->repo()->put('admins:1', ['id' => 1], 600);
+
+    expect($store->remember('admins:1', 10, fn () => null)?->id)->toBe(1);
+    $store->repo()->forget('admins:1');
+    $this->travel(10)->seconds();
+
+    expect($store->remember('admins:1', 10, fn () => null))->toBeNull();
 });
 
 function store(?Model $model = null): CacheStore

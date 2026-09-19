@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace Pin\Cache;
 
-use Pin\Support\Facades\RuntimeCache;
+use InvalidArgumentException;
 
 /**
- * HashKey
- *
- * 将字符串 key 映射为 Redis Hash 结构：
- * - key   => hash key
- * - field => hash field
+ * Hash 键与字段。
  */
 class HashKey
 {
@@ -20,37 +16,24 @@ class HashKey
     }
 
     /**
-     * 解析单个 key
-     *
-     * 使用最后一个 ":" 作为分隔符
-     *
-     * ```
-     * users:1 => users
-     * // key => users
-     * // field => 1
-     * ```
+     * 按最后一个冒号拆分缓存键。
      */
     public static function parse(string $raw): static
     {
-        return RuntimeCache::rememberForever(
-            static::class.'.'.$raw,
-            function () use ($raw) {
-                $pos = strrpos($raw, ':');
+        $position = strrpos($raw, ':');
 
-                if ($pos === false) {
-                    return new static($raw, '');
-                }
+        if ($position === false) {
+            return new static($raw, '');
+        }
 
-                return new static(
-                    substr($raw, 0, $pos),
-                    substr($raw, $pos + 1),
-                );
-            }
+        return new static(
+            substr($raw, 0, $position),
+            substr($raw, $position + 1),
         );
     }
 
     /**
-     * 批量解析 keys
+     * 解析同一 Hash 下的缓存键。
      *
      * @return array{0: string, 1: array<int, string>}
      */
@@ -60,7 +43,11 @@ class HashKey
         $fields = [];
 
         foreach ($keys as $raw) {
-            $item = static::parse($raw);
+            $item = static::parse((string) $raw);
+
+            if ($fields && $hashKey !== $item->key) {
+                throw new InvalidArgumentException('Cache keys must belong to the same hash.');
+            }
 
             $hashKey = $item->key;
             $fields[] = $item->field;

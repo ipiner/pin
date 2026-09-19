@@ -6,7 +6,6 @@ namespace Pin\Debug;
 
 use Dedoc\Scramble\Attributes\ExcludeAllRoutesFromDocs;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Pin\Errors\IError;
 use Pin\Errors\Registry;
 use Pin\Http\ApiResponse;
@@ -14,11 +13,14 @@ use Pin\Http\Controller;
 use Pin\Route\RouteRegistry;
 use Pin\Route\RouteRegistryItem;
 
+/**
+ * 调试信息。
+ */
 #[ExcludeAllRoutesFromDocs]
 class DebugController extends Controller
 {
     /**
-     * 配置
+     * 获取配置。
      */
     public function config(?string $name = null): ApiResponse
     {
@@ -26,7 +28,7 @@ class DebugController extends Controller
     }
 
     /**
-     * 调试首页
+     * 获取请求信息。
      */
     public function index(): ApiResponse
     {
@@ -40,82 +42,37 @@ class DebugController extends Controller
     }
 
     /**
-     * 错误码
+     * 获取错误码。
      */
     public function errors(): ApiResponse
     {
-        $data = collect(Registry::all())->map(fn (IError $item) => [
-            'code' => $item->code(),
-            'status' => $item->statusCode(),
-            'message' => $item->message(),
-        ])
+        $errors = collect(Registry::all())
             ->sortKeys()
+            ->map(static fn (IError $error) => [
+                'code' => $error->code(),
+                'status' => $error->statusCode(),
+                'message' => $error->message(),
+            ])
             ->values();
 
-        return $this->success($data);
+        return $this->success($errors);
     }
 
     /**
-     * 生成 TypeScript 接口定义、字段文本和列表页表格列定义
-     *
-     * - 根据每个模型生成：
-     * - 1. TypeScript 接口 (`export type Model ={ ... }`)
-     * - 2. 字段文本 (`export const labels = { ... }`)
-     * - 3. 列表页表格列定义 (`export const columns = [ ... ]`)
-     *
-     * - 自动跳过 `deleted_at` 字段
-     * - 数字类型（int, decimal）映射为 TypeScript `number`，其他类型映射为 `string`
+     * 生成 TypeScript 类型、标签和表格列。
      */
-    public function generateTypescript(Request $request): string
-    {
-        // 数据库连接
-        $connection = $request->query('connection', 'default');
-        $snakeCase = $request->boolean('snake_case');
+    public function generateTypescript(
+        Request $request,
+        TypescriptGenerator $generator
+    ): string {
+        $schemas = $this->loadSchemas($request->query('connection', 'default'));
+        $typescript = $generator->generate($schemas, $request->boolean('snake_case'));
 
-        $result = [];
-        $schemas = require database_path('schemas/'.$connection.'/__schemas__.php');
-        ksort($schemas);
-        foreach ($schemas as $name => $item) {
-            $model = Str::studly(Str::singular($name));
-            $result[$model] = "export type $model = {";
-            $result[$model.'.labels'] = 'export const labels = {';
-            $result[$model.'.columns'] = 'export const columns = [';
-            ksort($item['columns']);
-            foreach ($item['columns'] as $column) {
-                $name = $column['name'];
-                if ($name === 'deleted_at') {
-                    continue;
-                }
-
-                $name = $snakeCase ? $name : Str::camel($name);
-                $result[$model] .= sprintf(
-                    "\n  %s: %s; // %s",
-                    $name,
-                    Str::contains($column['type'], ['int', 'decimal']) ? 'number' : 'string',
-                    $column['label']
-                );
-                $result[$model.'.labels'] .= sprintf(
-                    "\n  %s: '%s',",
-                    $name,
-                    $column['label']
-                );
-                $result[$model.'.columns'] .= sprintf(
-                    "\n  table.column('%s', labels.%s),",
-                    $name,
-                    $name
-                );
-            }
-
-            $result[$model] .= "\n};";
-            $result[$model.'.labels'] .= "\n};";
-            $result[$model.'.columns'] .= "\n];";
-        }
-
-        return '<pre>'.implode("\n\n", $result).'</pre>';
+        return '<pre>'.e($typescript).'</pre>';
     }
 
     /**
-     * phpinfo
+     * 获取 PHP 信息。
      */
     public function phpinfo(int $flags = INFO_ALL): string
     {
@@ -126,20 +83,34 @@ class DebugController extends Controller
     }
 
     /**
-     * 已注册路由
+     * 获取已注册路由。
      */
     public function routes(): ApiResponse
     {
-        $data = RouteRegistry::items()->map(fn (RouteRegistryItem $item) => [
-            'name' => $item->route->getName(),
-            'action' => $item->route->action,
-            'case' => get_class($item->case).'::'.$item->case->name,
-            'title' => $item->case->title(),
-            'uri' => $item->case->uri(),
-        ])
+        $routes = RouteRegistry::items()
             ->sortKeys()
+            ->map(static fn (RouteRegistryItem $item) => [
+                'name' => $item->route->getName(),
+                'action' => $item->route->action,
+                'case' => $item->case::class.'::'.$item->case->name,
+                'title' => $item->case->title(),
+                'uri' => $item->case->uri(),
+            ])
             ->values();
 
-        return $this->success($data);
+        return $this->success($routes);
+    }
+
+    /**
+     * 读取数据表结构。
+     */
+    protected function loadSchemas(string $connection): array
+    {
+        abort_if($connection === '..' || basename($connection) !== $connection, 404);
+
+        $file = database_path("schemas/{$connection}/__schemas__.php");
+        abort_unless(is_file($file), 404, '数据表结构文件不存在。');
+
+        return require $file;
     }
 }

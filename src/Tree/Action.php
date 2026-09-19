@@ -4,33 +4,36 @@ declare(strict_types=1);
 
 namespace Pin\Tree;
 
-use Illuminate\Support\Facades\Request;
+use Pin\Action\Action as BaseAction;
 use Pin\Models\Model;
 use Pin\Tree\Rules\TreeParentRule;
 use Pin\Validation\Rules\Unique;
 
 /**
- * InteractsWithTreeValidation
- *
- * Tree 数据写入校验层
+ * 树节点写入校验。
  *
  * @template TModel of Model
+ *
+ * @extends BaseAction<TModel>
  */
-abstract class Action extends \Pin\Action\Action
+abstract class Action extends BaseAction
 {
+    /**
+     * @param  ModelService<TModel>  $service
+     */
     public function __construct(public protected(set) ModelService $service)
     {
     }
 
     /**
-     * 获取 Tree 基础验证规则集合
+     * 获取基础验证规则。
      *
      * @return array<string, mixed>
      */
     protected function basicRules(?int $id = null, ?int $pid = null): array
     {
-        $id ??= (int) $this->context->get('id');
-        $pid ??= (int) Request::json('pid');
+        $id ??= (int) $this->context('id');
+        $pid ??= (int) $this->payload('pid');
 
         return [
             /**
@@ -39,17 +42,13 @@ abstract class Action extends \Pin\Action\Action
             'name' => [
                 'required',
                 'string',
-                /**
-                 * 同级唯一性约束：
-                 * 在同一 pid 下 name 必须唯一
-                 */
                 'unique' => new Unique($this->service->modelClass)
                     ->where('pid', $pid)
                     ->ignore($id),
             ],
 
             /**
-             * 父id，`0` 表示一级
+             * 父节点 ID，0 表示根节点。
              */
             'pid' => [
                 'required',
@@ -60,7 +59,7 @@ abstract class Action extends \Pin\Action\Action
             ],
 
             /**
-             * 排序值， `-1` 时使用记录id
+             * 排序值，-1 使用节点 ID。
              *
              * @example -1
              */

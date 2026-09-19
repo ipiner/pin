@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Pin\Support\Facades;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Facade;
+use Override;
+use Pin\Auth\ConsoleUser;
 
 /**
  * @method static int id()
  * @method static string type()
- * @method static \Illuminate\Contracts\Auth\Authenticatable|\Pin\Auth\ConsoleUser|null user()
+ * @method static Authenticatable|ConsoleUser|null user()
  * @method static string username()
  *
  * @see \Pin\Log\Actor
@@ -17,9 +20,10 @@ use Illuminate\Support\Facades\Facade;
 class Actor extends Facade
 {
     /**
-     * Get the registered name of the component.
+     * 获取服务名称。
      */
-    protected static function getFacadeAccessor()
+    #[Override]
+    protected static function getFacadeAccessor(): string
     {
         return 'pin.log.actor';
     }

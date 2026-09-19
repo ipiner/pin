@@ -12,6 +12,7 @@ afterAll(function () {
 it('explodes strings', function () {
     expect(Str::explode(null))->toBe([])
         ->and(Str::explode(' '))->toBe([])
+        ->and(Str::explode(' 0, , 1 '))->toBe(['0', '1'])
         ->and(Str::explode(' foo, bar ,'))->toBe(['foo', 'bar'])
         ->and(Str::explode(' foo; bar ;', ';'))->toBe(['foo', 'bar']);
 });
@@ -59,6 +60,8 @@ it('converts values to string', function () {
         ['str', 'str'],
         [1, '1'],
         [Errors::Success, '0|success'],
+        [SupportIntegerEnum::Zero, '0'],
+        [SupportUnitEnum::Ready, 'Ready'],
         [Illuminate\Support\Str::of('str'), 'str'],
     ];
 
@@ -66,3 +69,23 @@ it('converts values to string', function () {
         expect(Str::string($case[0]))->toBe($case[1]);
     }
 });
+
+it('checks UTF-8 without changing the JSON error state', function () {
+    json_decode('{');
+
+    expect(Str::isValidUtf8('中文'))->toBeTrue()
+        ->and(Str::isValidUtf8("\xFF"))->toBeFalse()
+        ->and(json_last_error())->toBe(JSON_ERROR_SYNTAX);
+
+    json_decode('null');
+});
+
+enum SupportIntegerEnum: int
+{
+    case Zero = 0;
+}
+
+enum SupportUnitEnum
+{
+    case Ready;
+}

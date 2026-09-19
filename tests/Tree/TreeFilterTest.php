@@ -50,6 +50,36 @@ it('removes node and all descendants', function () {
     expect($res->pluck('id')->all())->toEqual([1, 4]);
 });
 
+it('removes rejected nodes even when their paths are empty', function () {
+    $tree = collect([
+        makeNode(1, 0, []),
+        makeNode(2, 0, [2]),
+    ]);
+
+    expect(Tree::filter($tree, fn ($node) => $node->id !== 1)->pluck('id')->all())
+        ->toBe([2]);
+});
+
+it('prunes a deep empty branch while preserving sibling order', function () {
+    $tree = collect([makeNode(1, 0, [1])]);
+
+    for ($id = 2; $id <= 100; $id++) {
+        $tree->push(makeNode($id, $id - 1, range(1, $id)));
+    }
+
+    $tree->push(makeNode(102, 1, [1, 102]), makeNode(101, 1, [1, 101]));
+    $calls = 0;
+    $filtered = Tree::filter($tree, function ($node) use (&$calls) {
+        $calls++;
+
+        return $node->id !== 100;
+    });
+
+    expect($filtered->pluck('id')->all())->toBe([1, 102, 101])
+        ->and($filtered->keys()->all())->toBe([0, 1, 2])
+        ->and($calls)->toBe($tree->count());
+});
+
 /**
  * 构造测试数据
  */

@@ -14,8 +14,6 @@ use Pin\Pagination\Pagination;
 /**
  * 查询操作
  *
- * 为 Service 提供统一的查询封装。
- *
  * @template TModel of Model
  */
 trait HandlesQuery
@@ -28,11 +26,12 @@ trait HandlesQuery
     /**
      * 执行分页查询
      *
-     * @param  Queryable|array|null  $rules  `Queryable` 可查询对象 或者 验证规则
+     * @param  Queryable|array<string, mixed>|null  $rules  查询条件或验证规则
+     * @return Pagination<TModel>
      */
     public function pagination(Queryable|array|null $rules = null): Pagination
     {
-        if ($rules) {
+        if ($rules !== null) {
             $this->queryable = is_array($rules) ? Queryable::fromRules($rules) : $rules;
         }
 
@@ -51,11 +50,13 @@ trait HandlesQuery
     }
 
     /**
-     * 查询数据
+     * 查询全部数据
+     *
+     * @return Collection<int, TModel>
      */
     protected function getAll(): Collection
     {
-        return $this->queryable?->conditions
+        return $this->queryable
             ? $this->queryBuilder()->get()
             : $this->modelClass::findAll()->values();
     }

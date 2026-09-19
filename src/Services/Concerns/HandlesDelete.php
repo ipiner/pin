@@ -11,41 +11,40 @@ use Pin\Services\Results\DeleteResult;
 /**
  * 删除操作
  *
- * 为 Service 提供统一删除流程封装
- *
  * @template TModel of Model
  */
 trait HandlesDelete
 {
     /**
-     * 执行标准删除流程
+     * 删除模型
      *
      * @param  TModel|int  $model
-     * @param  (Closure(TModel,array):void)|null  $callback
+     * @param  (Closure(TModel): void)|null  $callback
      * @return DeleteResult<TModel>
      */
-    public function delete($model, ?Closure $callback = null)
+    public function delete($model, ?Closure $callback = null): DeleteResult
     {
         $model = $this->find($model);
-        $deleted = $model->transaction(function (Model $model) use ($callback) {
+        $deleted = $model->transaction(function (Model $model) use ($callback): bool {
             $this->deleting($model);
 
-            $deleted = $model->delete();
-            if ($deleted) {
-                $this->deleted($model);
-                if ($callback) {
-                    $callback($model);
-                }
+            if (! $model->delete()) {
+                return false;
             }
 
-            return $deleted;
+            $this->deleted($model);
+            if ($callback) {
+                $callback($model);
+            }
+
+            return true;
         });
 
         return new DeleteResult($model, $deleted);
     }
 
     /**
-     * 删除前置操作
+     * 删除前处理
      *
      * @param  TModel  $model
      */
@@ -54,7 +53,7 @@ trait HandlesDelete
     }
 
     /**
-     * 删除成功后置操作
+     * 删除后处理
      *
      * @param  TModel  $model
      */

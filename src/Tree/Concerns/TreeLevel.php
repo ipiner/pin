@@ -9,13 +9,12 @@ use Pin\Exceptions\Exception;
 trait TreeLevel
 {
     /**
-     * 校验节点层级是否超过限制。
-     *
-     * 移动节点时，同时校验整个子树移动后的最大层级。
+     * 校验节点及子树层级。
      */
     protected function ensureLevelValid(): void
     {
         $maxLevel = $this->maxTreeLevel();
+
         if ($maxLevel === 0) {
             return;
         }
@@ -24,7 +23,7 @@ trait TreeLevel
             $this->levelExceeded($maxLevel);
         }
 
-        if ($this->exists()) {
+        if ($this->exists) {
             $this->ensureSubtreeLevelValid($maxLevel);
         }
     }
@@ -34,21 +33,21 @@ trait TreeLevel
      */
     protected function ensureSubtreeLevelValid(int $maxLevel): void
     {
-        $oldLevel = $this->pathLevel($this->getRawOriginal('path'));
-        $diff = $this->level - $oldLevel;
+        $oldPath = $this->getRawOriginal('path');
+        $levelDelta = $this->level - $this->pathLevel($oldPath);
 
-        if ($diff <= 0) {
+        if ($levelDelta <= 0) {
             return;
         }
 
         $maxSubtreeLevel = static::where(
             'path',
             'like',
-            $this->getRawOriginal('path').'/%'
+            $oldPath.'/%'
         )
             ->max('level');
 
-        if ($maxSubtreeLevel && $maxSubtreeLevel + $diff > $maxLevel) {
+        if ($maxSubtreeLevel && $maxSubtreeLevel + $levelDelta > $maxLevel) {
             $this->levelExceeded($maxLevel);
         }
     }

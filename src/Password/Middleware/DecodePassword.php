@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace Pin\Password\Middleware;
 
+use Override;
 use Pin\Http\Middleware\TransformsRequest;
 use Pin\Support\Facades\Password;
 
 /**
- * 请求密码字段解码中间件
- *
- * 自动对请求中的密码字段进行解码（如前端加密传输）
+ * 请求密码字段解码
  */
 class DecodePassword extends TransformsRequest
 {
     /**
-     * 需要解码的字段列表
+     * 待解码字段。
      *
      * @var array<string>
      */
@@ -27,15 +26,15 @@ class DecodePassword extends TransformsRequest
     ];
 
     /**
-     * 解密
+     * 解码密码
      */
+    #[Override]
     protected function normalize(string $value): string
     {
-        if ($plain = static::resolvePlainValue($value)) {
-            return Password::encode($plain);
-        }
-
-        $encoded = Password::decodeFromRequest($value);
+        $plain = static::resolvePlainValue($value);
+        $encoded = $plain === null
+            ? Password::decodeFromRequest($value)
+            : Password::encode($plain);
 
         return Password::isEmpty($encoded) ? '' : $encoded;
     }

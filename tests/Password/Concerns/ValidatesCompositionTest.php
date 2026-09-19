@@ -28,6 +28,7 @@ it('validates mixed case', function (string $value, int $expected) {
     expect($this->invoker->validateMixedCase())->toBe($expected);
 })->with([
     'valid' => ['12aB', 0],
+    'newline between cases' => ["a\nB", 0],
     'missing upper' => ['123a', Errors::PasswordRequiresMixedCase->code()],
     'missing lower' => ['123B', Errors::PasswordRequiresMixedCase->code()],
 ]);

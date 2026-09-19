@@ -7,7 +7,7 @@ namespace Pin\Route;
 use BackedEnum;
 
 /**
- * 可路由定义接口
+ * 路由枚举接口
  */
 interface Routable extends BackedEnum
 {
@@ -17,14 +17,17 @@ interface Routable extends BackedEnum
     public static function registerRoutes(): void;
 
     /**
-     * 获取当前枚举 Case 上指定类型的 Attribute 实例。
+     * 获取路由属性
      *
-     * @param  class-string  $class  要获取的 Attribute 类名
+     * @template TAttribute of object
+     *
+     * @param  class-string<TAttribute>  $class
+     * @return TAttribute|null
      */
     public function attribute(string $class): mixed;
 
     /**
-     * 获取当前枚举对应的路由定义信息
+     * 获取路由定义
      */
     public function definition(): RouteDefinition;
 }

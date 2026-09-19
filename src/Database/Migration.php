@@ -10,17 +10,17 @@ use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * 数据库迁移基类
+ * 数据库迁移基类。
  */
 class Migration extends \Illuminate\Database\Migrations\Migration
 {
     /**
-     * 当前操作的 Blueprint 实例（表结构构建器）
+     * 表结构构建器。
      */
     protected Blueprint $table;
 
     /**
-     * 获取当前数据库连接
+     * 获取连接名称。
      */
     public function getConnection()
     {
@@ -28,9 +28,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 操作用户字段
-     *
-     * 用于记录数据的创建用户与更新用户
+     * 添加操作用户字段。
      */
     protected function blameable(): void
     {
@@ -39,7 +37,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加软删除字段（deleted_at）
+     * 添加软删除字段。
      */
     protected function deleted(): void
     {
@@ -47,29 +45,34 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加主键 id
+     * 添加主键。
      */
     protected function id(bool $autoIncrement = true, bool $bigint = false): ColumnDefinition
     {
-        $col = $bigint ? $this->table->unsignedBigInteger('id') : $this->table->unsignedInteger('id');
+        $column = $bigint
+            ? $this->table->unsignedBigInteger('id')
+            : $this->table->unsignedInteger('id');
 
         if ($autoIncrement) {
-            return $col->autoIncrement()->comment('id|自增');
+            return $column->autoIncrement()->comment('id|自增');
         }
 
-        return $col->primary()->comment('id|由id生成器生成');
+        return $column->primary()->comment('id|由id生成器生成');
     }
 
     /**
-     * json字段
+     * 添加 JSON 字段。
      */
-    protected function json(string $column, string $comment, bool $nullable = true): ColumnDefinition
-    {
+    protected function json(
+        string $column,
+        string $comment,
+        bool $nullable = true
+    ): ColumnDefinition {
         return $this->table->json($column)->nullable($nullable)->comment($comment);
     }
 
     /**
-     * 生成表或字段注释
+     * 生成表或字段注释。
      */
     protected function makeComment(string $comment, string $creator): string
     {
@@ -77,39 +80,39 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 多态字段（morphs）
-     *
-     * 生成：
-     *   {name}_type
-     *   {name}_id
-     *
-     * 并自动创建索引
+     * 添加多态字段及索引。
      */
-    protected function morphs(string $name, string $typeComment, $idComment, bool $unique = true): void
-    {
-        $this->string("{$name}_type", $typeComment);
-        $this->unsignedBigInteger("{$name}_id", $idComment);
+    protected function morphs(
+        string $name,
+        string $typeComment,
+        string $idComment,
+        bool $unique = true
+    ): void {
+        $typeColumn = "{$name}_type";
+        $idColumn = "{$name}_id";
+
+        $this->string($typeColumn, $typeComment);
+        $this->unsignedBigInteger($idColumn, $idComment);
 
         if ($unique) {
-            $this->table->unique(["{$name}_type", "{$name}_id"]);
+            $this->table->unique([$typeColumn, $idColumn]);
         } else {
-            $this->table->index(["{$name}_type", "{$name}_id"]);
+            $this->table->index([$typeColumn, $idColumn]);
         }
 
-        // 单独索引 id（提升查询性能）
-        $this->table->index("{$name}_id");
+        $this->table->index($idColumn);
     }
 
     /**
-     * 请求id字段（request_id）
+     * 添加请求 ID 字段。
      */
-    protected function requestId($length = 36): ColumnDefinition
+    protected function requestId(int $length = 36): ColumnDefinition
     {
         return $this->string('request_id', '请求id', $length);
     }
 
     /**
-     * 获取 Schema Builder
+     * 获取表结构构建器。
      */
     protected function schema(): Builder
     {
@@ -117,7 +120,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加字符串字段
+     * 添加字符串字段。
      */
     protected function string(
         string $column,
@@ -125,8 +128,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
         ?int $length = null,
         bool $allowEmpty = false
     ): ColumnDefinition {
-        $definition = $this->table->string($column, $length)
-            ->comment($comment);
+        $definition = $this->table->string($column, $length)->comment($comment);
 
         if ($allowEmpty) {
             $definition->default('');
@@ -136,17 +138,15 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 创建/更新时间字段（nullable）
+     * 添加可空时间戳字段。
      */
     protected function timestamp(string $column, string $comment): ColumnDefinition
     {
-        return $this->table->timestamp($column)
-            ->nullable()
-            ->comment($comment);
+        return $this->table->timestamp($column)->nullable()->comment($comment);
     }
 
     /**
-     * 添加 created_at / updated_at
+     * 添加创建和更新时间字段。
      */
     protected function timestamps(): void
     {
@@ -155,7 +155,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 字段封装：unsigned bigint
+     * 添加无符号大整数字段。
      */
     protected function unsignedBigInteger(string $column, string $comment): ColumnDefinition
     {
@@ -163,7 +163,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 字段封装：unsigned int
+     * 添加无符号整数字段。
      */
     protected function unsignedInteger(string $column, string $comment): ColumnDefinition
     {
@@ -171,7 +171,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 字段封装：unsigned smallint
+     * 添加无符号小整数字段。
      */
     protected function unsignedSmallInteger(string $column, string $comment): ColumnDefinition
     {
@@ -179,7 +179,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 字段封装：unsigned tinyint
+     * 添加无符号 tinyint 字段。
      */
     protected function unsignedTinyInteger(string $column, string $comment): ColumnDefinition
     {
@@ -187,7 +187,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 绑定 Blueprint
+     * 绑定表结构构建器。
      */
     protected function useTable(Blueprint $table): void
     {
@@ -195,10 +195,10 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 数据版本号
+     * 添加数据版本字段。
      */
     protected function version(): ColumnDefinition
     {
-        return $this->table->unsignedInteger('v')->default(1)->comment('数据版本号');
+        return $this->unsignedInteger('v', '数据版本号')->default(1);
     }
 }

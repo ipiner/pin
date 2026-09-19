@@ -6,16 +6,15 @@ namespace Pin\Faker;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Override;
 
 /**
- * Fake 数据生成规则
- *
- * 用于定义 fake 数据生成器及其参数
+ * 测试数据生成规则
  */
 readonly class FakeRule implements ValidationRule
 {
     /**
-     * 创建 FakeRule
+     * 构造函数
      */
     public function __construct(
         protected string|Closure $generator,
@@ -24,7 +23,7 @@ readonly class FakeRule implements ValidationRule
     }
 
     /**
-     * 获取 generator
+     * 获取生成器
      */
     public function generator(): string|Closure
     {
@@ -33,12 +32,6 @@ readonly class FakeRule implements ValidationRule
 
     /**
      * 获取指定位置参数。
-     *
-     * @template T
-     *
-     * @param  int  $index  参数下标
-     * @param  T  $default  默认值
-     * @return mixed|T
      */
     public function parameter(int $index, mixed $default = null): mixed
     {
@@ -54,8 +47,9 @@ readonly class FakeRule implements ValidationRule
     }
 
     /**
-     * 当前规则仅用于挂载元数据，不进行实际验证，始终视为验证通过。
+     * 跳过验证
      */
+    #[Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
     }

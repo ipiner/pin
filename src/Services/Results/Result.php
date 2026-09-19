@@ -6,11 +6,10 @@ namespace Pin\Services\Results;
 
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
+use Override;
 
 /**
  * 操作结果
- *
- * 用于定义 Service 层统一结果对象规范
  */
 abstract class Result implements Arrayable, JsonSerializable
 {
@@ -22,6 +21,7 @@ abstract class Result implements Arrayable, JsonSerializable
     /**
      * JSON 序列化
      */
+    #[Override]
     public function jsonSerialize(): array
     {
         return $this->toArray();

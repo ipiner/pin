@@ -11,20 +11,17 @@ use Throwable;
 
 /**
  * 认证异常。
- *
- * 用于表示当前请求未通过身份认证。异常会统一返回 HTTP 401 状态码，
- * 并在可能的情况下，将底层 Token 错误转换为更明确的认证错误。
  */
 class AuthenticationException extends Exception
 {
     public function __construct(string $message = '', int $code = 401, ?Throwable $previous = null)
     {
         $code = $code ?: 401;
-        $err = $this->resolveAuthError($code);
+        $error = $this->resolveAuthError($code);
 
-        parent::__construct($message ?: '请登录', $err?->code() ?? $code, $previous);
+        parent::__construct($message ?: '请登录', $error?->code() ?? $code, $previous);
 
-        $this->withStatusCode(401)->withResponseMessage($err?->message());
+        $this->withStatusCode(401)->withResponseMessage($error?->message());
     }
 
     /**

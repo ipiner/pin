@@ -7,11 +7,7 @@ namespace Pin\Route\Testing\Assertions;
 use Pin\Support\Str;
 
 /**
- * 验证错误断言支持。
- *
- * 为 TestResponse 提供统一的验证失败断言能力，用于验证 Laravel Validation 异常返回的错误字段。
- *
- * 默认从 `data.errors` 中读取验证错误信息。
+ * 验证错误断言
  */
 trait AssertValidation
 {

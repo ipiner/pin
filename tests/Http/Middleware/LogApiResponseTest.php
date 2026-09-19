@@ -132,6 +132,31 @@ it('handles exceptions during logging', function () {
     );
 });
 
+it('uses each request start time when the middleware is reused', function () {
+    $durations = [];
+
+    Log::shouldReceive('channel->log')
+        ->twice()
+        ->withArgs(function ($level, $message, $context) use (&$durations) {
+            $durations[] = $context['time'];
+
+            return true;
+        });
+
+    $middleware = makeMiddleware();
+    $response = new JsonResponse(['code' => 500, 'message' => 'error', 'data' => null]);
+
+    foreach ([60, 1] as $seconds) {
+        $request = Request::create('/test', server: [
+            'REQUEST_TIME_FLOAT' => microtime(true) - $seconds,
+        ]);
+        $middleware->terminate($request, $response);
+    }
+
+    expect($durations[0])->toBeInt()->toBeGreaterThanOrEqual(60000)
+        ->and($durations[1])->toBeInt()->toBeGreaterThanOrEqual(1000)->toBeLessThan(10000);
+});
+
 function makeMiddleware(): LogApiResponse
 {
     return new LogApiResponse(app(QueryMonitor::class));

@@ -9,20 +9,18 @@ use Pin\Support\DataBag;
 use Pin\Support\Facades\Actor;
 
 /**
- * 日志基础载体（基础上下文 Payload）
+ * 日志数据
  *
- * 用于封装一次请求/操作的通用上下文信息，属于日志系统的“基础层”
- *
- * @property int $uid 用户id
+ * @property int $uid 用户 ID
  * @property string $username 用户名
  * @property string $user_type 用户类型
- * @property string $request_id 请求id
- * @property string $request_method HTTP请求方法/命令行下“console”
- * @property string $request_url 请求URL/命令行下为命令完整参数
- * @property string $route 路由名称或路由URI
- * @property string $ip 客户端IP
+ * @property string $request_id 请求 ID
+ * @property string $request_method HTTP 方法或 console
+ * @property string $request_url 请求 URL 或命令行参数
+ * @property string $route 路由名称或 URI
+ * @property string|null $ip 客户端 IP
  * @property CarbonInterface $created_at 当前时间
- * @property ?array $context 日志上下文扩展信息
+ * @property array|null $context 扩展上下文
  */
 class Payload extends DataBag
 {
@@ -33,9 +31,7 @@ class Payload extends DataBag
     }
 
     /**
-     * 合并扩展上下文信息
-     *
-     * @param  array  $context  扩展上下文数据
+     * 合并扩展上下文
      */
     public function context(array $context): static
     {
@@ -54,7 +50,7 @@ class Payload extends DataBag
     }
 
     /**
-     * 初始化请求上下文信息
+     * 初始化请求上下文
      */
     protected function initRequest(): static
     {
@@ -70,7 +66,7 @@ class Payload extends DataBag
     }
 
     /**
-     * 初始化用户上下文信息
+     * 初始化用户上下文
      */
     protected function initUser(): static
     {

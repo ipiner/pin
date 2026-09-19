@@ -8,15 +8,12 @@ use Illuminate\Database\Seeder;
 use Symfony\Component\Finder\Finder;
 
 /**
- * 系统数据库 Seeder 调度器
- *
- * 用于自动扫描并执行项目中所有 Seeder 类，
- * 替代 Laravel 默认手动 `$this->call([...])` 的方式。
+ * 数据填充调度器。
  */
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * 执行数据填充。
      */
     public function run(): static
     {
@@ -24,26 +21,26 @@ class DatabaseSeeder extends Seeder
     }
 
     /**
-     * 自动扫描并解析所有 Seeder 类
+     * 扫描数据填充类。
      *
-     * Database/Seeders/UserSeeder.php → Database\Seeders\UserSeeder
+     * @return list<class-string<Seeder>>
      */
     protected function seeders(?string $path = null): array
     {
         $path ??= database_path('seeders');
-        $finder = new Finder();
-        $finder->files()->in($path)->name('*Seeder.php');
+
+        if (! is_dir($path)) {
+            return [];
+        }
+
+        $files = Finder::create()->files()->in($path)->name('*Seeder.php');
 
         $seeders = [];
-        foreach ($finder as $file) {
-            $s = str_replace(
+        foreach ($files as $file) {
+            $class = 'Database\\Seeders\\'.str_replace(
                 '/',
                 '\\',
-                str_replace([$path, '.php'], '', $file->getPathname())
-            );
-            $class = sprintf(
-                'Database\Seeders\\%s',
-                trim($s, '\\'),
+                substr($file->getRelativePathname(), 0, -4)
             );
 
             if ($class !== static::class) {

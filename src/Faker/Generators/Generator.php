@@ -8,53 +8,41 @@ use Pin\Faker\FakeRule;
 use Pin\Faker\RuleBag;
 
 /**
- * Fake Generator 基类
- *
- * 所有 Fake 数据生成器的抽象实现：
- * - 规则驱动生成
- * - 支持 nullable 控制
- * - 统一生成生命周期
+ * 测试数据生成器
  */
 abstract class Generator
 {
     /**
-     * 当前 FakeRule
+     * 当前生成规则
      */
     protected FakeRule $rule;
 
     /**
-     * 当前字段的 Validation Rules
+     * 当前字段的验证规则
      */
     protected RuleBag $rules;
 
     /**
-     * 生成 fake 数据
+     * 生成数据
      */
     abstract public function fake();
 
     /**
-     * 创建 Generator 实例
+     * 创建生成器
      */
     public static function make(string $name): static
     {
-        $class = sprintf(
-            '%s\\%sGenerator',
-            __NAMESPACE__,
-            $name
-        );
-
-        return app($class);
+        return app(__NAMESPACE__.'\\'.$name.'Generator');
     }
 
     /**
-     * 执行生成流程
+     * 生成字段值
      */
     public function generate(FakeRule $rule, ?RuleBag $rules = null): mixed
     {
         $this->rule = $rule;
         $this->rules = $rules ?? new RuleBag([]);
 
-        // nullable 随机返回 null
         if ($this->shouldReturnNull()) {
             return null;
         }
@@ -63,7 +51,7 @@ abstract class Generator
     }
 
     /**
-     * 是否返回 null
+     * 是否返回空值
      */
     protected function shouldReturnNull(): bool
     {
@@ -71,9 +59,8 @@ abstract class Generator
             return false;
         }
 
-        // 默认 20% 概率
-        $chance = (int) ($this->rules->parameter('nullable', 20));
+        $chance = (int) $this->rules->parameter('nullable', 20);
 
-        return random_int(1, 100) <= $chance;
+        return $chance >= 100 || ($chance > 0 && random_int(1, 100) <= $chance);
     }
 }

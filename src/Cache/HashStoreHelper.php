@@ -8,30 +8,23 @@ use BadMethodCallException;
 use Pin\Support\Json;
 
 /**
- * HashStoreHelper
- *
- * 提供 Redis Hash 缓存的通用操作：
- * - key 解析（HashKey）
- * - JSON 序列化/反序列化
- * - 批量读写
- * - TTL 控制（惰性 + 概率触发）
- * - 逻辑删除与物理删除区分
+ * Hash 缓存操作。
  */
 trait HashStoreHelper
 {
     protected HashDriver $driver;
 
     /**
-     * 缓存过期时间（秒）
-     *
-     * 默认：7 天
+     * 默认过期时间（秒）。
      */
-    protected int $defaultTTL = 604800;
+    protected const int DEFAULT_TTL = 604800;
+
+    protected int $defaultTtl = self::DEFAULT_TTL;
 
     /**
-     * 将未知方法代理到底层 Hash Driver
+     * 转发驱动调用。
      */
-    public function __call(string $method, mixed $parameters): mixed
+    public function __call(string $method, array $parameters): mixed
     {
         return $this->driver->{$method}(...$parameters);
     }
@@ -45,11 +38,11 @@ trait HashStoreHelper
     }
 
     /**
-     * 删除整个 key
+     * 删除整个 Hash。
      */
     public function del(array|string $key): bool
     {
-        return $this->driver->del($key);
+        return $key !== [] && $this->driver->del($key);
     }
 
     /**
@@ -57,11 +50,11 @@ trait HashStoreHelper
      */
     public function flush(): bool
     {
-        return throw new BadMethodCallException(__METHOD__.' not implemented.');
+        throw new BadMethodCallException(__METHOD__.' not implemented.');
     }
 
     /**
-     * 永久缓存（TTL=0）
+     * 写入永久缓存。
      */
     public function forever($key, $value): bool
     {
@@ -69,19 +62,13 @@ trait HashStoreHelper
     }
 
     /**
-     * 删除缓存
+     * 删除字段或整个 Hash。
      *
-     * 如果 `$key` 包括“:"：则删除 Redis Hash 结构中对应 hDel（删除字段）
-     * 否则会直接删除整个缓存键（包括所有 field）
-     *
-     * - users-all -> 删除整个缓存
-     * - users: -> 删除 users 中的字段 1
-     *
-     * @param  string|array  $key  缓存键（完整 key）
+     * @param  string|array  $key
      */
     public function forget($key): bool
     {
-        if (! str_contains($key, ':') || is_array($key)) {
+        if (is_array($key) || ! str_contains($key, ':')) {
             return $this->del($key);
         }
 
@@ -91,11 +78,9 @@ trait HashStoreHelper
     }
 
     /**
-     * 获取单条缓存
-     *
-     * key 形式：users:1
+     * 获取单条缓存。
      */
-    public function get($key)
+    public function get($key): mixed
     {
         $item = HashKey::parse($key);
         $value = $this->driver->hGet($item->key, $item->field);
@@ -104,18 +89,18 @@ trait HashStoreHelper
     }
 
     /**
-     * 获取所有缓存数据
+     * 获取整个 Hash 的缓存。
      */
     public function getAll(string $key): array
     {
         return array_map(
-            fn ($v) => $this->unserialize($v),
-            $this->driver->hGetAll($key)
+            $this->unserialize(...),
+            $this->driver->hGetAll($key),
         );
     }
 
     /**
-     * 获取 Driver
+     * 获取驱动。
      */
     public function getDriver(): HashDriver
     {
@@ -123,7 +108,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 设置 Driver
+     * 设置驱动。
      */
     protected function setDriver(HashDriver $driver): void
     {
@@ -147,25 +132,25 @@ trait HashStoreHelper
     }
 
     /**
-     * 批量获取缓存
-     *
-     * 注意：
-     * - 所有 keys 必须属于同一个 hash key
-     * - 返回值顺序与输入一致
+     * 批量获取同一 Hash 下的缓存。
      */
     public function many(array $keys): array
     {
+        if (! $keys) {
+            return [];
+        }
+
         [$key, $fields] = HashKey::parseMany($keys);
         $values = $this->driver->hMGet($key, $fields);
 
-        return array_map(
-            fn ($v) => $v === false ? null : $this->unserialize($v),
-            $values
-        );
+        return array_combine($keys, array_map(
+            fn ($value) => $value === false ? null : $this->unserialize($value),
+            $values,
+        ));
     }
 
     /**
-     * 写入单条缓存
+     * 写入单条缓存。
      */
     public function put($key, $value, $seconds = null): bool
     {
@@ -173,66 +158,57 @@ trait HashStoreHelper
     }
 
     /**
-     * 批量写入缓存
+     * 批量写入同一 Hash 下的缓存。
      */
     public function putMany(array $values, $seconds = null): bool
     {
-        $key = '';
-        $data = [];
-
-        foreach ($values as $k => $v) {
-            $item = HashKey::parse($k);
-            $key = $item->key;
-            $data[$item->field] = $this->serialize($v);
-        }
-
-        return tap(
-            $this->driver->hMSet($key, $data),
-            fn () => $this->expire($key, $seconds),
-        );
-    }
-
-    /**
-     * 刷新 TTL（延长生命周期）
-     */
-    public function touch($key, $seconds): bool
-    {
-        return $this->expire($key, $seconds, true);
-    }
-
-    /**
-     * 设置过期时间
-     *
-     * 惰性 + 概率执行
-     */
-    protected function expire(string $rawKey, ?int $seconds, ?bool $run = null): bool
-    {
-        // 默认 5% 概率执行 expire
-        $run ??= random_int(1, 100) <= 5;
-
-        if (! $run) {
-            return false;
-        }
-
-        $key = HashKey::parse($rawKey)->key;
-        // -1 = 已有 TTL，避免重复设置
-        if ($this->driver->ttl($key) !== -1) {
+        if (! $values) {
             return true;
         }
 
-        return $this->driver->expire($key, $seconds ?: $this->getTTL($seconds));
+        [$key, $fields] = HashKey::parseMany(array_keys($values));
+        $data = array_combine($fields, array_map($this->serialize(...), $values));
+
+        return $this->driver->hMSet($key, $data) && $this->expire($key, $seconds);
     }
 
     /**
-     * 获取TTL
+     * 更新整个 Hash 的过期时间。
+     */
+    public function touch($key, $seconds): bool
+    {
+        return $this->driver->expire(HashKey::parse($key)->key, $seconds);
+    }
+
+    /**
+     * 设置 Hash 过期时间。
+     */
+    protected function expire(string $key, ?int $seconds): bool
+    {
+        $seconds = $this->getTTL($seconds);
+        $ttl = $this->driver->ttl($key);
+
+        if ($ttl === -2) {
+            return false;
+        }
+
+        if ($seconds === 0) {
+            return $ttl === -1 || $this->driver->persist($key);
+        }
+
+        return $ttl !== -1 || $this->driver->expire($key, $seconds);
+    }
+
+    /**
+     * 获取过期时间。
      */
     protected function getTTL(?int $seconds = null): int
     {
-        return $seconds ?: $this->defaultTTL;
+        return $seconds ?? $this->defaultTtl;
     }
 
     /**
-     * 序列化存储值
+     * 序列化缓存值。
      */
     protected function serialize(mixed $value): string
     {
@@ -240,15 +216,15 @@ trait HashStoreHelper
     }
 
     /**
-     * 设置默认TTL
+     * 设置默认过期时间。
      */
     protected function setDefaultTTL(?int $seconds): void
     {
-        $this->defaultTTL = $seconds ?: 604800;
+        $this->defaultTtl = $seconds ?? static::DEFAULT_TTL;
     }
 
     /**
-     * 反序列化读取值
+     * 反序列化缓存值。
      */
     protected function unserialize(string $value): mixed
     {

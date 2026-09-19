@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 /**
- * Queryable 表示标准化后的查询条件集合，可直接应用到 Eloquent Builder。
+ * 查询条件集合
  */
 class Queryable
 {
@@ -33,7 +33,7 @@ class Queryable
     }
 
     /**
-     * 从已解析的查询参数创建实例。
+     * 从查询参数创建实例。
      *
      * @param  array<string, mixed>  $payload
      * @param  array<string, string|QueryableType>  $types
@@ -44,7 +44,7 @@ class Queryable
     }
 
     /**
-     * 从当前或指定的 HTTP 请求查询参数创建实例。
+     * 从请求参数创建实例。
      *
      * @param  array<string, string|QueryableType>  $types
      */
@@ -54,7 +54,7 @@ class Queryable
     }
 
     /**
-     * 从 Laravel Validation rules 中提取查询定义并创建实例。
+     * 从验证规则创建实例。
      *
      * @param  array<string, mixed>  $rules
      */
@@ -67,7 +67,7 @@ class Queryable
     }
 
     /**
-     * 将查询条件应用到 Eloquent Builder。
+     * 应用附加查询条件
      */
     public function apply(Builder $builder): Builder
     {
@@ -75,7 +75,7 @@ class Queryable
     }
 
     /**
-     * 解析支持的查询参数来源。
+     * 解析查询参数。
      *
      * @return array<string, mixed>
      */

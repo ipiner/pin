@@ -7,21 +7,17 @@ namespace Pin\Models\Queryable;
 use Pin\Validation\Rules\Queryable;
 
 /**
- * Queryable
- *
- * Query DSL 规则解析器（非 Laravel Validation）
- *
- * 从 Validation rules() 中提取查询语义（Query Metadata）”，用于构建 Queryable。
+ * 查询规则提取器
  *
  * @internal
  */
 class QueryableRuleExtractor
 {
     /**
-     * 从 Laravel rules() 中提取 Query DSL
+     * 从验证规则提取查询类型。
      *
-     * @param  array<string, mixed>  $rules  Validation rules()
-     * @return array<string, string> field => query operator
+     * @param  array<string, array|string>  $rules
+     * @return array<string, string>
      */
     public static function extract(array $rules): array
     {
@@ -31,6 +27,7 @@ class QueryableRuleExtractor
             foreach (static::normalizeRules($items) as $rule) {
                 if ($type = static::resolveRule($rule)) {
                     $conditions[$field] = $type;
+
                     break;
                 }
             }
@@ -40,18 +37,14 @@ class QueryableRuleExtractor
     }
 
     /**
-     * 解析单条 rule 中的 Query DSL 信息
-     *
-     * @param  mixed  $rule  Laravel validation rule
+     * 解析单条查询规则
      */
     protected static function resolveRule(mixed $rule): ?string
     {
-        // 对象规则
         if ($rule instanceof Queryable) {
             return $rule->type;
         }
 
-        // q:like / q:eq / q:ns:id,name
         if (is_string($rule) && str_starts_with($rule, 'q:')) {
             return substr($rule, 2);
         }
@@ -60,7 +53,7 @@ class QueryableRuleExtractor
     }
 
     /**
-     * 统一 rules 格式
+     * 标准化验证规则
      */
     protected static function normalizeRules(array|string $rules): array
     {

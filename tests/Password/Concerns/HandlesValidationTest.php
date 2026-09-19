@@ -44,3 +44,38 @@ it('validates password', function () {
 
     expect(str_starts_with($errors[0], Errors::PasswordTooShort->code().'|'))->toBeFalse();
 });
+
+it('clears previous errors when reusing a password rule', function () {
+    $rule = new PasswordRule()->min(1)->letters();
+    $errors = [];
+    $fail = function ($message) use (&$errors) {
+        $errors[] = $message;
+    };
+
+    $rule->validate('password', '12', $fail);
+    expect($errors)->toHaveCount(1)
+        ->and($errors[0])->toStartWith(Errors::PasswordRequiresLetter->code().'|');
+
+    $errors = [];
+    $rule->validate('password', 'a b', $fail);
+    expect($errors)->toHaveCount(1)
+        ->and($errors[0])->toStartWith(Errors::PasswordContainsWhitespace->code().'|');
+
+    $errors = [];
+    $rule->validate('password', 'aB7!', $fail);
+    expect($errors)->toBe([]);
+});
+
+it('keeps composition settings unchanged when counting character types', function () {
+    $rule = new PasswordRule()->min(1)->requiredCharacterTypes(2);
+    $errors = [];
+    $fail = function ($message) use (&$errors) {
+        $errors[] = $message;
+    };
+
+    $rule->validate('password', '1a', $fail);
+    expect($errors)->toBe([]);
+
+    $rule->requiredCharacterTypes(1)->validate('password', 'word', $fail);
+    expect($errors)->toBe([]);
+});

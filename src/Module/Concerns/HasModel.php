@@ -7,14 +7,12 @@ namespace Pin\Module\Concerns;
 trait HasModel
 {
     /**
-     * 按命名约定解析出的模型类名。
+     * 模型类名
      */
     protected string $model;
 
     /**
-     * 解析第一个存在的模型候选类
-     *
-     * 都不存在时返回最后一个兜底候选。
+     * 解析模型类名
      */
     public function model(): string
     {
@@ -24,39 +22,26 @@ trait HasModel
     }
 
     /**
-     * 从模块专属路径到 `App\Models` 依次生成模型候选类名。
+     * 生成模型候选类名。
      *
-     * @return list<class-string|string>
+     * @return list<string>
      */
     protected function getModelCandidates(): array
     {
-        $module = $this->module();
-        $namespace = $module['namespace'];
-        $module = $module['name'];
+        ['name' => $module, 'namespace' => $namespace] = $this->module();
         $domain = $this->domain();
-
-        $candidates = [
-            // 默认模型：App\Models\Category
-            sprintf('App\\Models\\%s', $domain),
-        ];
+        $default = "App\\Models\\{$domain}";
 
         if (! $namespace) {
-            return $candidates;
+            return [$default];
         }
 
         return [
-            // 模块内模型：App\Modules\Product\Models\Product
-            sprintf('%s\\Models\\%s', $namespace, $domain),
-
-            // 模块分组模型：App\Models\Product\Product
-            sprintf('App\\Models\\%s\\%s', $module, $domain),
-
-            // 模块分组复合模型：App\Models\Product\ProductCategory
-            sprintf('App\\Models\\%s\\%s%s', $module, $module, $domain),
-
-            // 顶层复合模型：App\Models\ProductCategory
-            sprintf('App\\Models\\%s%s', $module, $domain),
-            ...$candidates,
+            "{$namespace}\\Models\\{$domain}",
+            "App\\Models\\{$module}\\{$domain}",
+            "App\\Models\\{$module}\\{$module}{$domain}",
+            "App\\Models\\{$module}{$domain}",
+            $default,
         ];
     }
 }

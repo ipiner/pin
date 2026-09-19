@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use App\Routes\User\UserRoute;
+use Illuminate\Testing\TestResponse as BaseResponse;
 use Pin\Route\RouteRegistrar;
 use Pin\Route\Testing\Reporter;
+use Pin\Route\Testing\TestResponse;
 use Pin\Support\Invoker;
 
 it('returns correct method color', function (string $method, string $expected): void {
@@ -58,4 +60,25 @@ it('returns correct status color', function (int $status, string $expected) {
     [400, 'yellow'],
     [500, 'red'],
     [501, 'red'],
+]);
+
+it('reports responses without requiring JSON', function (string $content, int $status) {
+    $stream = fopen('php://memory', 'r+');
+
+    try {
+        $reporter = new Reporter($stream);
+        $reporter->reportRequestEnabled = true;
+        $response = new TestResponse(BaseResponse::fromBaseResponse(response($content, $status)));
+
+        expect($reporter->reportRequest(UserRoute::Index, '/', $response))->toBeTrue();
+
+        rewind($stream);
+        expect(stream_get_contents($stream))->toContain((string) $status, $content);
+    } finally {
+        fclose($stream);
+    }
+})->with([
+    'empty response' => ['', 204],
+    'text response' => ['Service unavailable', 503],
+    'JSON response' => ['{"code":0}', 200],
 ]);

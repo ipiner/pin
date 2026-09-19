@@ -7,24 +7,29 @@ namespace Pin\Log;
 use Throwable;
 
 /**
- * StackTraceNormalizer
- *
- * 用于将 Throwable 的 stack trace 转换为统一、可读的结构。
+ * 异常堆栈格式化
  */
 class StackTraceNormalizer
 {
     /**
-     * 标准化异常 trace
+     * 格式化异常堆栈。
+     *
+     * @return list<string>
      */
     public function normalize(Throwable $e): array
     {
-        $frames = [];
-        $maxFrames = config('pin.logging.stack_trace.max_frames');
-        $traces = $e->getTrace();
-        $total = count($traces);
+        $maxFrames = (int) config('pin.logging.stack_trace.max_frames', 10);
 
-        foreach ($traces as $index => $frame) {
-            if (count($frames) === $maxFrames) {
+        if ($maxFrames <= 0) {
+            return [];
+        }
+
+        $frames = [];
+        $trace = $e->getTrace();
+        $total = count($trace);
+
+        foreach ($trace as $index => $frame) {
+            if (count($frames) >= $maxFrames) {
                 break;
             }
 
@@ -39,7 +44,7 @@ class StackTraceNormalizer
     }
 
     /**
-     * 格式化单个 trace frame。
+     * 格式化堆栈帧
      */
     protected function formatFrame(int $index, int $total, array $frame): string
     {
@@ -56,25 +61,24 @@ class StackTraceNormalizer
     }
 
     /**
-     * 判断指定 frame 是否属于排除列表
+     * 是否排除堆栈帧
      */
     protected function isExcludedFrame(array $frame): bool
     {
         return array_any(
-            config('pin.logging.stack_trace.exclude_frames'),
+            config('pin.logging.stack_trace.exclude_frames', []),
             fn ($term) => $this->matchFrame($frame, $term)
         );
     }
 
     /**
-     * 判断指定 frame 是否允许保留
+     * 是否保留堆栈帧
      */
     protected function isIncludedFrame(array $frame): bool
     {
-        $includes = config('pin.logging.stack_trace.include_frames');
+        $includes = config('pin.logging.stack_trace.include_frames', []);
 
-        // 空白名单：默认允许全部 frame
-        if ($includes === []) {
+        if (! $includes) {
             return true;
         }
 
@@ -85,22 +89,20 @@ class StackTraceNormalizer
     }
 
     /**
-     * 判断 frame 是否匹配指定规则
+     * 匹配堆栈帧
      */
     protected function matchFrame(array $frame, string $term): bool
     {
-        $s = implode(' ', array_filter([
+        $text = implode(' ', array_filter([
             $frame['file'] ?? null,
             $frame['class'] ?? null,
             $frame['function'] ?? null,
         ]));
 
-        // 正则规则（以 # 开头）
         if (str_starts_with($term, '#')) {
-            return (bool) preg_match($term, $s);
+            return preg_match($term, $text) === 1;
         }
 
-        // 普通字符串包含匹配
-        return str_contains($s, $term);
+        return str_contains($text, $term);
     }
 }

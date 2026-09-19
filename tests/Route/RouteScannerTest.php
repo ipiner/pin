@@ -26,3 +26,29 @@ it('scans and returns all route classes', function () {
     $routes = $scanner->scan([new RouteScanPath($path, 'NotFound')]);
     expect(count($routes))->toBe(0);
 });
+
+it('supports namespace mappings and custom file patterns', function () {
+    $scanner = new RouteScanner();
+    $path = __DIR__.'/../laravel/app/Routes/User';
+
+    expect($scanner->scan([$path => 'App\\Routes\\User']))->toBe([UserRoute::class])
+        ->and($scanner->scan([
+            new RouteScanPath($path, '\\App\\Routes\\User\\', 'User*.php'),
+        ]))->toBe([UserRoute::class])
+        ->and($scanner->scan([]))->toBe([]);
+});
+
+it('resolves symbolic links using their scanned paths', function () {
+    $path = sys_get_temp_dir().'/pin-route-scan-'.uniqid();
+    mkdir($path);
+
+    try {
+        symlink(__DIR__.'/../laravel/app/Routes/User/UserRoute.php', $path.'/UserRoute.php');
+
+        expect(new RouteScanner()->scan([$path => 'App\\Routes\\User']))
+            ->toBe([UserRoute::class]);
+    } finally {
+        unlink($path.'/UserRoute.php');
+        rmdir($path);
+    }
+});

@@ -9,9 +9,7 @@ use Pin\Route\RouteDefinition;
 use Pin\Support\Facades\RuntimeCache;
 
 /**
- * HasDefinition
- *
- * 提供 Route Enum 的路由定义解析能力。
+ * 路由定义解析
  */
 trait HasDefinition
 {
@@ -51,7 +49,7 @@ trait HasDefinition
     }
 
     /**
-     * 获取路由URI
+     * 获取路由 URI
      */
     public function uri(): string
     {

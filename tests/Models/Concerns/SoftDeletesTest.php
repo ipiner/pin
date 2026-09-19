@@ -67,6 +67,66 @@ it('soft deletes model and updates values', function () {
         ->and($model->name)->toBe('foo');
 });
 
+it('reports soft deletion state', function () {
+    $model = SoftDelete::query()->findOrFail(1);
+
+    expect($model->trashed())->toBeFalse();
+    $model->delete();
+    expect($model->trashed())->toBeTrue();
+    $model->restore();
+    expect($model->trashed())->toBeFalse();
+});
+
+it('keeps custom soft delete values in sync with the database', function () {
+    $model = new class extends SoftDelete
+    {
+        protected $table = 'soft_deletes';
+
+        public function softDeletedAtValue(bool $deleted): int
+        {
+            return $deleted ? 1234567890 : 0;
+        }
+    };
+    $model = $model->newQuery()->findOrFail(1);
+    $model->delete();
+
+    expect($model->deleted_at)->toBe(1234567890)
+        ->and($model->getRawOriginal('deleted_at'))->toBe(1234567890)
+        ->and(DB::table('soft_deletes')->where('id', 1)->value('deleted_at'))->toBe(1234567890);
+});
+
+it('does not fire restored when saving is rejected', function () {
+    $model = SoftDelete::query()->findOrFail(1);
+    $model->delete();
+    $restored = false;
+
+    SoftDelete::saving(fn () => false);
+    SoftDelete::restored(function () use (&$restored) {
+        $restored = true;
+    });
+
+    expect($model->restore())->toBeFalse()
+        ->and($restored)->toBeFalse();
+});
+
+it('calls the trashed event method', function () {
+    $model = new class extends SoftDelete
+    {
+        protected $table = 'soft_deletes';
+
+        public bool $wasTrashed = false;
+
+        protected function onTrashed(): void
+        {
+            $this->wasTrashed = true;
+        }
+    };
+    $model = $model->newQuery()->findOrFail(1);
+    $model->delete();
+
+    expect($model->wasTrashed)->toBeTrue();
+});
+
 function createSchema(): void
 {
     schema()->create('soft_deletes', function (Blueprint $table) {

@@ -10,6 +10,9 @@ use Dedoc\Scramble\Support\Type\Type;
 use Override;
 use Pin\Pagination\Pagination;
 
+/**
+ * 分页响应 Schema
+ */
 class PaginationToSchema extends GenericTypeToSchema
 {
     #[Override]
@@ -27,9 +30,6 @@ class PaginationToSchema extends GenericTypeToSchema
     #[Override]
     protected function transformTemplateType(Type $type): Type
     {
-        return new ArrayType(
-            $type,
-            new IntegerType(),
-        );
+        return new ArrayType($type, new IntegerType());
     }
 }

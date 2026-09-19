@@ -23,9 +23,21 @@ it('normalizes stack traces', function () {
     expect(count($this->normalizer->normalize($e)))->toBe(1);
 
     config(['pin.logging.stack_trace.exclude_frames' => ['php']]);
-    // #1/19 [internal]:? P\Tests\Log\StackTraceNormalizerTest->{closure:Pest\Factories\TestCaseMethodFactory::getClosure():167}
     expect(count($this->normalizer->normalize($e)))->toBe(1);
 });
+
+it('respects frame limits', function (int|string $limit, int $expected) {
+    config([
+        'pin.logging.stack_trace.max_frames' => $limit,
+        'pin.logging.stack_trace.exclude_frames' => [],
+    ]);
+
+    expect($this->normalizer->normalize(new RuntimeException()))->toHaveCount($expected);
+})->with([
+    ['2', 2],
+    [0, 0],
+    [-1, 0],
+]);
 
 it('determines whether frames are excluded', function () {
     $frame = (new RuntimeException())->getTrace()[0];

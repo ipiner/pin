@@ -7,23 +7,29 @@ namespace Pin\Services;
 use Pin\Models\Model;
 
 /**
- * 通用模型服务层（Service Layer），封装增删改查逻辑。
+ * 模型增删改查服务
  *
  * @template TModel of Model
- *
- * @use Concerns\HandlesCreate<TModel>
- * @use Concerns\HandlesDelete<TModel>
- * @use Concerns\HandlesUpdate<TModel>
- * @use Concerns\InteractsWithModel<TModel>
  *
  * @extends Service<TModel>
  */
 class ModelService extends Service
 {
-    use Concerns\HandlesCreate,
-        Concerns\HandlesDelete,
-        Concerns\HandlesQuery,
-        Concerns\HandlesSave,
-        Concerns\HandlesUpdate,
-        Concerns\InteractsWithModel;
+    /** @use Concerns\HandlesCreate<TModel> */
+    use Concerns\HandlesCreate;
+
+    /** @use Concerns\HandlesDelete<TModel> */
+    use Concerns\HandlesDelete;
+
+    /** @use Concerns\HandlesQuery<TModel> */
+    use Concerns\HandlesQuery;
+
+    /** @use Concerns\HandlesSave<TModel> */
+    use Concerns\HandlesSave;
+
+    /** @use Concerns\HandlesUpdate<TModel> */
+    use Concerns\HandlesUpdate;
+
+    /** @use Concerns\InteractsWithModel<TModel> */
+    use Concerns\InteractsWithModel;
 }

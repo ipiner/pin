@@ -6,6 +6,7 @@ use App\Routes\User\UserRoute;
 use Pin\Http\ApiResponse;
 use Pin\Route\Testing\TestingMethod;
 use Pin\Route\Testing\TestingTask;
+use Pin\Route\Testing\TestSuite;
 
 it('runs test suite and assertions successfully', function () {
     UserRoute::Index->register(
@@ -31,3 +32,12 @@ it('returns correct assertion methods for routes', function (string $name, strin
     [UserRoute::Index->name, TestingMethod::Successful->value],
     [UserRoute::List->name, TestingMethod::Successful->value],
 ]);
+
+it('keeps testing method mappings declared by subclasses', function () {
+    $suite = new class($this, [UserRoute::List]) extends TestSuite
+    {
+        protected array $testingMethods = ['List' => 'paginated'];
+    };
+
+    expect($suite->tasks()->first()->method)->toBe(TestingMethod::Paginated->value);
+});

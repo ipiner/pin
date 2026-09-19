@@ -9,20 +9,14 @@ use Faker\Generator;
 use Illuminate\Support\Traits\Macroable;
 
 /**
- * Fake DSL
- *
- * 提供 fake 数据生成规则定义：
- * - FakerPHP generators
- * - Closure generators
- * - Rule inference
- * - Macro extensions
+ * 测试数据规则入口
  *
  * @mixin Generator
  *
- * @method static FakeRule infer() 根据 Validation Rules 自动推导 FakeRule
+ * @method static FakeRule infer() 根据验证规则推导生成器
  * @method static FakeRule string(int $length = 16) 生成随机字符串
  * @method static FakeRule integer(int $min = 1, int $max = 10000) 生成随机整数
- * @method static FakeRule password(string $plain = 'test@123') 生成密码，适用于请求传输的格式（如前端提交前处理）
+ * @method static FakeRule password(string $plain = 'test@123') 生成请求传输密码
  * @method static FakeRule in(mixed ...$value) 从给定值中随机选择
  * @method static FakeRule enum(string $enum) 从枚举中随机选择
  */
@@ -33,7 +27,7 @@ class Fake
     }
 
     /**
-     * 创建 FakeRule
+     * 创建生成规则
      */
     public static function __callStatic($method, $parameters): FakeRule
     {
@@ -45,9 +39,9 @@ class Fake
     }
 
     /**
-     * 根据规则批量生成 fake 数据。
+     * 根据验证规则生成测试数据。
      *
-     * @param  array  $rules  Validation Rules + FakeRule
+     * @param  array<string, array|string>  $rules  验证规则
      * @return array<string, mixed>
      */
     public static function generate(array $rules): array
@@ -56,7 +50,7 @@ class Fake
     }
 
     /**
-     * 创建 FakeRule 实例。
+     * 创建生成规则
      */
     public static function make(string|Closure $generator, array $arguments = []): FakeRule
     {
@@ -64,7 +58,9 @@ class Fake
     }
 
     /**
-     * 注册规则推导器
+     * 注册规则推导器。
+     *
+     * @param  callable(RuleBag): FakeRule  $callback
      */
     public static function registerInfer(string $rule, callable $callback): void
     {

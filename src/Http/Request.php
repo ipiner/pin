@@ -7,12 +7,12 @@ namespace Pin\Http;
 use Illuminate\Http\Request as BaseRequest;
 
 /**
- * Laravel Request 增强工具类
+ * 请求宏
  */
 class Request
 {
     /**
-     * 需要注册到 Laravel Request 的宏方法列表
+     * 宏方法列表。
      *
      * @var array<int, string>
      */
@@ -24,14 +24,16 @@ class Request
     ];
 
     /**
-     * 注册宏方法到 Illuminate\Http\Request
+     * 注册请求宏
      */
     public static function registerMacros(): void
     {
+        $class = static::class;
+
         foreach (static::MACROS as $method) {
-            BaseRequest::macro($method, function (...$parameters) use ($method) {
+            BaseRequest::macro($method, function (...$parameters) use ($class, $method) {
                 /** @var BaseRequest $this */
-                return Request::{$method}($this, ...$parameters);
+                return $class::{$method}($this, ...$parameters);
             });
         }
     }
@@ -41,9 +43,9 @@ class Request
      */
     public static function getReferer(BaseRequest $request): string
     {
-        $from = $request->header('x-referer') ?: $request->header('referer');
+        $referer = $request->header('x-referer') ?: $request->header('referer');
 
-        return $from ? urldecode($from) : '';
+        return $referer ? urldecode($referer) : '';
     }
 
     /**
@@ -52,11 +54,13 @@ class Request
     public static function isFromApiDocument(BaseRequest $request): bool
     {
         $config = config('app.x_api_document');
+
         if (! $config['enabled']) {
             return false;
         }
 
         $value = $request->header('x-api-document');
+
         if ($value && in_array($value, $config['allows'], true)) {
             return true;
         }
@@ -67,13 +71,11 @@ class Request
     }
 
     /**
-     * 请求是否为读取请求
-     *
-     * HEAD、GET、OPTIONS 请求视为读取操作
+     * 是否为读取请求（HEAD、GET、OPTIONS）
      */
     public static function isReading(BaseRequest $request): bool
     {
-        return in_array(strtoupper($request->method()), ['HEAD', 'GET', 'OPTIONS']);
+        return in_array($request->method(), ['HEAD', 'GET', 'OPTIONS'], true);
     }
 
     /**
@@ -83,9 +85,8 @@ class Request
      */
     public static function isRequest(BaseRequest $request, string|array $values): bool
     {
-        $values = (array) $values;
-        foreach ($values as $s) {
-            if ($request->is(ltrim($s, '/')) || $request->routeIs($s)) {
+        foreach ((array) $values as $pattern) {
+            if ($request->is(ltrim($pattern, '/')) || $request->routeIs($pattern)) {
                 return true;
             }
         }

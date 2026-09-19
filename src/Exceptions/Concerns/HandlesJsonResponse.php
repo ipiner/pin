@@ -6,8 +6,11 @@ namespace Pin\Exceptions\Concerns;
 
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException as LaravelValidationException;
 use Override;
+use Pin\Auth\AuthenticationException as PinAuthenticationException;
 use Pin\Auth\Guard;
 use Pin\Exceptions\Exception;
 use Pin\Exceptions\ValidationException;
@@ -15,47 +18,36 @@ use Pin\Http\ApiResponse;
 use Throwable;
 
 /**
- * JSON 异常渲染层
- *
- * 用于将系统异常统一转换为 API JSON 响应：
- * - 支持业务异常 / HTTP 异常 / 框架异常
- * - 统一错误码与响应结构
- * - 支持自定义 Responsable 输出
- *
- * 作为 API Exception Handler 的核心输出层
+ * JSON 异常响应。
  */
 trait HandlesJsonResponse
 {
     #[Override]
-    protected function convertExceptionToArray(Throwable $e)
+    protected function convertExceptionToArray(Throwable $e): array
     {
-        $exceptionArray = [];
+        $data = $e instanceof ValidationException ? ['errors' => $e->getErrors()] : [];
 
-        // 验证异常特殊处理
-        if ($e instanceof ValidationException) {
-            $exceptionArray['errors'] = $e->getErrors();
+        if (! app()->hasDebugModeEnabled()) {
+            return $data;
         }
 
-        // debug 模式输出完整信息
-        if (app()->hasDebugModeEnabled()) {
-            $exceptionArray['class'] = get_class($e);
-            $exceptionArray['code'] = $e->getCode();
-            $exceptionArray['message'] = $e->getMessage();
-            $exceptionArray['context'] = $e instanceof Exception ? $e->getContext() : [];
-            $exceptionArray['trace'] = array_merge(
-                [$e->getFile().':'.$e->getLine()],
-                explode("\n", $e->getTraceAsString())
-            );
-            $exceptionArray['post'] = app()->request->post();
-            $exceptionArray['headers'] = app()->request->headers->all();
-            $exceptionArray['server'] = app()->request->server->all();
-        }
+        $request = app()->request;
 
-        return $exceptionArray;
+        return [
+            ...$data,
+            'class' => $e::class,
+            'code' => $e->getCode(),
+            'message' => $e->getMessage(),
+            'context' => $e instanceof Exception ? $e->getContext() : [],
+            'trace' => [$e->getFile().':'.$e->getLine(), ...explode("\n", $e->getTraceAsString())],
+            'post' => $request->post(),
+            'headers' => $request->headers->all(),
+            'server' => $request->server->all(),
+        ];
     }
 
     /**
-     * 响应头解析
+     * 获取响应头。
      */
     protected function resolveHeaders(Throwable $e): array
     {
@@ -65,32 +57,27 @@ trait HandlesJsonResponse
     }
 
     #[Override]
-    protected function prepareJsonResponse($request, Throwable $e)
+    protected function prepareJsonResponse($request, Throwable $e): JsonResponse
     {
-        $exceptionArray = $this->convertExceptionToArray($e);
-
         return ApiResponse::make(
             $this->resolveResponseCode($e),
             $this->resolveResponseMessage($e),
-            $exceptionArray,
-        )
-            ->withStatusCode($this->resolveStatusCode($e))
+            $this->convertExceptionToArray($e),
+        )->withStatusCode($this->resolveStatusCode($e))
             ->withHeaders($this->resolveHeaders($e))
             ->toResponse($request);
     }
 
     /**
-     * JSON 异常渲染入口
+     * 渲染 JSON 异常响应。
      */
     protected function renderJsonException(Request $request, Throwable $e)
     {
         $e = match (true) {
-            // Laravel 验证异常 → 自定义
-            $e instanceof \Illuminate\Validation\ValidationException => new ValidationException($e),
-
-            // 认证异常 → 自定义
-            $e instanceof AuthenticationException => new \Pin\Auth\AuthenticationException(
-                code: (int) $request->attributes->get(Guard::UNAUTHENTICATED_CODE)
+            $e instanceof LaravelValidationException => new ValidationException($e),
+            $e instanceof AuthenticationException => new PinAuthenticationException(
+                code: (int) $request->attributes->get(Guard::UNAUTHENTICATED_CODE),
+                previous: $e
             ),
 
             default => $e,
@@ -104,7 +91,7 @@ trait HandlesJsonResponse
     }
 
     #[Override]
-    protected function shouldReturnJson($request, Throwable $e)
+    protected function shouldReturnJson($request, Throwable $e): bool
     {
         return $request->is('api/*') || parent::shouldReturnJson($request, $e);
     }

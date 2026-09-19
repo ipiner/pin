@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pin\Http\Middleware\LogApiResponse;
 
 /**
- * 响应数据策略控制层
- *
- * 用于控制请求/响应日志中是否记录敏感或大体量数据
+ * 日志数据记录策略
  */
 trait HandlesData
 {
     /**
-     * 是否记录请求 payload
+     * 是否记录请求体
      */
     protected function shouldIncludeRequestPayload(): bool
     {
@@ -20,13 +20,13 @@ trait HandlesData
     }
 
     /**
-     * 是否记录 response data
+     * 是否记录响应数据
      */
     protected function shouldIncludeData(): bool
     {
-        $ignores = config('pin.logging.response.ignore_response_data');
+        $ignores = config('pin.logging.response.ignore_response_data', []);
 
-        return ! in_array('*', $ignores)
+        return ! in_array('*', $ignores, true)
             && ! $this->request->isRequest($ignores);
     }
 }

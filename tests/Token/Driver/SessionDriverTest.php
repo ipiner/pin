@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Pin\Testing\Concerns\InteractsWithRedis;
 use Pin\Token\Drivers\SessionDriver;
 use Pin\Token\Exceptions\TokenExpiredException;
+use Pin\Token\Exceptions\TokenInvalidException;
 use Pin\Token\Exceptions\TokenMissingException;
 use Pin\Token\Token;
 use Pin\Token\TokenPayload;
@@ -81,4 +82,54 @@ it('refreshes session token based on config', function () {
 
     $driver = new SessionDriver(Cache::store(), []);
     expect($this->invoker($driver)->refresh($token))->toBeTrue();
+});
+
+it('fills missing session settings regardless of the number of supplied options', function () {
+    $this->freezeTime();
+    $driver = new SessionDriver(Cache::store('array'), [
+        'driver' => 'session',
+        'expires' => 120,
+        'refresh_before' => 0,
+    ]);
+    $token = $driver->decode($driver->encode(new TokenPayload(['uid' => 1])));
+
+    expect($token->uid)->toBe(1)
+        ->and($token->expires)->toBe(120)
+        ->and($token->exp)->toBe(now()->getTimestamp() + 120)
+        ->and($token->jti)->toStartWith(config('pin.token.drivers.session.cache_prefix'));
+});
+
+it('rejects session payloads without required fields', function (string $field) {
+    $payload = [
+        'iat' => now()->getTimestamp(),
+        'expires' => 60,
+        'jti' => 'invalid-session',
+    ];
+    unset($payload[$field]);
+
+    $raw = Pin\Support\Facades\Token::encode($payload);
+    $driver = new SessionDriver(Cache::store('array'), []);
+
+    expect(fn () => $driver->decode($raw))->toThrow(TokenInvalidException::class);
+})->with(['iat', 'expires', 'jti']);
+
+it('renews the cached expiration without changing the issued token', function () {
+    $this->freezeTime();
+    $cache = Cache::store('array');
+    $driver = new SessionDriver($cache, ['refresh_before' => 30]);
+    $raw = $driver->encode(new TokenPayload(['uid' => 1]), 60);
+    $original = $driver->decode($raw);
+
+    $this->travel(40)->seconds();
+    $renewed = $driver->decode($raw);
+
+    expect($renewed->raw)->toBe($raw)
+        ->and($renewed->jti)->toBe($original->jti)
+        ->and($renewed->iat)->toBe($original->iat)
+        ->and($renewed->exp)->toBe($original->exp + 40)
+        ->and($cache->get($renewed->jti))->toBe($renewed->exp);
+
+    $driver->forget($renewed);
+
+    expect(fn () => $driver->decode($raw))->toThrow(TokenMissingException::class);
 });

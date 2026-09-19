@@ -7,10 +7,13 @@ namespace Pin\Token;
 use Pin\Support\DataBag;
 
 /**
- * @property ?int $exp
- * @property ?int $iat
- * @property ?string $jti
- * @property ?int $expires
+ * Token 载荷。
+ *
+ * @property ?int $uid 用户 ID
+ * @property ?int $exp 过期时间戳
+ * @property ?int $iat 签发时间戳
+ * @property ?string $jti 唯一标识
+ * @property ?int $expires 有效期（秒）
  */
 class TokenPayload extends DataBag
 {

@@ -19,24 +19,18 @@ interface Cacher
 
     /**
      * 获取单条模型
-     *
-     * @return Model|null
      */
-    public function get(int $id);
+    public function get(int $id): ?Model;
 
     /**
-     * 获取全量数据
+     * 获取全量数据。
      *
-     * @return Collection
-     *
-     * 返回约定：
-     * - 永远返回 Collection（即使为空）
-     * - keyBy('id') 结构
+     * @return Collection<int, Model>
      */
     public function getAll(): Collection;
 
     /**
-     * 设置缓存 TTL
+     * 设置缓存有效期（秒）
      */
     public function ttl(int $seconds): static;
 }

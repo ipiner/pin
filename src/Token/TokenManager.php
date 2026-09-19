@@ -5,61 +5,55 @@ declare(strict_types=1);
 namespace Pin\Token;
 
 use Closure;
-use Illuminate\Support\Facades\Cache;
 use InvalidArgumentException;
 use Pin\Application;
+use Pin\Token\Contracts\TokenFactory as FactoryContract;
 use Pin\Token\Drivers\AesDriver;
 use Pin\Token\Drivers\JwtDriver;
 use Pin\Token\Drivers\SessionDriver;
 
 /**
- * Token 管理器（Token Manager）
+ * Token 管理器。
  *
  * @mixin TokenFactory
  */
 class TokenManager
 {
     /**
-     * 自定义 Driver 创建器
+     * 自定义驱动工厂。
      *
-     * @var array<string, Closure(Application,array): Contracts\TokenFactory>
+     * @var array<string, Closure(Application, array): FactoryContract>
      */
     protected array $customCreators = [];
 
     /**
-     * 已解析的 Driver 实例缓存
+     * 已解析的工厂。
      *
-     * @var array<string, Contracts\TokenFactory>
+     * @var array<string, FactoryContract>
      */
     protected array $factories = [];
 
-    /**
-     * @param  Application  $app  应用实例
-     */
     public function __construct(protected Application $app)
     {
     }
 
     /**
-     * 动态调用默认 Driver 方法
-     *
-     * @return mixed
+     * 转发默认工厂调用。
      */
-    public function __call(string $method, array $parameters)
+    public function __call(string $method, array $parameters): mixed
     {
         return $this->driver()->{$method}(...$parameters);
     }
 
     /**
-     * 根据配置构建 TokenFactory
+     * 按配置创建工厂。
      *
-     * @param  array  $config  Driver 配置
+     * @param  array{driver: string, ...}  $config
      */
-    public function build(array $config): Contracts\TokenFactory
+    public function build(array $config): FactoryContract
     {
         $driver = $config['driver'];
 
-        // 优先使用自定义 Driver
         if (isset($this->customCreators[$driver])) {
             return $this->callCustomCreator($config);
         }
@@ -75,10 +69,9 @@ class TokenManager
     }
 
     /**
-     * 注册自定义 Driver
+     * 注册自定义驱动。
      *
-     * @param  string  $driver  Driver 名称
-     * @param  Closure  $callback  Driver 创建回调
+     * @param  Closure(Application, array): FactoryContract  $callback
      */
     public function extend(string $driver, Closure $callback): static
     {
@@ -88,11 +81,9 @@ class TokenManager
     }
 
     /**
-     * 获取指定 Driver 实例
-     *
-     * @param  string|null  $name  Driver 名称
+     * 获取指定工厂。
      */
-    public function driver(?string $name = null): Contracts\TokenFactory
+    public function driver(?string $name = null): FactoryContract
     {
         $name ??= $this->getDefaultDriver();
 
@@ -100,44 +91,42 @@ class TokenManager
     }
 
     /**
-     * 调用自定义 Driver 创建器
-     *
-     * @param  array  $config  Driver 配置
+     * 创建自定义工厂。
      */
-    protected function callCustomCreator(array $config): Contracts\TokenFactory
+    protected function callCustomCreator(array $config): FactoryContract
     {
         return $this->customCreators[$config['driver']]($this->app, $config);
     }
 
     /**
-     * 创建 AES Driver
+     * 创建 AES 工厂。
      */
-    protected function createAesFactory(): Contracts\TokenFactory
+    protected function createAesFactory(): FactoryContract
     {
         return new TokenFactory(new AesDriver());
     }
 
     /**
-     * 创建 Session Driver
+     * 创建 Session 工厂。
      */
-    protected function createSessionFactory(array $config): Contracts\TokenFactory
+    protected function createSessionFactory(array $config): FactoryContract
     {
         return new TokenFactory(new SessionDriver(
-            Cache::store($config['cacheStore'] ?? null),
+            $this->app['cache']->store($config['cacheStore'] ?? null),
             $config,
         ));
     }
 
     /**
-     * 创建 JWT Driver
+     * 创建 JWT 工厂。
      */
-    protected function createJwtFactory(array $config): Contracts\TokenFactory
+    protected function createJwtFactory(array $config): FactoryContract
     {
         return new TokenFactory(new JwtDriver($config));
     }
 
     /**
-     * 获取 Driver 配置
+     * 获取驱动配置。
      */
     protected function getConfig(string $name): ?array
     {
@@ -145,7 +134,7 @@ class TokenManager
     }
 
     /**
-     * 获取默认 Driver 名称
+     * 获取默认驱动名称。
      */
     protected function getDefaultDriver(): string
     {
@@ -153,20 +142,18 @@ class TokenManager
     }
 
     /**
-     * 解析 Driver
+     * 解析驱动工厂。
      */
-    protected function resolve(string $name): Contracts\TokenFactory
+    protected function resolve(string $name): FactoryContract
     {
         $config = $this->getConfig($name);
 
-        // 配置驱动
         if ($config !== null) {
             $config['driver'] ??= $name;
 
             return $this->build($config);
         }
 
-        // 自定义驱动
         if (isset($this->customCreators[$name])) {
             return $this->callCustomCreator(['driver' => $name]);
         }

@@ -30,3 +30,15 @@ it('decrypts plain value in non production', function () {
     )
         ->toBe('123456');
 });
+
+it('accepts empty and zero plain values', function (string $value, string $expected) {
+    $request = $this->app['request'];
+    $request->query->set('password', $value);
+
+    $this->middleware->handle($request, fn () => true, 'password');
+
+    expect($request->query('password'))->toBe($expected);
+})->with([
+    ['plain:', ''],
+    ['plain:0', '0'],
+]);

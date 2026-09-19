@@ -6,6 +6,7 @@ namespace Pin\Support\Facades;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
+use Override;
 
 /**
  * @method static array check(Collection $models)
@@ -17,9 +18,10 @@ use Illuminate\Support\Facades\Facade;
 class Tree extends Facade
 {
     /**
-     * Get the registered name of the component.
+     * 获取服务名称。
      */
-    protected static function getFacadeAccessor()
+    #[Override]
+    protected static function getFacadeAccessor(): string
     {
         return 'pin.tree';
     }

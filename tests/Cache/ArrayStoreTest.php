@@ -53,3 +53,19 @@ it('removes overflow items when gc enabled', function () {
         range(5, 10),
     ));
 });
+
+it('clears overflow when the collection batch reaches the cache limit', function (int $batch) {
+    $store = new ArrayStore(3, $batch);
+    $store->putMany(range(1, 4), 0);
+
+    $store->gc(true);
+
+    expect($store->getAll())->toBe([]);
+})->with([3, 5]);
+
+it('filters numeric cache keys by prefix', function () {
+    $store = new ArrayStore();
+    $store->putMany(['0' => 'zero', '01' => 'first', 'other' => 'other'], 0);
+
+    expect($store->getAll('0'))->toBe([0 => 'zero', '01' => 'first']);
+});

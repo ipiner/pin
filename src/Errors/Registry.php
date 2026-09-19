@@ -5,28 +5,21 @@ declare(strict_types=1);
 namespace Pin\Errors;
 
 /**
- * 错误注册中心（Error Registry）
- *
- * 用于统一管理系统中所有 IError 实例：
- * - 根据错误码解析错误定义
- * - 提供全局错误查找能力
- * - 支持错误枚举批量注册
- *
- * 作为错误系统的运行时索引容器
+ * 错误注册表。
  */
 class Registry
 {
     /**
-     * 已注册错误集合
+     * 已注册错误。
      *
      * @var array<int, IError>
      */
     protected static array $errors = [];
 
     /**
-     * 获取所有已注册错误
+     * 获取所有错误。
      *
-     * @return IError[]
+     * @return array<int, IError>
      */
     public static function all(): array
     {
@@ -34,23 +27,15 @@ class Registry
     }
 
     /**
-     * 根据错误码获取错误定义
-     *
-     *  未命中时返回 Unknown
+     * 查找错误，未注册时返回未知错误。
      */
     public static function get(int $code): IError
     {
-        $errors = static::all();
-
-        return $errors[$code]
-            ?? $errors[Errors::Unknown->code()]
-            ?? Errors::Unknown;
+        return static::$errors[$code] ?? static::resolve(Errors::Unknown);
     }
 
     /**
-     * 自动加载错误枚举
-     *
-     * 扫描指定命名空间下的 enum 并注册其 cases
+     * 加载目录中的错误枚举。
      */
     public static function load(string $path, string $namespace = 'App\\Errors'): bool
     {
@@ -59,12 +44,14 @@ class Registry
         }
 
         foreach (scandir($path) as $item) {
-            if (
-                str_ends_with($item, '.php')
-                && enum_exists($enum = $namespace.'\\'.basename($item, '.php'))
-            ) {
-                /** @var IError $enum */
-                self::register($enum::cases());
+            if (! str_ends_with($item, '.php')) {
+                continue;
+            }
+
+            $enum = $namespace.'\\'.basename($item, '.php');
+
+            if (enum_exists($enum) && is_subclass_of($enum, IError::class)) {
+                static::register($enum::cases());
             }
         }
 
@@ -72,18 +59,22 @@ class Registry
     }
 
     /**
-     * 批量注册错误定义
+     * 注册错误，同码覆盖。
      *
      * @param  IError[]  $cases
      */
     public static function register(array $cases): void
     {
-        foreach ($cases as $item) {
-            /**
-             * 以 code 为 key 存储
-             * 后注册的会覆盖前面的（允许扩展或重写错误定义）
-             */
-            static::$errors[$item->code()] = $item;
+        foreach ($cases as $case) {
+            static::$errors[$case->code()] = $case;
         }
+    }
+
+    /**
+     * 获取覆盖后的错误定义。
+     */
+    public static function resolve(IError $error): IError
+    {
+        return static::$errors[$error->code()] ?? $error;
     }
 }

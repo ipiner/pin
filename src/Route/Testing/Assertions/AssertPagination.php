@@ -7,9 +7,7 @@ namespace Pin\Route\Testing\Assertions;
 use Closure;
 
 /**
- * 分页响应断言支持。
- *
- * 为 TestResponse 提供统一的分页响应断言能力。
+ * 分页响应断言
  */
 trait AssertPagination
 {

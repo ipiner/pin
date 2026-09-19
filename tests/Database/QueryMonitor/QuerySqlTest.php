@@ -27,3 +27,13 @@ it('truncates SQL when exceeding max length', function () {
     expect(QuerySql::truncate('select * from users'))
         ->toBe('select * f(...9)');
 });
+
+it('truncates SQL by character count', function (string $sql, int $limit, string $expected) {
+    config(['pin.logging.sql_max_length' => $limit]);
+
+    expect(QuerySql::truncate($sql))->toBe($expected);
+})->with([
+    ['中文查询', 4, '中文查询'],
+    ['中文查询', 2, '中文(...2)'],
+    ['查询😀', 2, '查询(...1)'],
+]);

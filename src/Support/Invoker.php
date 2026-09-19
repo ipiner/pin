@@ -9,47 +9,32 @@ use ReflectionClass;
 use ReflectionProperty;
 
 /**
- * 一个通用工具类
- *
- * 动态访问对象或类的属性和方法，包括：
- * - 私有/受保护属性访问
- * - 静态属性访问
- * - 属性嵌套访问（支持点语法 "prop.key"）
- * - 方法调用（实例方法和静态方法）
+ * 访问对象或类的非公开成员。
  */
 class Invoker
 {
+    protected ReflectionClass $reflection;
+
     /**
      * @param  class-string|object  $obj
      */
     public function __construct(protected string|object $obj)
     {
+        $this->reflection = new ReflectionClass($obj);
     }
 
     /**
-     * 调用方法
-     *
-     * 支持 private / protected / static
+     * 调用方法。
      */
     public function __call(string $method, array $args): mixed
     {
-        $ref = new ReflectionClass($this->obj);
-        $m = $ref->getMethod($method);
-        $m->setAccessible(true);
+        $method = $this->reflection->getMethod($method);
 
-        // 静态方法
-        if ($m->isStatic()) {
-            return $m->invokeArgs(null, $args);
-        }
-
-        // 实例方法
-        return $m->invokeArgs($this->getInstance(), $args);
+        return $method->invokeArgs($method->isStatic() ? null : $this->getInstance(), $args);
     }
 
     /**
-     * 获取属性值
-     *
-     * 支持 private / protected / static / 点语法
+     * 获取属性值。
      */
     public function __get(string $name): mixed
     {
@@ -57,9 +42,7 @@ class Invoker
     }
 
     /**
-     * 设置属性值
-     *
-     * 支持 private / protected / static / 点语法
+     * 设置属性值。
      */
     public function __set(string $name, mixed $value): void
     {
@@ -67,88 +50,64 @@ class Invoker
     }
 
     /**
-     * 获取属性值
-     *
-     * 支持 private / protected / static / 点语法
+     * 获取属性值，支持点语法。
      */
     public function get(string $name): mixed
     {
-        [$prop, $key] = $this->parse($name);
+        [$name, $key] = $this->parse($name);
+        $property = $this->prop($name);
+        $value = $property->getValue($property->isStatic() ? null : $this->getInstance());
 
-        $p = $this->prop($prop);
-
-        // 静态属性
-        if ($p->isStatic()) {
-            $value = $p->getValue();
-        } else {
-            $value = $p->getValue($this->getInstance());
-        }
-
-        return $prop === $key
-            ? $value
-            : Arr::get($value, $key);
+        return $key === null ? $value : Arr::get($value, $key);
     }
 
     /**
-     * 设置属性值
-     *
-     * 支持 private / protected / static / 点语法
+     * 设置属性值，支持点语法。
      */
     public function set(string $name, mixed $value): void
     {
-        [$prop, $key] = $this->parse($name);
+        [$name, $key] = $this->parse($name);
+        $property = $this->prop($name);
+        $instance = $property->isStatic() ? null : $this->getInstance();
 
-        $p = $this->prop($prop);
-
-        if ($p->isStatic()) {
-            $data = $p->getValue();
-
-            if ($prop === $key) {
-                $p->setValue(null, $value);
-            } else {
-                Arr::set($data, $key, $value);
-                $p->setValue(null, $data);
-            }
+        if ($key === null) {
+            $property->setValue($instance, $value);
 
             return;
         }
 
-        $instance = $this->getInstance();
-        if ($prop === $key) {
-            $p->setValue($instance, $value);
-
-            return;
-        }
-
-        $data = $p->getValue($instance);
+        $data = $property->getValue($instance);
         Arr::set($data, $key, $value);
-        $p->setValue($instance, $data);
+        $property->setValue($instance, $data);
     }
 
     /**
-     * 获取实例
+     * 获取实例，跳过构造函数。
      */
     protected function getInstance(): object
     {
-        return is_object($this->obj) ? $this->obj : new ReflectionClass($this->obj)->newInstanceWithoutConstructor();
+        if (is_string($this->obj)) {
+            $this->obj = $this->reflection->newInstanceWithoutConstructor();
+        }
+
+        return $this->obj;
     }
 
     /**
-     * 解析点语法
+     * 解析属性名和嵌套键。
+     *
+     * @return array{string, string|null}
      */
     protected function parse(string $name): array
     {
-        return str_contains($name, '.') ? explode('.', $name, 2) : [$name, $name];
+        return str_contains($name, '.') ? explode('.', $name, 2) : [$name, null];
     }
 
     /**
-     * 获取 ReflectionProperty（自动 accessible）
+     * 获取属性反射。
      */
     protected function prop(string $name): ReflectionProperty
     {
-        $p = new ReflectionProperty($this->obj, $name);
-        $p->setAccessible(true);
-
-        return $p;
+        return new ReflectionProperty($this->obj, $name);
     }
 }

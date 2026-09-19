@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace Pin\Models\Cache;
 
 /**
- * 空值占位符（用于缓存穿透保护）
- *
- * 存储格式：
- * {expiredAt}__cache:null_placeholder__
+ * 空值缓存占位符
  */
 class NullPlaceholder
 {
     /**
-     * 占位符后缀（用于标识该缓存值为“空值”）
+     * 占位符后缀
      */
     protected const string VALUE = '__cache:null_placeholder__';
 
@@ -25,9 +22,7 @@ class NullPlaceholder
     }
 
     /**
-     * 判断是否为占位符缓存值
-     *
-     * @param  mixed  $value  缓存中的原始值
+     * 是否为占位符缓存值
      */
     public static function isHolderValue(mixed $value): bool
     {
@@ -35,7 +30,7 @@ class NullPlaceholder
     }
 
     /**
-     * 创建一个空值占位符实例
+     * 创建空值占位符
      */
     public static function make(int $ttl = 3600): static
     {
@@ -57,14 +52,14 @@ class NullPlaceholder
      */
     public function isExpired(): bool
     {
-        return now()->getTimestamp() > $this->expiredAt;
+        return now()->getTimestamp() >= $this->expiredAt;
     }
 
     /**
-     * 转换为可存储的字符串形式
+     * 序列化占位符
      */
     public function toString(): string
     {
-        return sprintf('%d%s', $this->expiredAt, static::VALUE);
+        return $this->expiredAt.static::VALUE;
     }
 }

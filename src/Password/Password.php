@@ -10,10 +10,15 @@ use Pin\Errors\Errors;
 use Pin\Support\Facades\Aes;
 
 /**
- * 密码加解密
+ * 密码编码与校验
  */
 class Password
 {
+    /**
+     * 空密码编码
+     */
+    protected const string EMPTY_ENCODED_PASSWORD = '74BE16979710D4C4E7C6647856088456';
+
     /**
      * 校验密码是否正确
      *
@@ -27,36 +32,34 @@ class Password
     }
 
     /**
-     * 将请求中的密码解密为 encode 后的密码
+     * 解密请求密码。
      *
      * @throws PasswordException
      */
     public function decodeFromRequest(string $requestPassword): string
     {
-        // 前端 AES 加密 → 后端解密
         try {
             $encoded = Aes::decrypt($requestPassword);
         } catch (CryptException $e) {
             throw new PasswordException(
-                "请求密码异常",
+                '请求密码异常',
                 Errors::PasswordDecodeFailed->code(),
                 $e,
             );
         }
 
-        // 校验是否符合 encode 后的格式（32位大写）
-        if ($this->isValid($encoded)) {
-            return $encoded;
+        if (! $this->isValid($encoded)) {
+            throw new PasswordException(
+                '请求密码异常',
+                Errors::PasswordInvalid->code(),
+            );
         }
 
-        throw new PasswordException(
-            "请求密码异常",
-            Errors::PasswordInvalid->code(),
-        );
+        return $encoded;
     }
 
     /**
-     * 对明文密码进行编码（用于 hash 前）
+     * 编码明文密码。
      *
      * @param  string  $plain  明文密码
      * @return string 32位大写字符串
@@ -67,45 +70,43 @@ class Password
     }
 
     /**
-     * 将明文密码转为请求传输格式
+     * 生成请求传输密码。
      *
      * @param  string  $plain  明文密码
      * @return string 加密后的请求密码
      */
     public function encodeToRequest(string $plain): string
     {
-        return Aes::encrypt(static::encode($plain), true);
+        return Aes::encrypt($this->encode($plain), true);
     }
 
     /**
-     * 生成密码哈希（存储用）
+     * 生成存储密码哈希。
      *
      * @throws PasswordException
      */
     public function hash(string $encoded, string $salt): string
     {
-        // 必须为 encode 后格式（32位大写）
-        if ($this->isValid($encoded)) {
-            return Hash::make($encoded.$salt);
+        if (! $this->isValid($encoded)) {
+            throw new PasswordException(
+                '密码异常',
+                Errors::PasswordInvalid->code(),
+            );
         }
 
-        throw new PasswordException(
-            "密码异常",
-            Errors::PasswordInvalid->code(),
-        );
+        return Hash::make($encoded.$salt);
     }
 
     /**
-     * 密码已编码密码是否为双重md5空字符
+     * 是否为空密码编码
      */
     public function isEmpty(string $encoded): bool
     {
-        // strtoupper(md5(md5('')))
-        return strtoupper($encoded) === '74BE16979710D4C4E7C6647856088456';
+        return strtoupper($encoded) === static::EMPTY_ENCODED_PASSWORD;
     }
 
     /**
-     * 校验密码是否合法（encode 后格式）
+     * 是否符合密码编码格式
      */
     protected function isValid(string $encoded): bool
     {
