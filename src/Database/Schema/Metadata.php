@@ -28,7 +28,7 @@ class Metadata
     public function __construct(protected string $connection, protected string $table)
     {
         $metadata = $this->load();
-        $this->label = $metadata['label'] ?? Str::title($this->table);
+        $this->label = $metadata['label'] ?? Str::headline(Str::singular($this->table));
         $this->attributes = $metadata['attributes'] ?? [];
     }
 

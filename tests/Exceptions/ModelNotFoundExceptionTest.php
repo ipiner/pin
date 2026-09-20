@@ -5,12 +5,23 @@ declare(strict_types=1);
 use App\Models\User;
 use Pin\Errors\Errors;
 use Pin\Exceptions\ModelNotFoundException;
+use Pin\Support\Facades\RuntimeCache;
 
 beforeEach(function () {
+    $this->databasePath = $this->app->databasePath();
+    $this->app->useDatabasePath(sys_get_temp_dir().'/pin-model-exception-'.uniqid());
+    RuntimeCache::flush();
+
     $this->e = new ModelNotFoundException(
         (new Illuminate\Database\Eloquent\ModelNotFoundException())
             ->setModel(User::class, 1)
     );
+});
+
+afterEach(function () {
+    $this->app['files']->deleteDirectory($this->app->databasePath());
+    $this->app->useDatabasePath($this->databasePath);
+    RuntimeCache::flush();
 });
 
 it('gets caller information', function () {
@@ -53,4 +64,17 @@ it('resolves model labels', function () {
         ->toBe('User')
         ->and($this->invoker($this->e)->modelLabel('UserAddress'))
         ->toBe('User Address');
+});
+
+it('uses configured model labels', function () {
+    $directory = database_path('schemas/testing');
+    $this->app['files']->ensureDirectoryExists($directory);
+    $this->app['files']->put($directory.'/users.php', "<?php return ['label' => '成员'];");
+    RuntimeCache::flush();
+
+    $exception = new ModelNotFoundException(
+        (new Illuminate\Database\Eloquent\ModelNotFoundException())->setModel(User::class)
+    );
+
+    expect($exception->getMessage())->toBe('成员 not found');
 });

@@ -37,6 +37,17 @@ it('loads metadata', function () {
     expect($meta->attributes['created_at'])->toBe('Created At');
 });
 
+it('uses singular labels without schema files', function (string $table, string $label) {
+    $meta = Metadata::make('testing', $table);
+
+    expect($meta->label)->toBe($label)
+        ->and($meta->attributes)->toBe([]);
+})->with([
+    ['admins', 'Admin'],
+    ['users', 'User'],
+    ['user_addresses', 'User Address'],
+]);
+
 it('keeps connection and table cache keys distinct', function () {
     $first = Metadata::make('schema_a', 'bc');
     $second = Metadata::make('schema_ab', 'c');
