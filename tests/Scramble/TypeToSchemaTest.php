@@ -85,10 +85,8 @@ it('generates resource and pagination field types', function () {
         ->and($pagination['properties']['total_page']['type'])->toBe('integer')
         ->and($pagination['properties']['items']['type'])->toBe('array')
         ->and($schemas['SelectOption']['properties']['label']['type'])->toBe('string')
-        ->and($schemas['SelectOption']['properties']['value']['anyOf'])->toBe([
-            ['type' => 'integer'],
-            ['type' => 'string'],
-        ]);
+        ->and($schemas['SelectOption']['properties']['value']['type'])
+        ->toBe(['integer', 'string']);
 
     foreach ([Deleted::class, Updated::class] as $resource) {
         $this->transformer->transform(new Generic(ApiResponse::class, [new ObjectType($resource)]));
@@ -159,8 +157,8 @@ it('generates a complete document from controller annotations', function () {
 
     expect($schema['properties']['data']['properties']['items']['type'])->toBe('array')
         ->and($schema['properties']['data']['description'])->toBe('响应数据')
-        ->and($document['components']['schemas']['SelectOption']['properties']['value']['anyOf'])
-        ->toHaveCount(2)
+        ->and($document['components']['schemas']['SelectOption']['properties']['value']['type'])
+        ->toBe(['integer', 'string'])
         ->and($document['components']['securitySchemes']['bearer'])->toBe([
             'type' => 'http',
             'scheme' => 'bearer',

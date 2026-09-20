@@ -10,16 +10,23 @@ use Pin\Tests\Models\Models\Admin;
 
 uses(InteractsWithDatabase::class);
 
-beforeEach(fn () => RuntimeCache::flush());
-afterEach(fn () => RuntimeCache::flush());
+beforeEach(function () {
+    $this->databasePath = $this->app->databasePath();
+    $this->app->useDatabasePath(sys_get_temp_dir().'/pin-metadata-'.uniqid());
+    RuntimeCache::flush();
+});
+
+afterEach(function () {
+    $this->app['files']->deleteDirectory($this->app->databasePath());
+    $this->app->useDatabasePath($this->databasePath);
+    RuntimeCache::flush();
+});
 
 it('loads metadata', function () {
-    $command = $this->artisan(
+    $this->artisan(
         TableSchemasGenerateCommand::class,
         ['--connection' => 'testing', '--force' => true]
-    );
-
-    $command->assertExitCode(0);
+    )->assertSuccessful()->run();
 
     RuntimeCache::flush();
 
