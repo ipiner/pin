@@ -8,7 +8,7 @@ use Pin\Models\Model;
 use Pin\Module\ModuleInspector;
 
 /**
- * 模型绑定与实例化。
+ * 模型绑定与实例化
  *
  * @template TModel of Model
  */
@@ -20,7 +20,7 @@ trait HasModel
     public protected(set) string $modelClass;
 
     /**
-     * 获取模型字段名称。
+     * 获取模型字段名称
      */
     public function attributes(): array
     {

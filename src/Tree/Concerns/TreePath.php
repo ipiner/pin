@@ -8,7 +8,7 @@ use Pin\Errors\Errors;
 use Pin\Exceptions\Exception;
 
 /**
- * 树路径读写。
+ * 树路径读写
  */
 trait TreePath
 {
@@ -18,7 +18,7 @@ trait TreePath
     protected $appends = ['paths'];
 
     /**
-     * 根据父节点生成路径。
+     * 根据父节点生成路径
      *
      * @param  int  $pid  父节点 ID（0 表示根节点）
      */
@@ -32,7 +32,7 @@ trait TreePath
     }
 
     /**
-     * 校验移动目标。
+     * 校验移动目标
      */
     protected function ensureParentValid(): void
     {
@@ -45,7 +45,7 @@ trait TreePath
     }
 
     /**
-     * 获取路径 ID 数组。
+     * 获取路径 ID 数组
      */
     public function getPathsAttribute(): array
     {
@@ -53,7 +53,7 @@ trait TreePath
     }
 
     /**
-     * 解析路径 ID。
+     * 解析路径 ID
      *
      * @return list<int>
      */
@@ -65,7 +65,7 @@ trait TreePath
     }
 
     /**
-     * 更新后代节点的路径和层级。
+     * 更新后代节点的路径和层级
      */
     protected static function relocateSubtree(string $oldPath, string $newPath): int
     {

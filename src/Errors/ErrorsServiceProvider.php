@@ -7,12 +7,12 @@ namespace Pin\Errors;
 use Pin\Support\ServiceProvider;
 
 /**
- * 错误码服务提供者。
+ * 错误码服务提供者
  */
 class ErrorsServiceProvider extends ServiceProvider
 {
     /**
-     * 加载错误定义。
+     * 加载错误定义
      */
     public function boot(): void
     {

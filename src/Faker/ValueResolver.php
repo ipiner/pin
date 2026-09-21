@@ -14,7 +14,7 @@ use Pin\Faker\Generators\Generator;
 class ValueResolver
 {
     /**
-     * 内置生成器类缓存。
+     * 内置生成器类缓存
      *
      * @var array<string, class-string<Generator>|null>
      */
@@ -39,7 +39,7 @@ class ValueResolver
     }
 
     /**
-     * 解析内置生成器类。
+     * 解析内置生成器类
      *
      * @return class-string<Generator>|null
      */

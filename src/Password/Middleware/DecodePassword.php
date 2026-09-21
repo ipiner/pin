@@ -14,7 +14,7 @@ use Pin\Support\Facades\Password;
 class DecodePassword extends TransformsRequest
 {
     /**
-     * 待解码字段。
+     * 待解码字段
      *
      * @var array<string>
      */

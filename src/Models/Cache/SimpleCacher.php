@@ -72,7 +72,7 @@ class SimpleCacher implements Cacher
     }
 
     /**
-     * 获取全量模型集合。
+     * 获取全量模型集合
      *
      * @return Collection<int, Model>
      */

@@ -32,7 +32,7 @@ class Password
     }
 
     /**
-     * 解密请求密码。
+     * 解密请求密码
      *
      * @throws PasswordException
      */
@@ -59,7 +59,7 @@ class Password
     }
 
     /**
-     * 编码明文密码。
+     * 编码明文密码
      *
      * @param  string  $plain  明文密码
      * @return string 32位大写字符串
@@ -70,7 +70,7 @@ class Password
     }
 
     /**
-     * 生成请求传输密码。
+     * 生成请求传输密码
      *
      * @param  string  $plain  明文密码
      * @return string 加密后的请求密码
@@ -81,7 +81,7 @@ class Password
     }
 
     /**
-     * 生成存储密码哈希。
+     * 生成存储密码哈希
      *
      * @throws PasswordException
      */

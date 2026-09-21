@@ -10,7 +10,7 @@ namespace Pin\Support;
 class Arr
 {
     /**
-     * 递归脱敏。
+     * 递归脱敏
      */
     public static function maskSensitive(array $data): array
     {
@@ -22,7 +22,7 @@ class Arr
     }
 
     /**
-     * 递归合并数组。
+     * 递归合并数组
      *
      * @param  array|bool  $array  首个数组，或是否保留数字键
      */
@@ -53,7 +53,7 @@ class Arr
     }
 
     /**
-     * 递归将 null 替换为空字符串。
+     * 递归将 null 替换为空字符串
      */
     public static function nullToEmptyString(array $data): array
     {
@@ -69,7 +69,7 @@ class Arr
     }
 
     /**
-     * 将含 id 和父级字段的数组转换为树。
+     * 将含 id 和父级字段的数组转换为树
      *
      * @param  string  $pidKey  父级字段名
      * @param  string  $childrenKey  子节点字段名
@@ -89,7 +89,7 @@ class Arr
     }
 
     /**
-     * 从父级分组递归构建子树。
+     * 从父级分组递归构建子树
      */
     protected static function toTreeInternal(
         array $groups,

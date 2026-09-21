@@ -8,7 +8,7 @@ use Illuminate\Http\Response;
 use Pin\Support\Facades\RuntimeCache;
 
 /**
- * 错误定义。
+ * 错误定义
  */
 class Error
 {
@@ -30,7 +30,7 @@ class Error
     }
 
     /**
-     * 解析并缓存错误定义。
+     * 解析并缓存错误定义
      */
     public static function parse(IError $err): static
     {
@@ -44,7 +44,7 @@ class Error
     }
 
     /**
-     * 解析 code|message 或 code|status|message。
+     * 解析 code|message 或 code|status|message
      */
     protected static function parseInternal(string $value): static
     {

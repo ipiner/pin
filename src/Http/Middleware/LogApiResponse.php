@@ -102,7 +102,7 @@ class LogApiResponse
     }
 
     /**
-     * 解析日志级别。
+     * 解析日志级别
      *
      * @param  array{
      *     status: int,

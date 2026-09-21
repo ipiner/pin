@@ -12,24 +12,24 @@ use Pin\Token\Exceptions\TokenException;
 use Throwable;
 
 /**
- * 基于 Token 的认证 Guard。
+ * 基于 Token 的认证 Guard
  */
 class Guard implements GuardContract
 {
     use GuardHelpers;
 
     /**
-     * Guard 注册名称。
+     * Guard 注册名称
      */
     public const string NAME = 'pin';
 
     /**
-     * 未认证原因的请求属性键名。
+     * 未认证原因的请求属性键名
      */
     public const string UNAUTHENTICATED_CODE = 'unauthenticated.code';
 
     /**
-     * 是否已解析用户。
+     * 是否已解析用户
      */
     protected bool $userResolved = false;
 
@@ -41,7 +41,7 @@ class Guard implements GuardContract
     }
 
     /**
-     * 清理用户解析状态。
+     * 清理用户解析状态
      */
     public function forgetUser(): static
     {
@@ -53,7 +53,7 @@ class Guard implements GuardContract
     }
 
     /**
-     * 注销请求 Token。
+     * 注销请求 Token
      */
     public function logout(): void
     {
@@ -66,7 +66,7 @@ class Guard implements GuardContract
     }
 
     /**
-     * 设置当前请求。
+     * 设置当前请求
      */
     public function setRequest(Request $request): static
     {
@@ -85,11 +85,11 @@ class Guard implements GuardContract
     }
 
     /**
-     * 获取当前认证用户。
+     * 获取当前认证用户
      */
     public function user(): ?Authenticatable
     {
-        // 复用解析结果（包括 null）。
+        // 复用解析结果（包括 null）
         if ($this->userResolved || $this->user) {
             return $this->user;
         }
@@ -100,7 +100,7 @@ class Guard implements GuardContract
         try {
             return $this->user = $this->resolveUser();
         } catch (Throwable $e) {
-            // 保存认证错误码。
+            // 保存认证错误码
             $this->tokenResolver->getRequest()->attributes->set(
                 static::UNAUTHENTICATED_CODE,
                 $e->getCode(),
@@ -112,7 +112,7 @@ class Guard implements GuardContract
     }
 
     /**
-     * 校验认证凭证。
+     * 校验认证凭证
      */
     public function validate(array $credentials = []): bool
     {
@@ -136,7 +136,7 @@ class Guard implements GuardContract
     }
 
     /**
-     * 在非生产环境中解析调试登录用户。
+     * 在非生产环境中解析调试登录用户
      *
      * @throws AuthenticationException
      */
@@ -162,7 +162,7 @@ class Guard implements GuardContract
     }
 
     /**
-     * 通过认证 Token 加载用户。
+     * 通过认证 Token 加载用户
      */
     protected function resolveTokenUser(string $token): ?Authenticatable
     {
@@ -173,7 +173,7 @@ class Guard implements GuardContract
     }
 
     /**
-     * 根据当前运行环境解析用户。
+     * 根据当前运行环境解析用户
      */
     protected function resolveUser(): ?Authenticatable
     {
@@ -185,7 +185,7 @@ class Guard implements GuardContract
     }
 
     /**
-     * 为控制台环境创建认证用户。
+     * 为控制台环境创建认证用户
      */
     protected function resolveUserForConsole(): Authenticatable
     {
@@ -201,7 +201,7 @@ class Guard implements GuardContract
     }
 
     /**
-     * 从 HTTP 请求中解析认证用户。
+     * 从 HTTP 请求中解析认证用户
      */
     protected function resolveUserForHttp(): ?Authenticatable
     {
@@ -220,7 +220,7 @@ class Guard implements GuardContract
     }
 
     /**
-     * 注销请求 Token。
+     * 注销请求 Token
      */
     protected function revokeToken(): void
     {
@@ -228,7 +228,7 @@ class Guard implements GuardContract
             try {
                 $this->tokenResolver->resolve($this->tokenResolver->getRequestToken());
             } catch (TokenException) {
-                // 已失效或非法的 Token 无需再注销。
+                // 已失效或非法的 Token 无需再注销
                 return;
             }
         }

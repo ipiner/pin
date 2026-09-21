@@ -9,7 +9,7 @@ use Illuminate\Contracts\Validation\ValidationRule as ValidationRuleContract;
 use Override;
 
 /**
- * 验证规则基类。
+ * 验证规则基类
  */
 abstract class ValidationRule implements ValidationRuleContract
 {
@@ -24,7 +24,7 @@ abstract class ValidationRule implements ValidationRuleContract
     abstract protected function handle(string $attribute, mixed $value): bool;
 
     /**
-     * 执行验证。
+     * 执行验证
      *
      * @param  Closure(string): mixed  $fail  失败回调
      */

@@ -7,17 +7,17 @@ namespace Pin\Cache;
 use Illuminate\Cache\ArrayStore as BaseArrayStore;
 
 /**
- * 进程内缓存存储。
+ * 进程内缓存存储
  */
 class ArrayStore extends BaseArrayStore
 {
     /**
-     * 最大缓存数量。
+     * 最大缓存数量
      */
     protected const int MAX_ITEMS = 10000;
 
     /**
-     * 批量回收数量。
+     * 批量回收数量
      */
     protected const int GC_BATCH = 1000;
 
@@ -33,7 +33,7 @@ class ArrayStore extends BaseArrayStore
     }
 
     /**
-     * 获取未过期的缓存。
+     * 获取未过期的缓存
      *
      * @return array<array-key, mixed>
      */
@@ -55,7 +55,7 @@ class ArrayStore extends BaseArrayStore
     }
 
     /**
-     * 回收最早写入的缓存。
+     * 回收最早写入的缓存
      */
     public function gc(?bool $run = null): void
     {

@@ -9,7 +9,7 @@ use Pin\Exceptions\Exception;
 trait TreeLevel
 {
     /**
-     * 校验节点及子树层级。
+     * 校验节点及子树层级
      */
     protected function ensureLevelValid(): void
     {
@@ -29,7 +29,7 @@ trait TreeLevel
     }
 
     /**
-     * 校验移动子树后的最大层级。
+     * 校验移动子树后的最大层级
      */
     protected function ensureSubtreeLevelValid(int $maxLevel): void
     {
@@ -53,7 +53,7 @@ trait TreeLevel
     }
 
     /**
-     * 获取允许的最大层级。
+     * 获取允许的最大层级
      */
     protected function maxTreeLevel(): int
     {
@@ -61,7 +61,7 @@ trait TreeLevel
     }
 
     /**
-     * 抛出层级超限异常。
+     * 抛出层级超限异常
      */
     public function levelExceeded(int $maxLevel): never
     {
@@ -70,7 +70,7 @@ trait TreeLevel
     }
 
     /**
-     * 根据路径计算节点层级。
+     * 根据路径计算节点层级
      */
     protected function pathLevel(?string $path = null): int
     {

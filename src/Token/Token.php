@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pin\Token;
 
 /**
- * Token 数据。
+ * Token 数据
  *
  * @property ?int $uid 用户id
  * @property ?int $exp 过期时间
@@ -16,7 +16,7 @@ namespace Pin\Token;
 class Token
 {
     /**
-     * Token 载荷。
+     * Token 载荷
      */
     public protected(set) TokenPayload $payload;
 
@@ -28,7 +28,7 @@ class Token
     }
 
     /**
-     * 获取载荷属性。
+     * 获取载荷属性
      */
     public function __get(string $key): mixed
     {
@@ -36,7 +36,7 @@ class Token
     }
 
     /**
-     * 设置载荷属性。
+     * 设置载荷属性
      */
     public function __set(string $key, mixed $value): void
     {
@@ -44,7 +44,7 @@ class Token
     }
 
     /**
-     * 判断载荷属性是否存在。
+     * 判断载荷属性是否存在
      */
     public function __isset(string $key): bool
     {
@@ -52,7 +52,7 @@ class Token
     }
 
     /**
-     * 删除载荷属性。
+     * 删除载荷属性
      */
     public function __unset(string $key): void
     {

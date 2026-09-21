@@ -10,12 +10,12 @@ use Pin\Exceptions\Exception;
 use Throwable;
 
 /**
- * 错误枚举行为。
+ * 错误枚举行为
  */
 trait Errorful
 {
     /**
-     * 获取业务错误码。
+     * 获取业务错误码
      */
     public function code(): int
     {
@@ -23,7 +23,7 @@ trait Errorful
     }
 
     /**
-     * 创建异常。
+     * 创建异常
      */
     public function exception(
         ?string $message = null,
@@ -40,7 +40,7 @@ trait Errorful
     }
 
     /**
-     * 获取错误消息。
+     * 获取错误消息
      */
     public function message(array $replace = []): string
     {
@@ -50,7 +50,7 @@ trait Errorful
     }
 
     /**
-     * 获取 HTTP 状态码。
+     * 获取 HTTP 状态码
      */
     public function statusCode(): int
     {
@@ -58,7 +58,7 @@ trait Errorful
     }
 
     /**
-     * 抛出异常。
+     * 抛出异常
      *
      * @throws Exception
      */
@@ -71,7 +71,7 @@ trait Errorful
     }
 
     /**
-     * 获取枚举项属性。
+     * 获取枚举项属性
      *
      * @template TAttribute of object
      *
@@ -84,7 +84,7 @@ trait Errorful
     }
 
     /**
-     * 翻译错误消息。
+     * 翻译错误消息
      */
     protected function translate(array $replace = []): string
     {
@@ -99,7 +99,7 @@ trait Errorful
     }
 
     /**
-     * 获取翻译分组。
+     * 获取翻译分组
      */
     protected function translationGroup(): string|false
     {

@@ -9,7 +9,7 @@ use Pin\Token\Token;
 use Throwable;
 
 /**
- * Token 无效。
+ * Token 无效
  */
 class TokenInvalidException extends TokenException
 {

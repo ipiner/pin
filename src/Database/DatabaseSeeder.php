@@ -8,12 +8,12 @@ use Illuminate\Database\Seeder;
 use Symfony\Component\Finder\Finder;
 
 /**
- * 数据填充调度器。
+ * 数据填充调度器
  */
 class DatabaseSeeder extends Seeder
 {
     /**
-     * 执行数据填充。
+     * 执行数据填充
      */
     public function run(): static
     {
@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
     }
 
     /**
-     * 扫描数据填充类。
+     * 扫描数据填充类
      *
      * @return list<class-string<Seeder>>
      */

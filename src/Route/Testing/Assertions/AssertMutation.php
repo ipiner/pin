@@ -8,12 +8,12 @@ use Closure;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 /**
- * 数据变更类断言支持。
+ * 数据变更类断言支持
  */
 trait AssertMutation
 {
     /**
-     * 创建成功断言。
+     * 创建成功断言
      *
      * @param  Closure(int, static): void|null  $assert
      */
@@ -32,7 +32,7 @@ trait AssertMutation
     }
 
     /**
-     * 删除成功断言。
+     * 删除成功断言
      */
     public function assertDeleted(): static
     {
@@ -42,7 +42,7 @@ trait AssertMutation
     }
 
     /**
-     * 更新成功断言。
+     * 更新成功断言
      */
     public function assertUpdated(): static
     {

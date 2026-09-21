@@ -10,17 +10,17 @@ use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * 数据库迁移基类。
+ * 数据库迁移基类
  */
 class Migration extends \Illuminate\Database\Migrations\Migration
 {
     /**
-     * 表结构构建器。
+     * 表结构构建器
      */
     protected Blueprint $table;
 
     /**
-     * 获取连接名称。
+     * 获取连接名称
      */
     public function getConnection()
     {
@@ -28,7 +28,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加操作用户字段。
+     * 添加操作用户字段
      */
     protected function blameable(): void
     {
@@ -37,7 +37,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加软删除字段。
+     * 添加软删除字段
      */
     protected function deleted(): void
     {
@@ -45,7 +45,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加主键。
+     * 添加主键
      */
     protected function id(bool $autoIncrement = true, bool $bigint = false): ColumnDefinition
     {
@@ -61,7 +61,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加 JSON 字段。
+     * 添加 JSON 字段
      */
     protected function json(
         string $column,
@@ -72,7 +72,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 生成表或字段注释。
+     * 生成表或字段注释
      */
     protected function makeComment(string $comment, string $creator): string
     {
@@ -80,7 +80,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加多态字段及索引。
+     * 添加多态字段及索引
      */
     protected function morphs(
         string $name,
@@ -104,7 +104,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加请求 ID 字段。
+     * 添加请求 ID 字段
      */
     protected function requestId(int $length = 36): ColumnDefinition
     {
@@ -112,7 +112,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 获取表结构构建器。
+     * 获取表结构构建器
      */
     protected function schema(): Builder
     {
@@ -120,7 +120,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加字符串字段。
+     * 添加字符串字段
      */
     protected function string(
         string $column,
@@ -138,7 +138,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加可空时间戳字段。
+     * 添加可空时间戳字段
      */
     protected function timestamp(string $column, string $comment): ColumnDefinition
     {
@@ -146,7 +146,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加创建和更新时间字段。
+     * 添加创建和更新时间字段
      */
     protected function timestamps(): void
     {
@@ -155,7 +155,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加无符号大整数字段。
+     * 添加无符号大整数字段
      */
     protected function unsignedBigInteger(string $column, string $comment): ColumnDefinition
     {
@@ -163,7 +163,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加无符号整数字段。
+     * 添加无符号整数字段
      */
     protected function unsignedInteger(string $column, string $comment): ColumnDefinition
     {
@@ -171,7 +171,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加无符号小整数字段。
+     * 添加无符号小整数字段
      */
     protected function unsignedSmallInteger(string $column, string $comment): ColumnDefinition
     {
@@ -179,7 +179,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加无符号 tinyint 字段。
+     * 添加无符号 tinyint 字段
      */
     protected function unsignedTinyInteger(string $column, string $comment): ColumnDefinition
     {
@@ -187,7 +187,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 绑定表结构构建器。
+     * 绑定表结构构建器
      */
     protected function useTable(Blueprint $table): void
     {
@@ -195,7 +195,7 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     }
 
     /**
-     * 添加数据版本字段。
+     * 添加数据版本字段
      */
     protected function version(): ColumnDefinition
     {

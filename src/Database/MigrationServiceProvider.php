@@ -9,12 +9,12 @@ use Illuminate\Database\MigrationServiceProvider as BaseMigrationServiceProvider
 use Illuminate\Support\ServiceProvider;
 
 /**
- * 数据库迁移服务提供者。
+ * 数据库迁移服务提供者
  */
 class MigrationServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
-     * 注册迁移创建器。
+     * 注册迁移创建器
      */
     public function register(): void
     {
@@ -23,7 +23,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     }
 
     /**
-     * 获取延迟加载的服务。
+     * 获取延迟加载的服务
      */
     public function provides(): array
     {

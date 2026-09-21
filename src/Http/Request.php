@@ -12,7 +12,7 @@ use Illuminate\Http\Request as BaseRequest;
 class Request
 {
     /**
-     * 宏方法列表。
+     * 宏方法列表
      *
      * @var array<int, string>
      */
@@ -49,7 +49,7 @@ class Request
     }
 
     /**
-     * 请求是否来自 API 文档。
+     * 请求是否来自 API 文档
      */
     public static function isFromApiDocument(BaseRequest $request): bool
     {
@@ -81,7 +81,7 @@ class Request
     /**
      * 请求是否匹配指定规则
      *
-     * @param  string|array  $values  URI 或路由名称规则。
+     * @param  string|array  $values  URI 或路由名称规则
      */
     public static function isRequest(BaseRequest $request, string|array $values): bool
     {

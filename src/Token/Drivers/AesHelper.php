@@ -12,12 +12,12 @@ use Pin\Token\Token;
 use Pin\Token\TokenPayload;
 
 /**
- * AES Token 加解密。
+ * AES Token 加解密
  */
 trait AesHelper
 {
     /**
-     * 解密 Token。
+     * 解密 Token
      *
      * @throws TokenInvalidException
      */
@@ -37,7 +37,7 @@ trait AesHelper
     }
 
     /**
-     * 加密 Token。
+     * 加密 Token
      */
     protected function encrypt(TokenPayload $payload): string
     {

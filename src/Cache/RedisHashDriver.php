@@ -7,7 +7,7 @@ namespace Pin\Cache;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 
 /**
- * PhpRedis Hash 命令适配器。
+ * PhpRedis Hash 命令适配器
  */
 class RedisHashDriver implements HashDriver
 {
@@ -16,7 +16,7 @@ class RedisHashDriver implements HashDriver
     }
 
     /**
-     * 转发 Redis 命令。
+     * 转发 Redis 命令
      */
     public function __call(string $method, array $parameters): mixed
     {

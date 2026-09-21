@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use Pin\Support\DataBag;
 
 /**
- * 数据表结构。
+ * 数据表结构
  *
  * @property string $name 表名
  * @property string|null $comment 表备注
@@ -27,7 +27,7 @@ class Table extends DataBag
     }
 
     /**
-     * 获取字段名称映射。
+     * 获取字段名称映射
      *
      * @return array<string, string>
      */
@@ -40,7 +40,7 @@ class Table extends DataBag
     }
 
     /**
-     * 获取字段。
+     * 获取字段
      */
     public function column(string $name): ?Column
     {
@@ -50,7 +50,7 @@ class Table extends DataBag
     }
 
     /**
-     * 获取所有字段。
+     * 获取所有字段
      *
      * @return Collection<string, Column>
      */
@@ -60,7 +60,7 @@ class Table extends DataBag
     }
 
     /**
-     * 是否存在字段。
+     * 是否存在字段
      */
     public function hasColumn(string $name): bool
     {
@@ -68,7 +68,7 @@ class Table extends DataBag
     }
 
     /**
-     * 解析表名称。
+     * 解析表名称
      */
     protected function parseLabel(): string
     {
@@ -80,7 +80,7 @@ class Table extends DataBag
     }
 
     /**
-     * 转换字段结构。
+     * 转换字段结构
      */
     protected function resolveColumn(Column|array $column): Column
     {

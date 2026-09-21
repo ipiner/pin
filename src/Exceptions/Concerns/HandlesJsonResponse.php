@@ -18,7 +18,7 @@ use Pin\Http\ApiResponse;
 use Throwable;
 
 /**
- * JSON 异常响应。
+ * JSON 异常响应
  */
 trait HandlesJsonResponse
 {
@@ -47,7 +47,7 @@ trait HandlesJsonResponse
     }
 
     /**
-     * 获取响应头。
+     * 获取响应头
      */
     protected function resolveHeaders(Throwable $e): array
     {
@@ -69,7 +69,7 @@ trait HandlesJsonResponse
     }
 
     /**
-     * 渲染 JSON 异常响应。
+     * 渲染 JSON 异常响应
      */
     protected function renderJsonException(Request $request, Throwable $e)
     {

@@ -23,7 +23,7 @@ interface Cacher
     public function get(int $id): ?Model;
 
     /**
-     * 获取全量数据。
+     * 获取全量数据
      *
      * @return Collection<int, Model>
      */

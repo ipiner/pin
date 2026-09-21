@@ -12,7 +12,7 @@ use Pin\Models\Model;
 use Pin\Services\ModelService as BaseModelService;
 
 /**
- * 树节点服务。
+ * 树节点服务
  *
  * @template TModel of Model
  *
@@ -26,7 +26,7 @@ class ModelService extends BaseModelService
     public string $resourceName;
 
     /**
-     * 创建有序查询。
+     * 创建有序查询
      *
      * @return Builder<TModel>
      */
@@ -37,7 +37,7 @@ class ModelService extends BaseModelService
     }
 
     /**
-     * 校验节点能否删除。
+     * 校验节点能否删除
      *
      * @param  TModel  $model
      *

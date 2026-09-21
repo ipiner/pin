@@ -7,7 +7,7 @@ namespace Pin\Token;
 use Pin\Support\DataBag;
 
 /**
- * Token 载荷。
+ * Token 载荷
  *
  * @property ?int $uid 用户 ID
  * @property ?int $exp 过期时间戳

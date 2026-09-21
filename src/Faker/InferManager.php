@@ -10,7 +10,7 @@ namespace Pin\Faker;
 class InferManager
 {
     /**
-     * 已注册的推导回调。
+     * 已注册的推导回调
      *
      * @var array<string, callable(RuleBag): FakeRule>
      */
@@ -22,7 +22,7 @@ class InferManager
     }
 
     /**
-     * 注册规则推导器。
+     * 注册规则推导器
      *
      * @param  callable(RuleBag): FakeRule  $callback
      */
@@ -52,7 +52,7 @@ class InferManager
     {
         $this->registerInInfer();
         $this->registerIntegerInfer();
-        // 邮箱规则优先于字符串规则。
+        // 邮箱规则优先于字符串规则
         $this->registerEmailInfer();
         $this->registerStringInfer();
     }

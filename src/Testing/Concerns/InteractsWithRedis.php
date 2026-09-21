@@ -7,12 +7,12 @@ namespace Pin\Testing\Concerns;
 use Illuminate\Support\Facades\Redis;
 
 /**
- * 清理测试 Redis 数据。
+ * 清理测试 Redis 数据
  */
 trait InteractsWithRedis
 {
     /**
-     * 清理测试前的数据。
+     * 清理测试前的数据
      */
     protected function setUpInteractsWithRedis(): void
     {
@@ -20,7 +20,7 @@ trait InteractsWithRedis
     }
 
     /**
-     * 清空指定连接。
+     * 清空指定连接
      */
     protected function cleanRedis(): void
     {
@@ -30,7 +30,7 @@ trait InteractsWithRedis
     }
 
     /**
-     * 获取待清理的连接。
+     * 获取待清理的连接
      *
      * @return list<string>
      */

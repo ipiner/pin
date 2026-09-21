@@ -14,14 +14,14 @@ use Pin\Token\Token;
 use Pin\Token\TokenPayload;
 
 /**
- * Session Token 驱动。
+ * Session Token 驱动
  */
 class SessionDriver extends Driver
 {
     use AesHelper;
 
     /**
-     * 驱动配置。
+     * 驱动配置
      */
     protected SessionDriverConfig $config;
 
@@ -34,7 +34,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 解码 Token。
+     * 解码 Token
      *
      * @throws TokenInvalidException
      * @throws TokenExpiredException
@@ -58,7 +58,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 编码 Token。
+     * 编码 Token
      *
      * @param  int|null  $expires  有效期（秒）
      */
@@ -78,7 +78,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 注销 Token。
+     * 注销 Token
      */
     public function forget(Token|string|null $token): bool
     {
@@ -90,7 +90,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 判断 Token 是否过期。
+     * 判断 Token 是否过期
      */
     #[Override]
     protected function isExpired(Token $token): bool
@@ -105,7 +105,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 缓存 Token 过期时间。
+     * 缓存 Token 过期时间
      */
     protected function persist(TokenPayload $payload): bool
     {
@@ -117,7 +117,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 按需续期。
+     * 按需续期
      */
     protected function refresh(Token $token): bool
     {
@@ -125,7 +125,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 判断是否需要续期。
+     * 判断是否需要续期
      */
     protected function shouldRefresh(Token $token): bool
     {
@@ -137,7 +137,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 延长 Token 有效期。
+     * 延长 Token 有效期
      */
     protected function touch(Token $token): bool
     {
@@ -147,7 +147,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 校验最大有效期。
+     * 校验最大有效期
      */
     protected function validateMaxAge(Token $token): void
     {
@@ -160,7 +160,7 @@ class SessionDriver extends Driver
     }
 
     /**
-     * 读取缓存中的过期时间。
+     * 读取缓存中的过期时间
      */
     protected function reloadExpiredAt(Token $token): void
     {

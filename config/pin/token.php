@@ -7,7 +7,7 @@ return [
     /**
      * 默认 Token 驱动
      *
-     * 指定系统默认使用的 Token 驱动。
+     * 指定系统默认使用的 Token 驱动
      */
     'default' => 'default',
 
@@ -24,7 +24,7 @@ return [
         /**
          * 默认 AES Token 驱动
          *
-         * 使用 AES 对 Token 进行加密。
+         * 使用 AES 对 Token 进行加密
          *
          * 适用于：
          * - 内部系统
@@ -38,7 +38,7 @@ return [
         /**
          * JWT Token 驱动
          *
-         * 基于 JWT（JSON Web Token）实现。
+         * 基于 JWT（JSON Web Token）实现
          *
          * 适用于：
          * - API 鉴权
@@ -52,7 +52,7 @@ return [
             /**
              * JWT 签名密钥
              *
-             * 用于 JWT 签名与校验。
+             * 用于 JWT 签名与校验
              *
              * 默认读取：
              * config('app.key')
@@ -68,7 +68,7 @@ return [
         /**
          * Session Token 驱动
          *
-         * 基于 Redis / Cache 的有状态 Token。
+         * 基于 Redis / Cache 的有状态 Token
          *
          * 支持：
          * - 服务端主动失效
@@ -96,7 +96,7 @@ return [
             /**
              * Token 自动续期阈值（秒）
              *
-             * 当 Token 剩余时间小于该值时，自动刷新 TTL（滑动过期）。
+             * 当 Token 剩余时间小于该值时，自动刷新 TTL（滑动过期）
              *
              * 默认：
              * - 600 秒（10 分钟）
@@ -106,7 +106,7 @@ return [
             /**
              * Token 最大生命周期（秒）
              *
-             * 即使用户持续活跃，Token 生命周期也不能超过该值。
+             * 即使用户持续活跃，Token 生命周期也不能超过该值
              *
              * 默认：
              * - 86400 秒（24 小时）

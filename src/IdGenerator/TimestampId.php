@@ -24,7 +24,7 @@ class TimestampId implements IdGeneratorInterface
     }
 
     /**
-     * 生成一个或多个 ID。
+     * 生成一个或多个 ID
      *
      * @param  int  $count  生成数量
      * @return int|list<int>

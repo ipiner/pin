@@ -7,22 +7,22 @@ namespace Pin\Auth;
 use Illuminate\Http\Request;
 
 /**
- * 命令行和队列任务的操作用户信息。
+ * 命令行和队列任务的操作用户信息
  */
 class ConsoleUser
 {
     /**
-     * 默认控制台用户名。
+     * 默认控制台用户名
      */
     public const string DEFAULT_USERNAME = 'console';
 
     /**
-     * 当前系统用户 ID。
+     * 当前系统用户 ID
      */
     public int $id = 0;
 
     /**
-     * 当前系统用户名。
+     * 当前系统用户名
      */
     public string $username;
 
@@ -36,7 +36,7 @@ class ConsoleUser
     }
 
     /**
-     * 解析系统用户 ID。
+     * 解析系统用户 ID
      */
     protected function resolveUid(): int
     {
@@ -44,7 +44,7 @@ class ConsoleUser
     }
 
     /**
-     * 解析系统用户名。
+     * 解析系统用户名
      */
     protected function resolveUsername(Request $request): string
     {

@@ -9,7 +9,7 @@ use Override;
 use RuntimeException;
 
 /**
- * 支持严格读取的数据容器。
+ * 支持严格读取的数据容器
  */
 class DataBag extends Fluent
 {
@@ -23,7 +23,7 @@ class DataBag extends Fluent
     }
 
     /**
-     * 创建或复用数据容器。
+     * 创建或复用数据容器
      */
     public static function new($context): static
     {
@@ -39,7 +39,7 @@ class DataBag extends Fluent
     }
 
     /**
-     * 获取值。
+     * 获取值
      */
     #[Override]
     public function value($key, mixed $default = null): mixed

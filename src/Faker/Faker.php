@@ -19,7 +19,7 @@ class Faker
     }
 
     /**
-     * 生成测试数据。
+     * 生成测试数据
      *
      * @return array<string, mixed>
      */

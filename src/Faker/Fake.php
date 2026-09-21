@@ -39,7 +39,7 @@ class Fake
     }
 
     /**
-     * 根据验证规则生成测试数据。
+     * 根据验证规则生成测试数据
      *
      * @param  array<string, array|string>  $rules  验证规则
      * @return array<string, mixed>
@@ -58,7 +58,7 @@ class Fake
     }
 
     /**
-     * 注册规则推导器。
+     * 注册规则推导器
      *
      * @param  callable(RuleBag): FakeRule  $callback
      */

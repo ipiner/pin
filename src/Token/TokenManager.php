@@ -13,21 +13,21 @@ use Pin\Token\Drivers\JwtDriver;
 use Pin\Token\Drivers\SessionDriver;
 
 /**
- * Token 管理器。
+ * Token 管理器
  *
  * @mixin TokenFactory
  */
 class TokenManager
 {
     /**
-     * 自定义驱动工厂。
+     * 自定义驱动工厂
      *
      * @var array<string, Closure(Application, array): FactoryContract>
      */
     protected array $customCreators = [];
 
     /**
-     * 已解析的工厂。
+     * 已解析的工厂
      *
      * @var array<string, FactoryContract>
      */
@@ -38,7 +38,7 @@ class TokenManager
     }
 
     /**
-     * 转发默认工厂调用。
+     * 转发默认工厂调用
      */
     public function __call(string $method, array $parameters): mixed
     {
@@ -46,7 +46,7 @@ class TokenManager
     }
 
     /**
-     * 按配置创建工厂。
+     * 按配置创建工厂
      *
      * @param  array{driver: string, ...}  $config
      */
@@ -69,7 +69,7 @@ class TokenManager
     }
 
     /**
-     * 注册自定义驱动。
+     * 注册自定义驱动
      *
      * @param  Closure(Application, array): FactoryContract  $callback
      */
@@ -81,7 +81,7 @@ class TokenManager
     }
 
     /**
-     * 获取指定工厂。
+     * 获取指定工厂
      */
     public function driver(?string $name = null): FactoryContract
     {
@@ -91,7 +91,7 @@ class TokenManager
     }
 
     /**
-     * 创建自定义工厂。
+     * 创建自定义工厂
      */
     protected function callCustomCreator(array $config): FactoryContract
     {
@@ -99,7 +99,7 @@ class TokenManager
     }
 
     /**
-     * 创建 AES 工厂。
+     * 创建 AES 工厂
      */
     protected function createAesFactory(): FactoryContract
     {
@@ -107,7 +107,7 @@ class TokenManager
     }
 
     /**
-     * 创建 Session 工厂。
+     * 创建 Session 工厂
      */
     protected function createSessionFactory(array $config): FactoryContract
     {
@@ -118,7 +118,7 @@ class TokenManager
     }
 
     /**
-     * 创建 JWT 工厂。
+     * 创建 JWT 工厂
      */
     protected function createJwtFactory(array $config): FactoryContract
     {
@@ -126,7 +126,7 @@ class TokenManager
     }
 
     /**
-     * 获取驱动配置。
+     * 获取驱动配置
      */
     protected function getConfig(string $name): ?array
     {
@@ -134,7 +134,7 @@ class TokenManager
     }
 
     /**
-     * 获取默认驱动名称。
+     * 获取默认驱动名称
      */
     protected function getDefaultDriver(): string
     {
@@ -142,7 +142,7 @@ class TokenManager
     }
 
     /**
-     * 解析驱动工厂。
+     * 解析驱动工厂
      */
     protected function resolve(string $name): FactoryContract
     {

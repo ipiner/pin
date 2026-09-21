@@ -12,7 +12,7 @@ use Monolog\Formatter\NormalizerFormatter;
 class Config
 {
     /**
-     * 默认日志格式化器。
+     * 默认日志格式化器
      *
      * @var class-string<NormalizerFormatter>|null
      */

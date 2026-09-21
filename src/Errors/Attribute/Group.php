@@ -7,7 +7,7 @@ namespace Pin\Errors\Attribute;
 use Attribute;
 
 /**
- * 错误消息翻译分组。
+ * 错误消息翻译分组
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_CLASS_CONSTANT)]
 readonly class Group

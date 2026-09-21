@@ -25,7 +25,7 @@ enum IdGenerator: string
     case Snowflake = 'snowflake';
 
     /**
-     * 生成一个或多个 ID。
+     * 生成一个或多个 ID
      *
      * @param  int  $count  生成数量
      * @return int|string|list<int|string>

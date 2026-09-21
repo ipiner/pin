@@ -8,21 +8,21 @@ use BadMethodCallException;
 use Pin\Support\Json;
 
 /**
- * Hash 缓存操作。
+ * Hash 缓存操作
  */
 trait HashStoreHelper
 {
     protected HashDriver $driver;
 
     /**
-     * 默认过期时间（秒）。
+     * 默认过期时间（秒）
      */
     protected const int DEFAULT_TTL = 604800;
 
     protected int $defaultTtl = self::DEFAULT_TTL;
 
     /**
-     * 转发驱动调用。
+     * 转发驱动调用
      */
     public function __call(string $method, array $parameters): mixed
     {
@@ -38,7 +38,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 删除整个 Hash。
+     * 删除整个 Hash
      */
     public function del(array|string $key): bool
     {
@@ -54,7 +54,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 写入永久缓存。
+     * 写入永久缓存
      */
     public function forever($key, $value): bool
     {
@@ -62,7 +62,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 删除字段或整个 Hash。
+     * 删除字段或整个 Hash
      *
      * @param  string|array  $key
      */
@@ -78,7 +78,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 获取单条缓存。
+     * 获取单条缓存
      */
     public function get($key): mixed
     {
@@ -89,7 +89,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 获取整个 Hash 的缓存。
+     * 获取整个 Hash 的缓存
      */
     public function getAll(string $key): array
     {
@@ -100,7 +100,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 获取驱动。
+     * 获取驱动
      */
     public function getDriver(): HashDriver
     {
@@ -108,7 +108,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 设置驱动。
+     * 设置驱动
      */
     protected function setDriver(HashDriver $driver): void
     {
@@ -132,7 +132,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 批量获取同一 Hash 下的缓存。
+     * 批量获取同一 Hash 下的缓存
      */
     public function many(array $keys): array
     {
@@ -150,7 +150,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 写入单条缓存。
+     * 写入单条缓存
      */
     public function put($key, $value, $seconds = null): bool
     {
@@ -158,7 +158,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 批量写入同一 Hash 下的缓存。
+     * 批量写入同一 Hash 下的缓存
      */
     public function putMany(array $values, $seconds = null): bool
     {
@@ -173,7 +173,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 更新整个 Hash 的过期时间。
+     * 更新整个 Hash 的过期时间
      */
     public function touch($key, $seconds): bool
     {
@@ -181,7 +181,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 设置 Hash 过期时间。
+     * 设置 Hash 过期时间
      */
     protected function expire(string $key, ?int $seconds): bool
     {
@@ -200,7 +200,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 获取过期时间。
+     * 获取过期时间
      */
     protected function getTTL(?int $seconds = null): int
     {
@@ -208,7 +208,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 序列化缓存值。
+     * 序列化缓存值
      */
     protected function serialize(mixed $value): string
     {
@@ -216,7 +216,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 设置默认过期时间。
+     * 设置默认过期时间
      */
     protected function setDefaultTTL(?int $seconds): void
     {
@@ -224,7 +224,7 @@ trait HashStoreHelper
     }
 
     /**
-     * 反序列化缓存值。
+     * 反序列化缓存值
      */
     protected function unserialize(string $value): mixed
     {

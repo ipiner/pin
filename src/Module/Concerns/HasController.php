@@ -22,7 +22,7 @@ trait HasController
     }
 
     /**
-     * 生成控制器候选类名。
+     * 生成控制器候选类名
      *
      * @return list<string>
      */

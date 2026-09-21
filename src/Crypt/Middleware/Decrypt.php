@@ -9,12 +9,12 @@ use Pin\Http\Middleware\TransformsRequest;
 use Pin\Support\Facades\Aes;
 
 /**
- * 请求字段解密。
+ * 请求字段解密
  */
 class Decrypt extends TransformsRequest
 {
     /**
-     * 处理请求。
+     * 处理请求
      */
     public function handle($request, Closure $next, string ...$fields)
     {
@@ -24,7 +24,7 @@ class Decrypt extends TransformsRequest
     }
 
     /**
-     * 解密字段。
+     * 解密字段
      */
     protected function normalize(string $value): string
     {

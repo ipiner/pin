@@ -8,22 +8,22 @@ use Closure;
 use Illuminate\Cache\Repository;
 
 /**
- * 进程内缓存。
+ * 进程内缓存
  */
 class RuntimeCache
 {
     /**
-     * 默认缓存时间（秒）。
+     * 默认缓存时间（秒）
      */
     protected const int TTL = 86400;
 
     /**
-     * 进程共享的缓存仓库。
+     * 进程共享的缓存仓库
      */
     protected static Repository $repository;
 
     /**
-     * 获取未过期的缓存。
+     * 获取未过期的缓存
      *
      * @return array<array-key, mixed>
      */
@@ -33,7 +33,7 @@ class RuntimeCache
     }
 
     /**
-     * 删除缓存。
+     * 删除缓存
      */
     public function delete(string $key): bool
     {
@@ -41,7 +41,7 @@ class RuntimeCache
     }
 
     /**
-     * 清空缓存。
+     * 清空缓存
      */
     public function flush(): bool
     {
@@ -49,7 +49,7 @@ class RuntimeCache
     }
 
     /**
-     * 获取缓存。
+     * 获取缓存
      */
     public function get(string $key, mixed $default = null): mixed
     {
@@ -57,7 +57,7 @@ class RuntimeCache
     }
 
     /**
-     * 获取或生成缓存。
+     * 获取或生成缓存
      */
     public function remember(string $key, Closure $callback, ?int $ttl = self::TTL): mixed
     {
@@ -74,7 +74,7 @@ class RuntimeCache
     }
 
     /**
-     * 获取或生成永久缓存。
+     * 获取或生成永久缓存
      */
     public function rememberForever(string $key, Closure $callback): mixed
     {
@@ -82,7 +82,7 @@ class RuntimeCache
     }
 
     /**
-     * 获取缓存仓库。
+     * 获取缓存仓库
      */
     public function repo(): Repository
     {
@@ -90,7 +90,7 @@ class RuntimeCache
     }
 
     /**
-     * 写入缓存。
+     * 写入缓存
      */
     public function put(array|string $key, mixed $value = null, ?int $ttl = self::TTL): bool
     {

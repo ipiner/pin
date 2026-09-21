@@ -7,7 +7,7 @@ namespace Pin\Tree\Concerns;
 use WeakMap;
 
 /**
- * Pin 模型的树结构能力。
+ * Pin 模型的树结构能力
  *
  * @property int $pid
  * @property int $level
@@ -27,14 +27,14 @@ trait HasTree
         TreeRelation;
 
     /**
-     * 移动前的路径。
+     * 移动前的路径
      *
      * @var WeakMap<static, string>
      */
     protected static WeakMap $treeSnapshots;
 
     /**
-     * 注册节点初始化和移动事件。
+     * 注册节点初始化和移动事件
      */
     public static function bootHasTree(): void
     {

@@ -20,7 +20,7 @@ use Pin\Models\Model;
 trait HasCache
 {
     /**
-     * 模型缓存实例池。
+     * 模型缓存实例池
      *
      * @var array<class-string<Model>, Cacher>
      */
@@ -107,7 +107,7 @@ trait HasCache
     }
 
     /**
-     * 获取单条模型，不存在时抛出异常。
+     * 获取单条模型，不存在时抛出异常
      *
      * @throws ModelNotFoundException
      */

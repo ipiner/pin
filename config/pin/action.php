@@ -2,7 +2,7 @@
 
 return [
     /**
-     * 是否启用 Action Fake Response。
+     * 是否启用 Action Fake Response
      *
      * 开启后，当 Action 被容器解析时：
      *

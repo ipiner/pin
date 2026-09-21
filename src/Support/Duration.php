@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pin\Support;
 
 /**
- * 执行耗时与内存变化。
+ * 执行耗时与内存变化
  */
 class Duration
 {

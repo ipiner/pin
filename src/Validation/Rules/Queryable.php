@@ -11,7 +11,7 @@ use Pin\Models\Queryable\QueryableType;
 use Stringable;
 
 /**
- * 查询类型标记。
+ * 查询类型标记
  */
 class Queryable implements Stringable, ValidationRule
 {
@@ -26,7 +26,7 @@ class Queryable implements Stringable, ValidationRule
     }
 
     /**
-     * 转换为查询规则字符串。
+     * 转换为查询规则字符串
      */
     #[Override]
     public function __toString(): string
@@ -35,7 +35,7 @@ class Queryable implements Stringable, ValidationRule
     }
 
     /**
-     * 查询标记直接通过验证。
+     * 查询标记直接通过验证
      */
     #[Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void

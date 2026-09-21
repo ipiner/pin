@@ -8,19 +8,19 @@ use Closure;
 use Illuminate\Database\Events\QueryExecuted;
 
 /**
- * SQL 响应收集器。
+ * SQL 响应收集器
  */
 class QueryResponse
 {
     /**
-     * 响应中返回的 SQL 列表。
+     * 响应中返回的 SQL 列表
      *
      * @var list<array{sql: string, time: int}>
      */
     protected array $queries = [];
 
     /**
-     * 记录 SQL。
+     * 记录 SQL
      */
     public function push(QueryExecuted $event, string|Closure $sql): void
     {
@@ -32,7 +32,7 @@ class QueryResponse
     }
 
     /**
-     * 返回所有 SQL。
+     * 返回所有 SQL
      *
      * @return list<array{sql: string, time: int}>
      */
@@ -42,7 +42,7 @@ class QueryResponse
     }
 
     /**
-     * 是否在响应中附带 SQL。
+     * 是否在响应中附带 SQL
      */
     protected function shouldRespond(): bool
     {

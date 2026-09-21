@@ -11,21 +11,21 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Pin\Models\Model;
 
 /**
- * Pin 用户提供器。
+ * Pin 用户提供器
  *
  * @template TModel of Model&Authenticatable
  */
 class UsersProvider extends EloquentUserProvider
 {
     /**
-     * 用户模型类名。
+     * 用户模型类名
      *
      * @var class-string<TModel>
      */
     protected $model;
 
     /**
-     * Provider 注册名称。
+     * Provider 注册名称
      */
     public const string NAME = 'pin';
 
@@ -37,7 +37,7 @@ class UsersProvider extends EloquentUserProvider
     }
 
     /**
-     * 根据用户名查找用户。
+     * 根据用户名查找用户
      */
     public function findByUsername(string $username): ?Authenticatable
     {
@@ -45,7 +45,7 @@ class UsersProvider extends EloquentUserProvider
     }
 
     /**
-     * 根据用户 ID 查找用户。
+     * 根据用户 ID 查找用户
      */
     public function retrieveById($identifier): ?Authenticatable
     {
@@ -53,7 +53,7 @@ class UsersProvider extends EloquentUserProvider
     }
 
     /**
-     * 初始化用户提供器。
+     * 初始化用户提供器
      */
     protected function initialize(): void
     {

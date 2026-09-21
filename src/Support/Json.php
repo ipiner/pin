@@ -18,7 +18,7 @@ class Json
     public const int DEFAULT_ENCODE_OPTIONS = JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR;
 
     /**
-     * 解码 JSON。
+     * 解码 JSON
      *
      * @throws Exception
      */
@@ -33,7 +33,7 @@ class Json
     }
 
     /**
-     * 编码 JSON。
+     * 编码 JSON
      *
      * @throws Exception
      */

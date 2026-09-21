@@ -11,12 +11,12 @@ use Pin\Errors\Errors;
 use Pin\Models\Model;
 
 /**
- * 模型未找到异常。
+ * 模型未找到异常
  */
 class ModelNotFoundException extends Exception
 {
     /**
-     * 包装模型查询异常。
+     * 包装模型查询异常
      */
     public function __construct(protected readonly EloquentModelNotFoundException $e)
     {
@@ -30,7 +30,7 @@ class ModelNotFoundException extends Exception
     }
 
     /**
-     * 获取查询调用位置。
+     * 获取查询调用位置
      */
     #[Override]
     public function getCaller(?string $file = null, ?int $line = null): array
@@ -44,7 +44,7 @@ class ModelNotFoundException extends Exception
     }
 
     /**
-     * 获取模型名称。
+     * 获取模型名称
      */
     protected function modelLabel(string $model): string
     {

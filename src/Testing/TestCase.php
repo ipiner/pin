@@ -15,7 +15,7 @@ use Pin\Support\Invoker;
 Pest::boot();
 
 /**
- * Pin 测试基类。
+ * Pin 测试基类
  */
 abstract class TestCase extends BaseTestCase
 {
@@ -28,7 +28,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * 替换配置加载器。
+     * 替换配置加载器
      *
      * @param  BaseApplication  $app
      * @return array<class-string, class-string>
@@ -42,7 +42,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * 获取附加服务提供者。
+     * 获取附加服务提供者
      *
      * @return list<class-string<ServiceProvider>>
      */
@@ -52,7 +52,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * 创建测试应用。
+     * 创建测试应用
      */
     #[Override]
     protected function resolveApplication(): BaseApplication

@@ -9,7 +9,7 @@ use Pin\Support\Str;
 use Throwable;
 
 /**
- * RSA 加解密与签名。
+ * RSA 加解密与签名
  */
 class Rsa
 {
@@ -19,7 +19,7 @@ class Rsa
     protected array $keys = [];
 
     /**
-     * 使用私钥解密。
+     * 使用私钥解密
      *
      * @param  string  $str  base64 编码后的密文
      * @param  string|null  $privateKey  私钥（PEM 格式）
@@ -32,7 +32,7 @@ class Rsa
             $encrypted = base64_decode($str, true);
 
             if ($encrypted === false) {
-                throw new CryptException('解密数据失败。');
+                throw new CryptException('解密数据失败');
             }
 
             $result = openssl_private_decrypt(
@@ -42,17 +42,17 @@ class Rsa
             );
 
             if (! $result || ! Str::isValidUtf8($decrypted)) {
-                throw new CryptException('解密数据失败。');
+                throw new CryptException('解密数据失败');
             }
 
             return $decrypted;
         } catch (Throwable $e) {
-            throw $this->normalizeException($e, '解密数据失败。');
+            throw $this->normalizeException($e, '解密数据失败');
         }
     }
 
     /**
-     * 使用公钥加密。
+     * 使用公钥加密
      *
      * @param  string  $str  明文
      * @param  string|null  $publicKey  公钥（PEM 格式）
@@ -69,17 +69,17 @@ class Rsa
             );
 
             if (! $result) {
-                throw new CryptException('加密数据失败。');
+                throw new CryptException('加密数据失败');
             }
 
             return base64_encode($encrypted);
         } catch (Throwable $e) {
-            throw $this->normalizeException($e, '加密数据失败。');
+            throw $this->normalizeException($e, '加密数据失败');
         }
     }
 
     /**
-     * 使用私钥签名。
+     * 使用私钥签名
      *
      * @param  string  $str  原始数据
      * @param  string|null  $privateKey  私钥
@@ -101,17 +101,17 @@ class Rsa
             );
 
             if (! $result) {
-                throw new CryptException('数据签名失败。');
+                throw new CryptException('数据签名失败');
             }
 
             return base64_encode($signature);
         } catch (Throwable $e) {
-            throw $this->normalizeException($e, '数据签名失败。');
+            throw $this->normalizeException($e, '数据签名失败');
         }
     }
 
     /**
-     * 使用公钥验证签名。
+     * 使用公钥验证签名
      *
      * @param  string  $str  原始数据
      * @param  string  $signature  base64 编码签名
@@ -140,12 +140,12 @@ class Rsa
                 $algorithm
             ) === 1;
         } catch (Throwable $e) {
-            throw $this->normalizeException($e, '签名验证失败。');
+            throw $this->normalizeException($e, '签名验证失败');
         }
     }
 
     /**
-     * 解析并复用密钥。
+     * 解析并复用密钥
      */
     protected function resolveKey(?string $key, bool $private): OpenSSLAsymmetricKey
     {
@@ -161,7 +161,7 @@ class Rsa
             : openssl_pkey_get_public($pem);
 
         if (! $resolved) {
-            throw new CryptException('无效的 RSA 密钥。');
+            throw new CryptException('无效的 RSA 密钥');
         }
 
         $this->keys[$type] = ['pem' => $pem, 'key' => $resolved];
@@ -170,7 +170,7 @@ class Rsa
     }
 
     /**
-     * 转换加解密异常。
+     * 转换加解密异常
      */
     protected function normalizeException(Throwable $e, string $message): CryptException
     {

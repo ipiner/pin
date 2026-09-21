@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
 /**
- * 异常响应处理。
+ * 异常响应处理
  */
 trait HandlesResponse
 {
@@ -50,7 +50,7 @@ trait HandlesResponse
     }
 
     /**
-     * 获取响应业务码。
+     * 获取响应业务码
      */
     protected function resolveResponseCode(Throwable $e): int
     {
@@ -64,7 +64,7 @@ trait HandlesResponse
     }
 
     /**
-     * 获取响应消息。
+     * 获取响应消息
      */
     protected function resolveResponseMessage(Throwable $e): string
     {
@@ -85,7 +85,7 @@ trait HandlesResponse
     }
 
     /**
-     * 获取 HTTP 状态码。
+     * 获取 HTTP 状态码
      */
     protected function resolveStatusCode(Throwable $e): int
     {

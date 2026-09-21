@@ -10,7 +10,7 @@ use Override;
 use Pin\Tree\TreeGuard;
 
 /**
- * 父节点验证规则。
+ * 父节点验证规则
  */
 class TreeParentRule implements ValidationRule
 {
@@ -22,7 +22,7 @@ class TreeParentRule implements ValidationRule
     }
 
     /**
-     * 校验父节点。
+     * 校验父节点
      */
     #[Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void

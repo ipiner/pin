@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Log;
 use Psr\Log\LogLevel;
 
 /**
- * SQL 日志收集器。
+ * SQL 日志收集器
  */
 class QueryLogger
 {
     /**
-     * SQL 队列。
+     * SQL 队列
      *
      * @var list<array{sql: string, context: array}>
      */
@@ -26,7 +26,7 @@ class QueryLogger
     }
 
     /**
-     * 批量写入 SQL 日志。
+     * 批量写入 SQL 日志
      */
     public function flush(): void
     {
@@ -48,7 +48,7 @@ class QueryLogger
     }
 
     /**
-     * 收集 SQL 日志。
+     * 收集 SQL 日志
      */
     public function push(QueryExecuted $event, string|Closure $sql): void
     {
@@ -70,7 +70,7 @@ class QueryLogger
     }
 
     /**
-     * 是否忽略 SQL。
+     * 是否忽略 SQL
      */
     protected function isIgnored(QueryExecuted $event): bool
     {
@@ -81,7 +81,7 @@ class QueryLogger
     }
 
     /**
-     * 匹配正则或包含规则。
+     * 匹配正则或包含规则
      */
     protected function matchIgnore(string $sql, string $rule): bool
     {
@@ -93,7 +93,7 @@ class QueryLogger
     }
 
     /**
-     * 获取日志等级。
+     * 获取日志等级
      *
      * @param  array{slow: bool}  $context
      */
@@ -103,7 +103,7 @@ class QueryLogger
     }
 
     /**
-     * 是否记录 SQL。
+     * 是否记录 SQL
      */
     protected function shouldLog(QueryExecuted $event, bool $slow): bool
     {

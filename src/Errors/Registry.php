@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Pin\Errors;
 
 /**
- * 错误注册表。
+ * 错误注册表
  */
 class Registry
 {
     /**
-     * 已注册错误。
+     * 已注册错误
      *
      * @var array<int, IError>
      */
     protected static array $errors = [];
 
     /**
-     * 获取所有错误。
+     * 获取所有错误
      *
      * @return array<int, IError>
      */
@@ -27,7 +27,7 @@ class Registry
     }
 
     /**
-     * 查找错误，未注册时返回未知错误。
+     * 查找错误，未注册时返回未知错误
      */
     public static function get(int $code): IError
     {
@@ -35,7 +35,7 @@ class Registry
     }
 
     /**
-     * 加载目录中的错误枚举。
+     * 加载目录中的错误枚举
      */
     public static function load(string $path, string $namespace = 'App\\Errors'): bool
     {
@@ -59,7 +59,7 @@ class Registry
     }
 
     /**
-     * 注册错误，同码覆盖。
+     * 注册错误，同码覆盖
      *
      * @param  IError[]  $cases
      */
@@ -71,7 +71,7 @@ class Registry
     }
 
     /**
-     * 获取覆盖后的错误定义。
+     * 获取覆盖后的错误定义
      */
     public static function resolve(IError $error): IError
     {

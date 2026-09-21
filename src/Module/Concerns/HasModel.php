@@ -22,7 +22,7 @@ trait HasModel
     }
 
     /**
-     * 生成模型候选类名。
+     * 生成模型候选类名
      *
      * @return list<string>
      */

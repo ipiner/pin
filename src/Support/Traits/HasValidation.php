@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
 /**
- * 数据验证与权限校验。
+ * 数据验证与权限校验
  */
 trait HasValidation
 {
@@ -80,7 +80,7 @@ trait HasValidation
     }
 
     /**
-     * 清除已验证数据。
+     * 清除已验证数据
      */
     protected function payloadChanged(): void
     {
@@ -118,7 +118,7 @@ trait HasValidation
     }
 
     /**
-     * 获取验证字段名称。
+     * 获取验证字段名称
      */
     protected function validationAttributes(): array
     {
@@ -142,7 +142,7 @@ trait HasValidation
     }
 
     /**
-     * 创建验证器。
+     * 创建验证器
      */
     protected function validator(): Validator
     {

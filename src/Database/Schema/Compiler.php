@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
- * 数据库结构编译器。
+ * 数据库结构编译器
  */
 class Compiler
 {
@@ -21,7 +21,7 @@ class Compiler
     }
 
     /**
-     * 编译数据库结构。
+     * 编译数据库结构
      *
      * @return Collection<string, Table>
      */
@@ -33,7 +33,7 @@ class Compiler
     }
 
     /**
-     * 构建数据表结构。
+     * 构建数据表结构
      */
     protected function buildTableSchema(array $table): Table
     {
@@ -50,7 +50,7 @@ class Compiler
     }
 
     /**
-     * 获取字段结构。
+     * 获取字段结构
      *
      * @return array<string, Column>
      */
@@ -66,7 +66,7 @@ class Compiler
     }
 
     /**
-     * 获取数据库表列表。
+     * 获取数据库表列表
      *
      * @return list<array{name: string, comment: string|null}>
      */
@@ -86,7 +86,7 @@ class Compiler
     }
 
     /**
-     * 获取表查询的数据库名。
+     * 获取表查询的数据库名
      */
     protected function getTablesDatabase(): ?string
     {
@@ -96,7 +96,7 @@ class Compiler
     }
 
     /**
-     * 是否需要指定数据库名。
+     * 是否需要指定数据库名
      */
     protected function requiresDatabaseParameter(): bool
     {
@@ -106,7 +106,7 @@ class Compiler
     }
 
     /**
-     * 获取结构构建器。
+     * 获取结构构建器
      */
     protected function schema(): Builder
     {

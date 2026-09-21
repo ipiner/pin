@@ -11,12 +11,12 @@ use Pin\Support\Caller;
 use Throwable;
 
 /**
- * 异常日志上下文。
+ * 异常日志上下文
  */
 trait HandlesContext
 {
     /**
-     * 获取异常位置。
+     * 获取异常位置
      */
     protected function resolveCaller(Throwable $e): array
     {

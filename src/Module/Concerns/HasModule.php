@@ -7,14 +7,14 @@ namespace Pin\Module\Concerns;
 trait HasModule
 {
     /**
-     * 模块信息。
+     * 模块信息
      *
      * @var array{name: string|null, namespace: string|null}
      */
     protected array $module;
 
     /**
-     * 解析所属模块。
+     * 解析所属模块
      *
      * @return array{name: string|null, namespace: string|null}
      */

@@ -20,7 +20,7 @@ class Str
     protected static ?Closure $sensitiveValueMasker = null;
 
     /**
-     * 默认脱敏策略。
+     * 默认脱敏策略
      */
     public static function defaultSensitiveValueMasker(mixed $value, ?string $key): mixed
     {
@@ -32,7 +32,7 @@ class Str
     }
 
     /**
-     * 拆分字符串，去除首尾空白和空项。
+     * 拆分字符串，去除首尾空白和空项
      *
      * @return list<string>
      */
@@ -68,7 +68,7 @@ class Str
     }
 
     /**
-     * 替换占位符，支持 :key 或 {key}。
+     * 替换占位符，支持 :key 或 {key}
      */
     public static function format(string $str, array $replacement, string $delimiter = '{}'): string
     {
@@ -93,7 +93,7 @@ class Str
     }
 
     /**
-     * 敏感值脱敏。
+     * 敏感值脱敏
      */
     public static function maskSensitive(mixed $value, ?string $key = null): mixed
     {
@@ -117,7 +117,7 @@ class Str
     }
 
     /**
-     * 转换为字符串。
+     * 转换为字符串
      */
     public static function string(mixed $value): string
     {

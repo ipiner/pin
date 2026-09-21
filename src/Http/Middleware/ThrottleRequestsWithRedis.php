@@ -23,7 +23,7 @@ class ThrottleRequestsWithRedis extends BaseThrottleRequestsWithRedis
     public const string HEADER_NAME = 'x-b1nzygq';
 
     /**
-     * 解码限流响应头。
+     * 解码限流响应头
      *
      * @return int[]
      */

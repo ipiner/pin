@@ -9,7 +9,7 @@ use Pin\Token\Contracts\TokenDriver;
 use Pin\Token\Contracts\TokenFactory as FactoryContract;
 
 /**
- * Token 工厂。
+ * Token 工厂
  *
  * @mixin TokenDriver
  */
@@ -22,7 +22,7 @@ class TokenFactory implements FactoryContract
     }
 
     /**
-     * 转发驱动调用。
+     * 转发驱动调用
      */
     public function __call(string $method, array $parameters): mixed
     {
@@ -30,7 +30,7 @@ class TokenFactory implements FactoryContract
     }
 
     /**
-     * 编码 Token。
+     * 编码 Token
      *
      * @param  int|null  $expires  有效期（秒）
      */
@@ -40,7 +40,7 @@ class TokenFactory implements FactoryContract
     }
 
     /**
-     * 解码 Token。
+     * 解码 Token
      */
     public function decode(string $token): Token
     {
@@ -48,7 +48,7 @@ class TokenFactory implements FactoryContract
     }
 
     /**
-     * 获取驱动。
+     * 获取驱动
      */
     #[Override]
     public function driver(): TokenDriver

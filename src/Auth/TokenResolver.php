@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 use Pin\Token\Token;
 
 /**
- * 请求 Token 解析器。
+ * 请求 Token 解析器
  */
 class TokenResolver
 {
     /**
-     * 已解析的 Token。
+     * 已解析的 Token
      */
     protected ?Token $resolvedToken = null;
 
@@ -24,7 +24,7 @@ class TokenResolver
     }
 
     /**
-     * 注销当前已解析的 Token。
+     * 注销当前已解析的 Token
      */
     public function forgetToken(): void
     {
@@ -42,7 +42,7 @@ class TokenResolver
     }
 
     /**
-     * 从当前请求中获取 Token。
+     * 从当前请求中获取 Token
      */
     public function getRequestToken(): ?string
     {
@@ -64,7 +64,7 @@ class TokenResolver
     }
 
     /**
-     * 获取已解析的 Token。
+     * 获取已解析的 Token
      */
     public function getResolvedToken(): ?Token
     {
@@ -77,7 +77,7 @@ class TokenResolver
     }
 
     /**
-     * 获取用户 ID。
+     * 获取用户 ID
      */
     public function getUid(): ?int
     {
@@ -85,7 +85,7 @@ class TokenResolver
     }
 
     /**
-     * 判断是否为 Sanctum Token。
+     * 判断是否为 Sanctum Token
      */
     public function isSanctumToken(string $token): bool
     {
@@ -93,11 +93,11 @@ class TokenResolver
     }
 
     /**
-     * 解析请求 Token。
+     * 解析请求 Token
      */
     public function resolve(?string $requestToken): ?Token
     {
-        // 清理上次解析结果。
+        // 清理上次解析结果
         $this->resolvedToken = null;
         $requestToken = $this->normalizeToken($requestToken);
 
@@ -109,7 +109,7 @@ class TokenResolver
     }
 
     /**
-     * 设置当前请求。
+     * 设置当前请求
      */
     public function setRequest(Request $request): static
     {

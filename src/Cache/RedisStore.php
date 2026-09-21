@@ -7,7 +7,7 @@ namespace Pin\Cache;
 use Illuminate\Support\Facades\Redis;
 
 /**
- * Redis Hash 缓存存储。
+ * Redis Hash 缓存存储
  */
 class RedisStore implements HashStore
 {

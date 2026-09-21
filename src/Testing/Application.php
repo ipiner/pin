@@ -8,12 +8,12 @@ use Override;
 use Pin\Application as BaseApplication;
 
 /**
- * 测试应用。
+ * 测试应用
  */
 class Application extends BaseApplication
 {
     /**
-     * 补充测试数据库配置。
+     * 补充测试数据库配置
      */
     #[Override]
     public function loadedConfiguration(): void

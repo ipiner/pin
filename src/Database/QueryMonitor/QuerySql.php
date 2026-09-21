@@ -8,12 +8,12 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Str;
 
 /**
- * SQL 格式化。
+ * SQL 格式化
  */
 class QuerySql
 {
     /**
-     * 获取绑定参数后的 SQL。
+     * 获取绑定参数后的 SQL
      */
     public static function raw(QueryExecuted $event): string
     {
@@ -21,7 +21,7 @@ class QuerySql
     }
 
     /**
-     * 截断 SQL。
+     * 截断 SQL
      */
     public static function truncate(string $sql): string
     {

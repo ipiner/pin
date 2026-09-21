@@ -9,12 +9,12 @@ use Override;
 use Pin\Support\ServiceProvider;
 
 /**
- * 树结构数据服务提供者。
+ * 树结构数据服务提供者
  */
 class TreeServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
-     * 注册树服务。
+     * 注册树服务
      */
     #[Override]
     public function register(): void
@@ -26,7 +26,7 @@ class TreeServiceProvider extends ServiceProvider implements DeferrableProvider
     }
 
     /**
-     * 获取延迟加载的服务。
+     * 获取延迟加载的服务
      *
      * @return list<string>
      */

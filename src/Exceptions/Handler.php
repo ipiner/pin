@@ -15,14 +15,14 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Throwable;
 
 /**
- * 应用异常处理器。
+ * 应用异常处理器
  */
 class Handler extends \Illuminate\Foundation\Exceptions\Handler
 {
     use HandlesContext, HandlesJsonResponse, HandlesResponse;
 
     /**
-     * 异常日志级别。
+     * 异常日志级别
      */
     protected $levels = [
         ThrottleRequestsException::class => LogLevel::INFO,

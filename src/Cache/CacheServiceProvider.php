@@ -9,12 +9,12 @@ use Illuminate\Cache\Repository;
 use Pin\Support\ServiceProvider;
 
 /**
- * 缓存服务提供者。
+ * 缓存服务提供者
  */
 class CacheServiceProvider extends ServiceProvider
 {
     /**
-     * 注册缓存服务。
+     * 注册缓存服务
      */
     public function register(): void
     {

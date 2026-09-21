@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use Throwable;
 
 /**
- * AES-128-CBC 加解密。
+ * AES-128-CBC 加解密
  */
 class Aes
 {
@@ -17,7 +17,7 @@ class Aes
     protected const int KEY_LENGTH = 16;
 
     /**
-     * 解密字符串。
+     * 解密字符串
      *
      * @throws CryptException
      */
@@ -37,7 +37,7 @@ class Aes
             $decrypted = openssl_decrypt($encrypted, static::CIPHER, $key, 0, $iv);
 
             if ($decrypted === false) {
-                throw new CryptException('解密数据失败。');
+                throw new CryptException('解密数据失败');
             }
 
             return $decrypted;
@@ -47,7 +47,7 @@ class Aes
     }
 
     /**
-     * 加密字符串。
+     * 加密字符串
      *
      * @param  bool  $randomKey  使用随机密钥
      *
@@ -67,7 +67,7 @@ class Aes
             $encrypted = openssl_encrypt($plain, static::CIPHER, $key, 0, $iv);
 
             if ($encrypted === false) {
-                throw new CryptException('加密数据失败。');
+                throw new CryptException('加密数据失败');
             }
 
             return $randomKey
@@ -79,7 +79,7 @@ class Aes
     }
 
     /**
-     * 是否使用随机密钥。
+     * 是否使用随机密钥
      */
     protected function isRandomKey(string $str): bool
     {
@@ -89,7 +89,7 @@ class Aes
     }
 
     /**
-     * 转换加解密异常。
+     * 转换加解密异常
      */
     protected function normalizeException(Throwable $e): CryptException
     {

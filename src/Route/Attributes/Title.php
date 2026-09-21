@@ -7,7 +7,7 @@ namespace Pin\Route\Attributes;
 use Attribute;
 
 /**
- * 路由标题。
+ * 路由标题
  */
 #[Attribute(Attribute::TARGET_CLASS_CONSTANT)]
 class Title

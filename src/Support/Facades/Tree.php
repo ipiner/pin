@@ -18,7 +18,7 @@ use Override;
 class Tree extends Facade
 {
     /**
-     * 获取服务名称。
+     * 获取服务名称
      */
     #[Override]
     protected static function getFacadeAccessor(): string

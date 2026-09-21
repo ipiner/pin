@@ -17,7 +17,7 @@ use Throwable;
 class ExtraProcessor implements ProcessorInterface
 {
     /**
-     * 获取日志上下文。
+     * 获取日志上下文
      *
      * @return array{
      *     uid:int|null,

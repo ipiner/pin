@@ -18,14 +18,14 @@ use Override;
 class Pagination implements JsonSerializable
 {
     /**
-     * 分页实例。
+     * 分页实例
      *
      * @var LengthAwarePaginator<array-key, TItem>
      */
     public LengthAwarePaginator $paginator;
 
     /**
-     * 获取允许的分页大小。
+     * 获取允许的分页大小
      *
      * @return array<int>
      */
@@ -81,7 +81,7 @@ class Pagination implements JsonSerializable
     }
 
     /**
-     * 转换为数组。
+     * 转换为数组
      *
      * @param  bool|string|Closure  $withItems  是否保留数据、资源类名或转换回调
      * @return array{

@@ -14,7 +14,7 @@ use Pin\Validation\Rules\Queryable;
 class QueryableRuleExtractor
 {
     /**
-     * 从验证规则提取查询类型。
+     * 从验证规则提取查询类型
      *
      * @param  array<string, array|string>  $rules
      * @return array<string, string>

@@ -7,12 +7,12 @@ namespace Pin\Tree\Concerns;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 /**
- * 树路径展示。
+ * 树路径展示
  */
 trait TreePresenter
 {
     /**
-     * 获取完整名称。
+     * 获取完整名称
      *
      * @return Attribute<string, never>
      */
@@ -22,7 +22,7 @@ trait TreePresenter
     }
 
     /**
-     * 获取名称路径。
+     * 获取名称路径
      */
     public function namePath(?string $separator = ' / '): array|string
     {

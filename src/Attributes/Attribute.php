@@ -12,12 +12,12 @@ use ReflectionEnumUnitCase;
 use UnitEnum;
 
 /**
- * 读取类或枚举 case 上的 Attribute，并在运行时缓存中复用解析结果。
+ * 读取类或枚举 case 上的 Attribute，并在运行时缓存中复用解析结果
  */
 class Attribute
 {
     /**
-     * 按属性类名精确匹配，返回首个实例；不自动查找父类上的属性。
+     * 按属性类名精确匹配，返回首个实例；不自动查找父类上的属性
      *
      * @template TAttribute of object
      *
@@ -35,7 +35,7 @@ class Attribute
     }
 
     /**
-     * 获取枚举 case 上的 Attribute。
+     * 获取枚举 case 上的 Attribute
      *
      * @template TAttribute of object
      *
@@ -79,7 +79,7 @@ class Attribute
     }
 
     /**
-     * 缺失结果以 false 缓存，避免 RuntimeCache 将 null 视为未命中而重复反射。
+     * 缺失结果以 false 缓存，避免 RuntimeCache 将 null 视为未命中而重复反射
      *
      * @template TAttribute of object
      *
@@ -94,7 +94,7 @@ class Attribute
     }
 
     /**
-     * 从 Reflection 对象中创建 Attribute 实例。
+     * 从 Reflection 对象中创建 Attribute 实例
      *
      * @template TAttribute of object
      *

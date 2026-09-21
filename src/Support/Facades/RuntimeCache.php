@@ -25,7 +25,7 @@ use Pin\Cache\RuntimeCache as Cache;
 class RuntimeCache extends Facade
 {
     /**
-     * 获取服务名称。
+     * 获取服务名称
      */
     #[Override]
     protected static function getFacadeAccessor(): string
@@ -34,7 +34,7 @@ class RuntimeCache extends Facade
     }
 
     /**
-     * 获取缓存实例。
+     * 获取缓存实例
      *
      * @param  string  $name
      */

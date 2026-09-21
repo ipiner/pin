@@ -8,12 +8,12 @@ use Illuminate\Support\Collection;
 use Pin\Models\Model;
 
 /**
- * 树结构工具。
+ * 树结构工具
  */
 class Tree
 {
     /**
-     * 校验树结构完整性。
+     * 校验树结构完整性
      *
      * @param  Collection<array-key, Model>  $models
      * @return list<array{id: int, rule: string, message: string}>
@@ -24,7 +24,7 @@ class Tree
     }
 
     /**
-     * 过滤节点并修剪空分支。
+     * 过滤节点并修剪空分支
      *
      * @param  Collection<array-key, Model>  $models
      * @param  callable(Model): bool  $predicate
@@ -36,7 +36,7 @@ class Tree
     }
 
     /**
-     * 按父节点、排序值和 ID 排序。
+     * 按父节点、排序值和 ID 排序
      */
     public function sort(Collection $items): Collection
     {

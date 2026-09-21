@@ -7,12 +7,12 @@ namespace Pin\Tree\Concerns;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
- * 树节点导航。
+ * 树节点导航
  */
 trait TreeNavigation
 {
     /**
-     * 从根到父节点获取祖先。
+     * 从根到父节点获取祖先
      *
      * @return Collection<int, static>
      */
@@ -39,7 +39,7 @@ trait TreeNavigation
     }
 
     /**
-     * 获取后代节点。
+     * 获取后代节点
      *
      * @return Collection<int, static>
      */
@@ -49,7 +49,7 @@ trait TreeNavigation
     }
 
     /**
-     * 按路径获取后代节点。
+     * 按路径获取后代节点
      *
      * @return Collection<int, static>
      */

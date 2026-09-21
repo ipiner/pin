@@ -31,7 +31,7 @@ readonly class FakeRule implements ValidationRule
     }
 
     /**
-     * 获取指定位置参数。
+     * 获取指定位置参数
      */
     public function parameter(int $index, mixed $default = null): mixed
     {

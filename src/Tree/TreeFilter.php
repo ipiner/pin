@@ -8,12 +8,12 @@ use Illuminate\Support\Collection;
 use Pin\Models\Model;
 
 /**
- * 树结构过滤器。
+ * 树结构过滤器
  */
 class TreeFilter
 {
     /**
-     * 过滤节点并修剪空分支。
+     * 过滤节点并修剪空分支
      *
      * @param  Collection<array-key, Model>  $models
      * @param  callable(Model): bool  $predicate
@@ -29,7 +29,7 @@ class TreeFilter
     }
 
     /**
-     * 收集隐藏节点。
+     * 收集隐藏节点
      *
      * @param  Collection<array-key, Model>  $models
      * @param  callable(Model): bool  $predicate
@@ -49,7 +49,7 @@ class TreeFilter
     }
 
     /**
-     * 收集原始父节点。
+     * 收集原始父节点
      *
      * @param  Collection<array-key, Model>  $models
      * @return array<int, bool>
@@ -71,7 +71,7 @@ class TreeFilter
     }
 
     /**
-     * 从叶端逐级修剪空父节点。
+     * 从叶端逐级修剪空父节点
      *
      * @param  Collection<array-key, Model>  $models
      * @param  array<int, bool>  $parentIds
@@ -117,7 +117,7 @@ class TreeFilter
     }
 
     /**
-     * 移除隐藏节点及其后代。
+     * 移除隐藏节点及其后代
      *
      * @param  Collection<array-key, Model>  $models
      * @param  array<int, bool>  $hiddenIds

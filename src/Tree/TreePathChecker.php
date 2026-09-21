@@ -8,12 +8,12 @@ use Illuminate\Support\Collection;
 use Pin\Models\Model;
 
 /**
- * 树路径校验器。
+ * 树路径校验器
  */
 class TreePathChecker
 {
     /**
-     * 校验树结构完整性。
+     * 校验树结构完整性
      *
      * @param  Collection<array-key, Model>  $models
      * @return list<array{id: int, rule: string, message: string}>
@@ -34,7 +34,7 @@ class TreePathChecker
     }
 
     /**
-     * 按节点 ID 建立索引。
+     * 按节点 ID 建立索引
      *
      * @param  Collection<array-key, Model>  $models
      * @return Collection<int, Model>
@@ -45,7 +45,7 @@ class TreePathChecker
     }
 
     /**
-     * 校验 level 与 paths 长度一致。
+     * 校验 level 与 paths 长度一致
      */
     protected function checkLevelConsistency(
         int $id,
@@ -64,7 +64,7 @@ class TreePathChecker
     }
 
     /**
-     * 校验单个节点结构。
+     * 校验单个节点结构
      *
      * @param  Collection<int, Model>  $idMap
      * @return list<array{id: int, rule: string, message: string}>
@@ -113,7 +113,7 @@ class TreePathChecker
     }
 
     /**
-     * 校验父节点存在。
+     * 校验父节点存在
      */
     protected function checkParentExists(int $id, int $pid, ?Model $parent): ?array
     {
@@ -150,7 +150,7 @@ class TreePathChecker
     }
 
     /**
-     * 校验 paths 不为空。
+     * 校验 paths 不为空
      */
     protected function checkPathsNotEmpty(int $id, array $paths): ?array
     {
@@ -162,7 +162,7 @@ class TreePathChecker
     }
 
     /**
-     * 校验根节点结构。
+     * 校验根节点结构
      */
     protected function checkRootNode(int $id, array $paths): ?array
     {
@@ -178,7 +178,7 @@ class TreePathChecker
     }
 
     /**
-     * 校验 paths 最后一位必须是自身 id。
+     * 校验 paths 最后一位必须是自身 id
      */
     protected function checkSelfReference(int $id, array $paths): ?array
     {
@@ -196,7 +196,7 @@ class TreePathChecker
     }
 
     /**
-     * 构建统一错误结构。
+     * 构建统一错误结构
      *
      * @return array{id: int, rule: string, message: string}
      */

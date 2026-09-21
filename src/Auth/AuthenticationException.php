@@ -10,7 +10,7 @@ use Pin\Exceptions\Exception;
 use Throwable;
 
 /**
- * 认证异常。
+ * 认证异常
  */
 class AuthenticationException extends Exception
 {
@@ -25,7 +25,7 @@ class AuthenticationException extends Exception
     }
 
     /**
-     * 将 Token 层错误转换为认证层错误。
+     * 将 Token 层错误转换为认证层错误
      */
     protected function resolveAuthError(int $code): ?IError
     {

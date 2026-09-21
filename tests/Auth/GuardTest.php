@@ -22,7 +22,7 @@ uses(InteractsWithDatabase::class)->beforeEach(function () {
 });
 
 afterEach(function () {
-    // 测试中的生产环境模拟结束后，允许 Testbench 正常回滚测试迁移。
+    // 测试中的生产环境模拟结束后，允许 Testbench 正常回滚测试迁移
     app()->instance('env', 'testing');
 });
 

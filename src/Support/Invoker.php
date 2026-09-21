@@ -9,7 +9,7 @@ use ReflectionClass;
 use ReflectionProperty;
 
 /**
- * 访问对象或类的非公开成员。
+ * 访问对象或类的非公开成员
  */
 class Invoker
 {
@@ -24,7 +24,7 @@ class Invoker
     }
 
     /**
-     * 调用方法。
+     * 调用方法
      */
     public function __call(string $method, array $args): mixed
     {
@@ -34,7 +34,7 @@ class Invoker
     }
 
     /**
-     * 获取属性值。
+     * 获取属性值
      */
     public function __get(string $name): mixed
     {
@@ -42,7 +42,7 @@ class Invoker
     }
 
     /**
-     * 设置属性值。
+     * 设置属性值
      */
     public function __set(string $name, mixed $value): void
     {
@@ -50,7 +50,7 @@ class Invoker
     }
 
     /**
-     * 获取属性值，支持点语法。
+     * 获取属性值，支持点语法
      */
     public function get(string $name): mixed
     {
@@ -62,7 +62,7 @@ class Invoker
     }
 
     /**
-     * 设置属性值，支持点语法。
+     * 设置属性值，支持点语法
      */
     public function set(string $name, mixed $value): void
     {
@@ -82,7 +82,7 @@ class Invoker
     }
 
     /**
-     * 获取实例，跳过构造函数。
+     * 获取实例，跳过构造函数
      */
     protected function getInstance(): object
     {
@@ -94,7 +94,7 @@ class Invoker
     }
 
     /**
-     * 解析属性名和嵌套键。
+     * 解析属性名和嵌套键
      *
      * @return array{string, string|null}
      */
@@ -104,7 +104,7 @@ class Invoker
     }
 
     /**
-     * 获取属性反射。
+     * 获取属性反射
      */
     protected function prop(string $name): ReflectionProperty
     {

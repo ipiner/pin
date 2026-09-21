@@ -9,7 +9,7 @@ use Override;
 use Pin\Models\Model;
 
 /**
- * 唯一性验证。
+ * 唯一性验证
  *
  * @template TModel of Model
  */
@@ -32,7 +32,7 @@ class Unique extends ValidationRule
     }
 
     /**
-     * 判断字段值是否已存在。
+     * 判断字段值是否已存在
      */
     public function exists(string $attribute, mixed $value): bool
     {
@@ -52,7 +52,7 @@ class Unique extends ValidationRule
     }
 
     /**
-     * 验证唯一性。
+     * 验证唯一性
      */
     #[Override]
     protected function handle(string $attribute, mixed $value): bool
@@ -61,7 +61,7 @@ class Unique extends ValidationRule
     }
 
     /**
-     * 设置查询条件。
+     * 设置查询条件
      *
      * @param  string|array{string, string, mixed}  $column
      */
@@ -74,7 +74,7 @@ class Unique extends ValidationRule
     }
 
     /**
-     * 设置不等于条件。
+     * 设置不等于条件
      */
     public function whereNot(string $column, mixed $value): static
     {
@@ -82,7 +82,7 @@ class Unique extends ValidationRule
     }
 
     /**
-     * 构建唯一性查询。
+     * 构建唯一性查询
      *
      * @return Builder<TModel>
      */

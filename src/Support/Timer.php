@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Request;
 use LogicException;
 
 /**
- * 计时器。
+ * 计时器
  */
 class Timer
 {
     /**
-     * 计时起点。
+     * 计时起点
      *
      * @var array<string, float>
      */

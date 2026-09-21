@@ -60,7 +60,7 @@ class CacheStore
     }
 
     /**
-     * 读取或填充全量缓存。
+     * 读取或填充全量缓存
      *
      * @return Collection<int, Model>
      */

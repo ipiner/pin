@@ -7,7 +7,7 @@ namespace Pin\Errors;
 use Pin\Errors\Attribute\Group;
 
 /**
- * 系统错误码。
+ * 系统错误码
  *
  * - 20xx：验证码
  * - 30xx：上传
@@ -71,7 +71,7 @@ enum Errors: string implements IError
     case PasswordTooManyRepeats = '1052|422|password_too_many_repeats';
 
     /**
-     * 查找错误定义。
+     * 查找错误定义
      */
     public static function get(int $code): IError
     {
@@ -79,7 +79,7 @@ enum Errors: string implements IError
     }
 
     /**
-     * 获取错误消息。
+     * 获取错误消息
      */
     public static function getMessage(int $code, array $replace = []): string
     {

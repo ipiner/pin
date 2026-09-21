@@ -10,7 +10,7 @@ use Pin\Token\Token;
 use Throwable;
 
 /**
- * Token 异常。
+ * Token 异常
  */
 class TokenException extends Exception
 {

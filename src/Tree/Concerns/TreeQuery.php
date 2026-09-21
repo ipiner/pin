@@ -11,12 +11,12 @@ use Pin\Models\Cache\CacheType;
 use Pin\Support\Facades\Tree;
 
 /**
- * 树节点查询。
+ * 树节点查询
  */
 trait TreeQuery
 {
     /**
-     * 构建缓存查询。
+     * 构建缓存查询
      *
      * @return Builder<static>
      */
@@ -27,7 +27,7 @@ trait TreeQuery
     }
 
     /**
-     * 获取全部节点。
+     * 获取全部节点
      *
      * @return Collection<int, static>
      */
@@ -40,7 +40,7 @@ trait TreeQuery
     }
 
     /**
-     * 按层级、排序值和 ID 查询。
+     * 按层级、排序值和 ID 查询
      *
      * @return Builder<static>
      */

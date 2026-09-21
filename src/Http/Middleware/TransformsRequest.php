@@ -14,7 +14,7 @@ use Override;
 abstract class TransformsRequest extends BaseTransformsRequest
 {
     /**
-     * 待转换字段。
+     * 待转换字段
      *
      * @var string[]
      */

@@ -11,7 +11,7 @@ use Pin\Support\ServiceProvider;
 /**
  * Action 服务提供者
  *
- * 在容器解析 Action 后注入请求上下文，并支持 fake 响应调试。
+ * 在容器解析 Action 后注入请求上下文，并支持 fake 响应调试
  */
 class ActionServiceProvider extends ServiceProvider
 {

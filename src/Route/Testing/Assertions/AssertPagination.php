@@ -12,7 +12,7 @@ use Closure;
 trait AssertPagination
 {
     /**
-     * 分页响应断言。
+     * 分页响应断言
      *
      * @param  Closure(array, int, int): void|null  $assert
      */

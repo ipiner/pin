@@ -17,7 +17,7 @@ trait HasModel
     }
 
     /**
-     * 初始化当前 Route 对应的模型类。
+     * 初始化当前 Route 对应的模型类
      */
     protected function bootModel(): void
     {
@@ -27,7 +27,7 @@ trait HasModel
     }
 
     /**
-     * 查找或创建模型实例。
+     * 查找或创建模型实例
      *
      * @param  Model|int|null  $id  模型实例、模型 ID 或 null
      */

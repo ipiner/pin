@@ -100,7 +100,7 @@ class ApiResponse implements Responsable
     }
 
     /**
-     * 转换为基础响应数组。
+     * 转换为基础响应数组
      *
      * @return array{
      *     code:int,
@@ -236,7 +236,7 @@ class ApiResponse implements Responsable
     }
 
     /**
-     * 构建响应数据。
+     * 构建响应数据
      *
      * @return array<string, mixed>
      */

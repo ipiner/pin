@@ -7,12 +7,12 @@ namespace Pin\Tree\Concerns;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 树节点关系。
+ * 树节点关系
  */
 trait TreeRelation
 {
     /**
-     * 获取直接子节点。
+     * 获取直接子节点
      *
      * @return HasMany<static, $this>
      */

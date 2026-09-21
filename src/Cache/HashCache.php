@@ -8,7 +8,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Hash 缓存入口。
+ * Hash 缓存入口
  *
  * @method HashDriver getDriver()
  *
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Cache;
 class HashCache
 {
     /**
-     * 转发缓存调用。
+     * 转发缓存调用
      */
     public function __call(string $method, array $arguments): mixed
     {
@@ -27,7 +27,7 @@ class HashCache
     }
 
     /**
-     * 按输入顺序获取缓存值。
+     * 按输入顺序获取缓存值
      *
      * @param  list<string>  $keys
      */
@@ -39,7 +39,7 @@ class HashCache
     }
 
     /**
-     * 获取 Hash 缓存仓库。
+     * 获取 Hash 缓存仓库
      */
     public function store(): Repository
     {

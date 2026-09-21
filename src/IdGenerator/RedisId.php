@@ -22,7 +22,7 @@ class RedisId implements IdGeneratorInterface
     }
 
     /**
-     * 生成一个或多个 ID。
+     * 生成一个或多个 ID
      *
      * @param  int  $count  生成数量
      * @return int|list<int>
@@ -55,7 +55,7 @@ class RedisId implements IdGeneratorInterface
     }
 
     /**
-     * 按配置加锁执行。
+     * 按配置加锁执行
      *
      * @template TResult
      *

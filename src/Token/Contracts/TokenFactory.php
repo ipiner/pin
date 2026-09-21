@@ -8,7 +8,7 @@ use Pin\Token\Token;
 use Pin\Token\TokenPayload;
 
 /**
- * Token 工厂接口。
+ * Token 工厂接口
  *
  * @method string encode(array|TokenPayload $payload, ?int $expires = null)
  * @method Token decode(string $token)
@@ -16,7 +16,7 @@ use Pin\Token\TokenPayload;
 interface TokenFactory
 {
     /**
-     * 获取驱动。
+     * 获取驱动
      */
     public function driver(): TokenDriver;
 }

@@ -49,7 +49,7 @@ class Model extends BaseModel
     public const string CONNECTION_DEFAULT = 'default';
 
     /**
-     * 禁止批量赋值的字段。
+     * 禁止批量赋值的字段
      *
      * @var string[]|bool
      */

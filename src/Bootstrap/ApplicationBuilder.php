@@ -17,7 +17,7 @@ use Pin\Http\Middleware\ThrottleRequestsWithRedis;
 use Pin\Providers\PinServiceProvider;
 
 /**
- * Pin 应用构建器。
+ * Pin 应用构建器
  *
  * @mixin Builder
  */
@@ -29,7 +29,7 @@ class ApplicationBuilder
     protected array $configured = [];
 
     /**
-     * 应用实例。
+     * 应用实例
      */
     protected Application $app;
 
@@ -39,7 +39,7 @@ class ApplicationBuilder
     }
 
     /**
-     * 转发构建器调用。
+     * 转发构建器调用
      */
     public function __call(string $name, array $arguments): static
     {
@@ -50,7 +50,7 @@ class ApplicationBuilder
     }
 
     /**
-     * 创建应用。
+     * 创建应用
      */
     public function create(): Application
     {
@@ -74,7 +74,7 @@ class ApplicationBuilder
     }
 
     /**
-     * 配置异常处理器。
+     * 配置异常处理器
      *
      * @param  class-string|(Closure(Exceptions): mixed)|null  $handler
      * @param  (callable(Exceptions): mixed)|null  $using
@@ -99,7 +99,7 @@ class ApplicationBuilder
     }
 
     /**
-     * 配置中间件。
+     * 配置中间件
      */
     public function withMiddleware(?callable $callback = null): static
     {
@@ -123,7 +123,7 @@ class ApplicationBuilder
     }
 
     /**
-     * 配置服务提供者。
+     * 配置服务提供者
      */
     public function withProviders(
         array $providers = [],
@@ -142,7 +142,7 @@ class ApplicationBuilder
     }
 
     /**
-     * 获取路由文件路径。
+     * 获取路由文件路径
      */
     protected function routePath(string $name): ?string
     {

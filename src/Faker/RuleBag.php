@@ -10,14 +10,14 @@ namespace Pin\Faker;
 class RuleBag
 {
     /**
-     * 原始验证规则。
+     * 原始验证规则
      *
      * @var array<int, mixed>
      */
     protected array $rules;
 
     /**
-     * 已解析的规则缓存。
+     * 已解析的规则缓存
      *
      * @var array<string, array<int, string>>
      */
@@ -64,7 +64,7 @@ class RuleBag
     }
 
     /**
-     * 获取规则的全部参数。
+     * 获取规则的全部参数
      *
      * @return array<int, string>
      */
@@ -74,7 +74,7 @@ class RuleBag
     }
 
     /**
-     * 获取原始验证规则。
+     * 获取原始验证规则
      *
      * @return array<int, mixed>
      */
@@ -84,7 +84,7 @@ class RuleBag
     }
 
     /**
-     * 解析字符串规则。
+     * 解析字符串规则
      *
      * @return array<string, array<int, string>>
      */

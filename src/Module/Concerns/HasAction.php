@@ -9,7 +9,7 @@ use Pin\Route\Routable;
 trait HasAction
 {
     /**
-     * Action 类名缓存。
+     * Action 类名缓存
      *
      * @var array<string, string>
      */
@@ -28,7 +28,7 @@ trait HasAction
     }
 
     /**
-     * 生成 Action 候选类名。
+     * 生成 Action 候选类名
      *
      * @return array<int, string>
      */

@@ -20,7 +20,7 @@ use Pin\Support\Traits\HasValidation;
  * - 上下文共享
  * - Queryable 查询构建
  *
- * 适用于单一业务动作，如创建、更新、删除等。
+ * 适用于单一业务动作，如创建、更新、删除等
  *
  * @template TModel of Model
  */

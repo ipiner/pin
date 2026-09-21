@@ -14,13 +14,13 @@ use Pin\Route\RouteRegistry;
 use Pin\Route\RouteRegistryItem;
 
 /**
- * 调试信息。
+ * 调试信息
  */
 #[ExcludeAllRoutesFromDocs]
 class DebugController extends Controller
 {
     /**
-     * 获取配置。
+     * 获取配置
      */
     public function config(?string $name = null): ApiResponse
     {
@@ -28,7 +28,7 @@ class DebugController extends Controller
     }
 
     /**
-     * 获取请求信息。
+     * 获取请求信息
      */
     public function index(): ApiResponse
     {
@@ -42,7 +42,7 @@ class DebugController extends Controller
     }
 
     /**
-     * 获取错误码。
+     * 获取错误码
      */
     public function errors(): ApiResponse
     {
@@ -59,7 +59,7 @@ class DebugController extends Controller
     }
 
     /**
-     * 生成 TypeScript 类型、标签和表格列。
+     * 生成 TypeScript 类型、标签和表格列
      */
     public function generateTypescript(
         Request $request,
@@ -72,7 +72,7 @@ class DebugController extends Controller
     }
 
     /**
-     * 获取 PHP 信息。
+     * 获取 PHP 信息
      */
     public function phpinfo(int $flags = INFO_ALL): string
     {
@@ -83,7 +83,7 @@ class DebugController extends Controller
     }
 
     /**
-     * 获取已注册路由。
+     * 获取已注册路由
      */
     public function routes(): ApiResponse
     {
@@ -102,14 +102,14 @@ class DebugController extends Controller
     }
 
     /**
-     * 读取数据表结构。
+     * 读取数据表结构
      */
     protected function loadSchemas(string $connection): array
     {
         abort_if($connection === '..' || basename($connection) !== $connection, 404);
 
         $file = database_path("schemas/{$connection}/__schemas__.php");
-        abort_unless(is_file($file), 404, '数据表结构文件不存在。');
+        abort_unless(is_file($file), 404, '数据表结构文件不存在');
 
         return require $file;
     }

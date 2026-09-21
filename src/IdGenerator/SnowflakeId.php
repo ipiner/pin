@@ -27,7 +27,7 @@ class SnowflakeId implements IdGeneratorInterface
     }
 
     /**
-     * 生成一个或多个 ID。
+     * 生成一个或多个 ID
      *
      * @param  int  $count  生成数量
      * @return string|list<string>
@@ -49,7 +49,7 @@ class SnowflakeId implements IdGeneratorInterface
     }
 
     /**
-     * 解析 ID，timestamp 为相对起始时间的毫秒数。
+     * 解析 ID，timestamp 为相对起始时间的毫秒数
      *
      * @param  int|string  $id  要解析的 ID
      * @return array{

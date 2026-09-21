@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use Pin\Support\DataBag;
 
 /**
- * 数据库字段结构。
+ * 数据库字段结构
  *
  * @property string $name 字段名
  * @property string|null $type_name 类型名称
@@ -31,7 +31,7 @@ class Column extends DataBag
     }
 
     /**
-     * 解析字段名称。
+     * 解析字段名称
      */
     protected function parseLabel(): string
     {

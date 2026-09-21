@@ -8,12 +8,12 @@ use Pin\Models\Queryable\QueryableType;
 use Pin\Validation\Rules\Queryable;
 
 /**
- * 查询验证规则工厂。
+ * 查询验证规则工厂
  */
 class QueryableRules
 {
     /**
-     * 后缀匹配查询。
+     * 后缀匹配查询
      */
     public static function endsWith(mixed ...$rules): array
     {
@@ -21,7 +21,7 @@ class QueryableRules
     }
 
     /**
-     * 字符串等值查询。
+     * 字符串等值查询
      */
     public static function eq(mixed ...$rules): array
     {
@@ -29,7 +29,7 @@ class QueryableRules
     }
 
     /**
-     * 数值等值查询。
+     * 数值等值查询
      */
     public static function eqNumeric(mixed ...$rules): array
     {
@@ -37,7 +37,7 @@ class QueryableRules
     }
 
     /**
-     * 字符串大于查询。
+     * 字符串大于查询
      */
     public static function gt(mixed ...$rules): array
     {
@@ -45,7 +45,7 @@ class QueryableRules
     }
 
     /**
-     * 数值大于查询。
+     * 数值大于查询
      */
     public static function gtNumeric(mixed ...$rules): array
     {
@@ -53,7 +53,7 @@ class QueryableRules
     }
 
     /**
-     * 字符串大于等于查询。
+     * 字符串大于等于查询
      */
     public static function gte(mixed ...$rules): array
     {
@@ -61,7 +61,7 @@ class QueryableRules
     }
 
     /**
-     * 数值大于等于查询。
+     * 数值大于等于查询
      */
     public static function gteNumeric(mixed ...$rules): array
     {
@@ -69,7 +69,7 @@ class QueryableRules
     }
 
     /**
-     * 字符串 IN 查询。
+     * 字符串 IN 查询
      *
      * @param  string  $type  值类型规则
      */
@@ -79,7 +79,7 @@ class QueryableRules
     }
 
     /**
-     * 数值 IN 查询。
+     * 数值 IN 查询
      *
      * @param  string  $type  值类型规则
      */
@@ -89,7 +89,7 @@ class QueryableRules
     }
 
     /**
-     * 模糊查询。
+     * 模糊查询
      */
     public static function like(mixed ...$rules): array
     {
@@ -97,7 +97,7 @@ class QueryableRules
     }
 
     /**
-     * 字符串小于查询。
+     * 字符串小于查询
      */
     public static function lt(mixed ...$rules): array
     {
@@ -105,7 +105,7 @@ class QueryableRules
     }
 
     /**
-     * 数值小于查询。
+     * 数值小于查询
      */
     public static function ltNumeric(mixed ...$rules): array
     {
@@ -113,7 +113,7 @@ class QueryableRules
     }
 
     /**
-     * 字符串小于等于查询。
+     * 字符串小于等于查询
      */
     public static function lte(mixed ...$rules): array
     {
@@ -121,7 +121,7 @@ class QueryableRules
     }
 
     /**
-     * 数值小于等于查询。
+     * 数值小于等于查询
      */
     public static function lteNumeric(mixed ...$rules): array
     {
@@ -129,7 +129,7 @@ class QueryableRules
     }
 
     /**
-     * 智能搜索查询。
+     * 智能搜索查询
      *
      * @param  string  $fields  查询字段，逗号或竖线分隔
      */
@@ -139,7 +139,7 @@ class QueryableRules
     }
 
     /**
-     * 字符串区间查询。
+     * 字符串区间查询
      */
     public static function range(mixed ...$rules): array
     {
@@ -147,7 +147,7 @@ class QueryableRules
     }
 
     /**
-     * 数值区间查询。
+     * 数值区间查询
      */
     public static function rangeNumeric(mixed ...$rules): array
     {
@@ -155,7 +155,7 @@ class QueryableRules
     }
 
     /**
-     * 前缀匹配查询。
+     * 前缀匹配查询
      */
     public static function startsWith(mixed ...$rules): array
     {
@@ -163,7 +163,7 @@ class QueryableRules
     }
 
     /**
-     * 数值字段查询。
+     * 数值字段查询
      */
     protected static function number(
         Queryable|QueryableType|null $queryableRule = null,
@@ -173,7 +173,7 @@ class QueryableRules
     }
 
     /**
-     * 组合查询与验证规则。
+     * 组合查询与验证规则
      *
      * @return array<array-key, mixed>
      */
@@ -189,7 +189,7 @@ class QueryableRules
     }
 
     /**
-     * 字符串字段查询。
+     * 字符串字段查询
      */
     protected static function string(
         Queryable|QueryableType|null $queryableRule = null,

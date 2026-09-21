@@ -13,12 +13,12 @@ use Pin\Token\TokenFactory;
 use Pin\Token\TokenManager;
 
 /**
- * 注册 Guard、用户提供器和认证 Token 驱动。
+ * 注册 Guard、用户提供器和认证 Token 驱动
  */
 class AuthServiceProvider extends ServiceProvider
 {
     /**
-     * 注册认证服务。
+     * 注册认证服务
      */
     public function register(): void
     {
@@ -28,7 +28,7 @@ class AuthServiceProvider extends ServiceProvider
     }
 
     /**
-     * 注册 Token 认证 Guard。
+     * 注册 Token 认证 Guard
      */
     protected function configureGuard(string $name): void
     {
@@ -55,7 +55,7 @@ class AuthServiceProvider extends ServiceProvider
     }
 
     /**
-     * 注册认证 Token Driver。
+     * 注册认证 Token Driver
      */
     protected function configureTokenDriver(string $name): void
     {
@@ -76,7 +76,7 @@ class AuthServiceProvider extends ServiceProvider
     }
 
     /**
-     * 注册用户提供器。
+     * 注册用户提供器
      */
     protected function configureUserProvider(string $name): void
     {

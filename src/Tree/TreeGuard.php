@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pin\Tree;
 
 /**
- * 父节点校验。
+ * 父节点校验
  */
 class TreeGuard
 {
@@ -14,7 +14,7 @@ class TreeGuard
     }
 
     /**
-     * 校验目标父节点。
+     * 校验目标父节点
      *
      * @param  int  $id  当前节点 ID
      * @param  int  $pid  目标父节点 ID

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Pin\Database;
 
 /**
- * 数据库配置。
+ * 数据库配置
  */
 class Config
 {
     /**
-     * 生成 MySQL 连接配置。
+     * 生成 MySQL 连接配置
      *
      * @param  array  $options  覆盖默认配置
      */
@@ -34,14 +34,14 @@ class Config
             'engine' => static::env($connection, 'ENGINE'),
             'timezone' => static::env($connection, 'TIMEZONE') ?: null,
 
-            // 慢查询阈值：不大于 10 按秒，其余按毫秒。
+            // 慢查询阈值：不大于 10 按秒，其余按毫秒
             'slow_threshold' => static::env($connection, 'SLOW_THRESHOLD', 2),
             ...$options,
         ];
     }
 
     /**
-     * 读取连接环境变量。
+     * 读取连接环境变量
      */
     protected static function env(string $connection, string $key, mixed $default = null): mixed
     {

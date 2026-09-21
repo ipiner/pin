@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 
 /**
- * 数据库服务提供者。
+ * 数据库服务提供者
  */
 class DatabaseServiceProvider extends ServiceProvider
 {
     /**
-     * 注册查询监控。
+     * 注册查询监控
      */
     public function register(): void
     {
@@ -23,7 +23,7 @@ class DatabaseServiceProvider extends ServiceProvider
     }
 
     /**
-     * 监听查询事件。
+     * 监听查询事件
      */
     public function boot(): void
     {

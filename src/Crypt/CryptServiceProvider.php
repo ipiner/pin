@@ -8,12 +8,12 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Pin\Support\ServiceProvider;
 
 /**
- * 加解密服务提供者。
+ * 加解密服务提供者
  */
 class CryptServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
-     * 注册加解密服务。
+     * 注册加解密服务
      */
     public function register(): void
     {
@@ -22,7 +22,7 @@ class CryptServiceProvider extends ServiceProvider implements DeferrableProvider
     }
 
     /**
-     * 获取延迟加载的服务。
+     * 获取延迟加载的服务
      */
     public function provides(): array
     {

@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Override;
 
 /**
- * 支持递归合并配置的服务提供者。
+ * 支持递归合并配置的服务提供者
  */
 class ServiceProvider extends BaseServiceProvider
 {

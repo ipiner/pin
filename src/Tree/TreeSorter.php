@@ -7,12 +7,12 @@ namespace Pin\Tree;
 use Illuminate\Support\Collection;
 
 /**
- * 树节点排序。
+ * 树节点排序
  */
 class TreeSorter
 {
     /**
-     * 按父节点、排序值和 ID 排序。
+     * 按父节点、排序值和 ID 排序
      */
     public function sort(Collection $items): Collection
     {

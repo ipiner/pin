@@ -8,7 +8,7 @@ use Pin\Models\Concerns\CacheAll;
 use Pin\Tree\TreeModel;
 
 /**
- * 菜单树模型。
+ * 菜单树模型
  *
  * @property string $code 菜单或按钮唯一标识
  * @property string $type 菜单类型

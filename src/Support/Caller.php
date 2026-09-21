@@ -7,7 +7,7 @@ namespace Pin\Support;
 use Closure;
 
 /**
- * 业务调用栈解析。
+ * 业务调用栈解析
  */
 class Caller
 {
@@ -17,7 +17,7 @@ class Caller
     protected static ?Closure $applicationFileResolver = null;
 
     /**
-     * 获取首个业务调用点。
+     * 获取首个业务调用点
      *
      * @return array{file: string, line: int, ...}
      */
@@ -46,7 +46,7 @@ class Caller
     }
 
     /**
-     * 设置业务文件识别规则。
+     * 设置业务文件识别规则
      *
      * @param  (Closure(string): bool)|null  $resolver
      */
@@ -56,7 +56,7 @@ class Caller
     }
 
     /**
-     * 判断是否为业务文件。
+     * 判断是否为业务文件
      */
     protected static function isApplicationFile(string $file): bool
     {

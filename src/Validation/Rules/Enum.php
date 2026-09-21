@@ -9,7 +9,7 @@ use Override;
 use TypeError;
 
 /**
- * 枚举值验证。
+ * 枚举值验证
  */
 class Enum extends ValidationRule
 {
@@ -23,7 +23,7 @@ class Enum extends ValidationRule
     }
 
     /**
-     * 验证枚举值。
+     * 验证枚举值
      */
     #[Override]
     protected function handle(string $attribute, mixed $value): bool

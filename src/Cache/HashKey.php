@@ -7,7 +7,7 @@ namespace Pin\Cache;
 use InvalidArgumentException;
 
 /**
- * Hash 键与字段。
+ * Hash 键与字段
  */
 class HashKey
 {
@@ -16,7 +16,7 @@ class HashKey
     }
 
     /**
-     * 按最后一个冒号拆分缓存键。
+     * 按最后一个冒号拆分缓存键
      */
     public static function parse(string $raw): static
     {
@@ -33,7 +33,7 @@ class HashKey
     }
 
     /**
-     * 解析同一 Hash 下的缓存键。
+     * 解析同一 Hash 下的缓存键
      *
      * @return array{0: string, 1: array<int, string>}
      */

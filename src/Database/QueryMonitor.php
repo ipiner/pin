@@ -11,7 +11,7 @@ use Pin\Database\QueryMonitor\QueryResponse;
 use Pin\Database\QueryMonitor\QuerySql;
 
 /**
- * SQL 查询监控。
+ * SQL 查询监控
  */
 class QueryMonitor
 {
@@ -23,7 +23,7 @@ class QueryMonitor
     }
 
     /**
-     * 记录查询。
+     * 记录查询
      */
     public function handle(QueryExecuted $event): void
     {

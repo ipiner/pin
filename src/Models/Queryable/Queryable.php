@@ -33,7 +33,7 @@ class Queryable
     }
 
     /**
-     * 从查询参数创建实例。
+     * 从查询参数创建实例
      *
      * @param  array<string, mixed>  $payload
      * @param  array<string, string|QueryableType>  $types
@@ -44,7 +44,7 @@ class Queryable
     }
 
     /**
-     * 从请求参数创建实例。
+     * 从请求参数创建实例
      *
      * @param  array<string, string|QueryableType>  $types
      */
@@ -54,7 +54,7 @@ class Queryable
     }
 
     /**
-     * 从验证规则创建实例。
+     * 从验证规则创建实例
      *
      * @param  array<string, mixed>  $rules
      */
@@ -75,7 +75,7 @@ class Queryable
     }
 
     /**
-     * 解析查询参数。
+     * 解析查询参数
      *
      * @return array<string, mixed>
      */

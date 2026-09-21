@@ -7,7 +7,7 @@ namespace Pin\Token\Drivers;
 use Pin\Support\DataBag;
 
 /**
- * Session 驱动配置。
+ * Session 驱动配置
  *
  * @property int $expires 有效期（秒）
  * @property string $cache_prefix 缓存键前缀

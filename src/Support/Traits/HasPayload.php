@@ -7,7 +7,7 @@ namespace Pin\Support\Traits;
 use Illuminate\Support\Arr;
 
 /**
- * Payload 数据读写。
+ * Payload 数据读写
  */
 trait HasPayload
 {
@@ -17,7 +17,7 @@ trait HasPayload
     protected array $payload = [];
 
     /**
-     * 获取、设置或替换 payload。
+     * 获取、设置或替换 payload
      *
      * @param  array<string, mixed>|string|null  $key
      */
@@ -49,7 +49,7 @@ trait HasPayload
     }
 
     /**
-     * 处理 payload 更新。
+     * 处理 payload 更新
      */
     protected function payloadChanged(): void
     {

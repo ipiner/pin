@@ -15,7 +15,7 @@ use Pin\Token\TokenPayload;
 use Throwable;
 
 /**
- * JWT Token 驱动。
+ * JWT Token 驱动
  */
 class JwtDriver extends Driver
 {
@@ -24,7 +24,7 @@ class JwtDriver extends Driver
     }
 
     /**
-     * 解析 Token。
+     * 解析 Token
      */
     #[Override]
     public function decode(string $encodedPayload): Token
@@ -47,7 +47,7 @@ class JwtDriver extends Driver
     }
 
     /**
-     * 生成 Token。
+     * 生成 Token
      *
      * @param  int|null  $expires  有效期（秒）
      */
@@ -60,7 +60,7 @@ class JwtDriver extends Driver
     }
 
     /**
-     * 获取签名算法。
+     * 获取签名算法
      */
     protected function getAlgo(): string
     {
@@ -68,7 +68,7 @@ class JwtDriver extends Driver
     }
 
     /**
-     * 获取签名密钥。
+     * 获取签名密钥
      */
     protected function getKey(): string
     {

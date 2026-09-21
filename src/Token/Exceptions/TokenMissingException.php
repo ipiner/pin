@@ -10,7 +10,7 @@ use Pin\Token\Token;
 use Throwable;
 
 /**
- * Token 不存在。
+ * Token 不存在
  */
 class TokenMissingException extends TokenException implements ShouldntReport
 {

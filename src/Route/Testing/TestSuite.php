@@ -16,7 +16,7 @@ use Pin\Route\Routable;
 class TestSuite
 {
     /**
-     * Route 名称关键字与测试方法映射。
+     * Route 名称关键字与测试方法映射
      *
      * @var array<string, string>
      */

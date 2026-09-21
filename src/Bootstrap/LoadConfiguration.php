@@ -12,17 +12,17 @@ use Pin\Application;
 use Pin\Support\Arr;
 
 /**
- * Pin 配置加载器。
+ * Pin 配置加载器
  */
 class LoadConfiguration extends BaseLoadConfiguration
 {
     /**
-     * 框架配置目录。
+     * 框架配置目录
      */
     protected const string CONFIG_PATH = __DIR__.'/../../config';
 
     /**
-     * 合并环境配置。
+     * 合并环境配置
      */
     public static function loadedConfiguration(Application $app, ?string $env = null): void
     {
@@ -48,7 +48,7 @@ class LoadConfiguration extends BaseLoadConfiguration
     }
 
     /**
-     * 加载配置。
+     * 加载配置
      *
      * @param  Application  $app
      */
@@ -69,7 +69,7 @@ class LoadConfiguration extends BaseLoadConfiguration
     }
 
     /**
-     * 递归合并配置。
+     * 递归合并配置
      */
     protected static function mergeConfig(array $defaults, array $overrides): array
     {
@@ -77,7 +77,7 @@ class LoadConfiguration extends BaseLoadConfiguration
     }
 
     /**
-     * 加载应用配置。
+     * 加载应用配置
      */
     protected function loadApplicationConfigurationFiles(
         Application $app,
@@ -92,7 +92,7 @@ class LoadConfiguration extends BaseLoadConfiguration
     }
 
     /**
-     * 加载框架与应用配置。
+     * 加载框架与应用配置
      *
      * @param  Application  $app
      */
@@ -113,7 +113,7 @@ class LoadConfiguration extends BaseLoadConfiguration
     }
 
     /**
-     * 判断是否运行单元测试。
+     * 判断是否运行单元测试
      */
     protected function runningUnitTests(?array $argv = null): bool
     {

@@ -31,7 +31,7 @@ class ModuleInspector
     protected string $basename;
 
     /**
-     * 类名片段。
+     * 类名片段
      *
      * @var list<string>
      */
@@ -66,7 +66,7 @@ class ModuleInspector
     }
 
     /**
-     * 导出模块信息。
+     * 导出模块信息
      *
      * @return array{
      *     basename: string,
@@ -92,7 +92,7 @@ class ModuleInspector
     }
 
     /**
-     * 返回首个存在的类，未找到时取最后一个候选。
+     * 返回首个存在的类，未找到时取最后一个候选
      *
      * @param  string[]  $candidates
      */

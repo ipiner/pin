@@ -12,7 +12,7 @@ use Throwable;
 class StackTraceNormalizer
 {
     /**
-     * 格式化异常堆栈。
+     * 格式化异常堆栈
      *
      * @return list<string>
      */

@@ -7,22 +7,22 @@ namespace Pin\Database\QueryMonitor;
 use Illuminate\Database\Events\QueryExecuted;
 
 /**
- * SQL 执行统计。
+ * SQL 执行统计
  */
 class QueryProfile
 {
     /**
-     * SQL 执行次数。
+     * SQL 执行次数
      */
     public int $count = 0;
 
     /**
-     * SQL 总耗时（毫秒）。
+     * SQL 总耗时（毫秒）
      */
     public int $time = 0;
 
     /**
-     * 记录 SQL 执行。
+     * 记录 SQL 执行
      */
     public function record(QueryExecuted $event): void
     {
@@ -31,7 +31,7 @@ class QueryProfile
     }
 
     /**
-     * 是否慢查询。
+     * 是否慢查询
      */
     public function isSlow(QueryExecuted $event): bool
     {
@@ -39,7 +39,7 @@ class QueryProfile
     }
 
     /**
-     * 慢查询阈值（毫秒），配置值不大于 10 时按秒换算。
+     * 慢查询阈值（毫秒），配置值不大于 10 时按秒换算
      */
     protected function slowThreshold(QueryExecuted $event): int
     {

@@ -32,7 +32,7 @@ class JsonFormatter extends BaseJsonFormatter
     }
 
     /**
-     * 标准化异常。
+     * 标准化异常
      *
      * @return array<string, mixed>
      */
@@ -43,7 +43,7 @@ class JsonFormatter extends BaseJsonFormatter
     }
 
     /**
-     * 构建异常数据。
+     * 构建异常数据
      *
      * @return array<string, mixed>
      */

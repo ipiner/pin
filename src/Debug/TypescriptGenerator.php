@@ -7,12 +7,12 @@ namespace Pin\Debug;
 use Illuminate\Support\Str;
 
 /**
- * TypeScript 代码生成器。
+ * TypeScript 代码生成器
  */
 class TypescriptGenerator
 {
     /**
-     * 生成模型代码。
+     * 生成模型代码
      */
     public function generate(array $schemas, bool $snakeCase = false): string
     {
@@ -28,7 +28,7 @@ class TypescriptGenerator
     }
 
     /**
-     * 生成类型、标签和表格列。
+     * 生成类型、标签和表格列
      */
     protected function generateModel(string $model, array $columns, bool $snakeCase): string
     {
@@ -67,7 +67,7 @@ class TypescriptGenerator
     }
 
     /**
-     * 映射字段类型。
+     * 映射字段类型
      */
     protected function resolveType(string $type): string
     {
@@ -79,7 +79,7 @@ class TypescriptGenerator
     }
 
     /**
-     * 生成字符串字面量。
+     * 生成字符串字面量
      */
     protected function quote(string $value): string
     {

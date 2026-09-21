@@ -9,7 +9,7 @@ use Pin\Validation\Rules\Queryable;
 /**
  * 查询操作类型
  *
- * 小写表示按字符串语义比较，大写表示按数值语义比较。
+ * 小写表示按字符串语义比较，大写表示按数值语义比较
  */
 enum QueryableType: string
 {
@@ -104,7 +104,7 @@ enum QueryableType: string
     case Ns = 'ns';
 
     /**
-     * 解析查询类型与字段。
+     * 解析查询类型与字段
      *
      * @return array{0: QueryableType, 1: string[]|null}
      */

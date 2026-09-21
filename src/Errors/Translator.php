@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Pin\Errors;
 
 /**
- * 错误消息翻译。
+ * 错误消息翻译
  */
 class Translator
 {
     /**
-     * 翻译消息。
+     * 翻译消息
      */
     public static function trans(
         string $message,
@@ -25,7 +25,7 @@ class Translator
     }
 
     /**
-     * 替换消息占位符。
+     * 替换消息占位符
      */
     public static function transFallback(string $message, array $replace = []): string
     {

@@ -10,7 +10,7 @@ use Pin\Tree\Rules\TreeParentRule;
 use Pin\Validation\Rules\Unique;
 
 /**
- * 树节点写入校验。
+ * 树节点写入校验
  *
  * @template TModel of Model
  *
@@ -26,7 +26,7 @@ abstract class Action extends BaseAction
     }
 
     /**
-     * 获取基础验证规则。
+     * 获取基础验证规则
      *
      * @return array<string, mixed>
      */
@@ -48,7 +48,7 @@ abstract class Action extends BaseAction
             ],
 
             /**
-             * 父节点 ID，0 表示根节点。
+             * 父节点 ID，0 表示根节点
              */
             'pid' => [
                 'required',
@@ -59,7 +59,7 @@ abstract class Action extends BaseAction
             ],
 
             /**
-             * 排序值，-1 使用节点 ID。
+             * 排序值，-1 使用节点 ID
              *
              * @example -1
              */

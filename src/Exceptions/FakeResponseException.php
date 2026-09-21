@@ -9,17 +9,17 @@ use Illuminate\Http\JsonResponse;
 use Pin\Http\ApiResponse;
 
 /**
- * 模拟数据响应异常。
+ * 模拟数据响应异常
  */
 class FakeResponseException extends Exception implements Responsable
 {
     /**
-     * 不记录日志。
+     * 不记录日志
      */
     public ?bool $report = false;
 
     /**
-     * 设置模拟数据。
+     * 设置模拟数据
      */
     public function __construct(protected array $data)
     {
@@ -27,7 +27,7 @@ class FakeResponseException extends Exception implements Responsable
     }
 
     /**
-     * 输出模拟数据。
+     * 输出模拟数据
      */
     public function toResponse($request): JsonResponse
     {

@@ -28,14 +28,14 @@ return [
         /**
          * 排除记录的接口
          *
-         * 指定无需记录响应日志的 URI / 路由名称。
+         * 指定无需记录响应日志的 URI / 路由名称
          */
         'except' => Str::explode(env('LOG_RESPONSE_EXCEPT')),
 
         /**
          * 忽略 response.data 的接口
          *
-         * 这些接口仍会记录日志，但不会记录 response.data 字段。
+         * 这些接口仍会记录日志，但不会记录 response.data 字段
          */
         'ignore_response_data' => [
             ...Str::explode(env('LOG_RESPONSE_IGNORE_RESPONSE_DATA')),
@@ -79,7 +79,7 @@ return [
     /**
      * Stack Trace 配置
      *
-     * 用于控制异常堆栈记录行为。
+     * 用于控制异常堆栈记录行为
      */
     'stack_trace' => [
 
@@ -91,7 +91,7 @@ return [
         /**
          * 仅记录指定异常
          *
-         * 为空表示允许所有异常。
+         * 为空表示允许所有异常
          */
         'include_exceptions' => [],
 
@@ -108,14 +108,14 @@ return [
         /**
          * 仅保留匹配的 Frame
          *
-         * 为空表示全部允许。
+         * 为空表示全部允许
          */
         'include_frames' => [],
 
         /**
          * 排除指定 Frame
          *
-         * 常用于过滤框架内部调用。
+         * 常用于过滤框架内部调用
          */
         'exclude_frames' => [
             'Illuminate' => 'Illuminate',

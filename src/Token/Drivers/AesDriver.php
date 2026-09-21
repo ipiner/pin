@@ -9,14 +9,14 @@ use Pin\Token\Token;
 use Pin\Token\TokenPayload;
 
 /**
- * AES Token 驱动。
+ * AES Token 驱动
  */
 class AesDriver extends Driver
 {
     use AesHelper;
 
     /**
-     * 解码 Token。
+     * 解码 Token
      */
     #[Override]
     public function decode(string $encodedPayload): Token
@@ -28,7 +28,7 @@ class AesDriver extends Driver
     }
 
     /**
-     * 编码 Token。
+     * 编码 Token
      *
      * @param  int|null  $expires  有效期（秒）
      */

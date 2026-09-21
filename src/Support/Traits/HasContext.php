@@ -7,7 +7,7 @@ namespace Pin\Support\Traits;
 use Pin\Support\Context;
 
 /**
- * 上下文数据读写。
+ * 上下文数据读写
  */
 trait HasContext
 {
@@ -17,7 +17,7 @@ trait HasContext
     protected Context $context;
 
     /**
-     * 获取、设置或替换上下文。
+     * 获取、设置或替换上下文
      *
      * @param  array<string, mixed>|string|null  $key
      */

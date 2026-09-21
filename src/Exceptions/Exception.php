@@ -10,42 +10,42 @@ use Psr\Log\LogLevel;
 use Throwable;
 
 /**
- * 业务异常。
+ * 业务异常
  */
 class Exception extends \Exception
 {
     /**
-     * 是否记录日志，null 使用默认规则。
+     * 是否记录日志，null 使用默认规则
      */
     public ?bool $report = null;
 
     /**
-     * HTTP 状态码。
+     * HTTP 状态码
      */
     protected int $statusCode = 500;
 
     /**
-     * 响应头。
+     * 响应头
      */
     protected array $headers = [];
 
     /**
-     * 日志上下文。
+     * 日志上下文
      */
     protected array $context = [];
 
     /**
-     * 日志级别。
+     * 日志级别
      */
     protected string $logLevel = LogLevel::ERROR;
 
     /**
-     * 响应消息。
+     * 响应消息
      */
     protected ?string $responseMessage = null;
 
     /**
-     * 创建业务异常。
+     * 创建业务异常
      */
     public function __construct(
         string|IError $message = '',
@@ -68,7 +68,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 获取异常位置。
+     * 获取异常位置
      *
      * @return array{file: string, line: int}
      */
@@ -81,7 +81,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 获取日志上下文。
+     * 获取日志上下文
      */
     public function getContext(): array
     {
@@ -89,7 +89,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 获取响应头。
+     * 获取响应头
      */
     public function getHeaders(): array
     {
@@ -97,7 +97,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 获取日志级别。
+     * 获取日志级别
      */
     public function getLogLevel(): string
     {
@@ -105,7 +105,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 是否记录日志，默认仅记录 HTTP 500 异常。
+     * 是否记录日志，默认仅记录 HTTP 500 异常
      */
     public function getReport(): bool
     {
@@ -113,7 +113,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 获取响应消息。
+     * 获取响应消息
      */
     public function getResponseMessage(): ?string
     {
@@ -121,7 +121,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 获取 HTTP 状态码。
+     * 获取 HTTP 状态码
      */
     public function getStatusCode(): int
     {
@@ -129,7 +129,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 设置日志上下文。
+     * 设置日志上下文
      */
     public function withContext(array $context): static
     {
@@ -139,7 +139,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 设置响应头。
+     * 设置响应头
      */
     public function withHeaders(array $headers): static
     {
@@ -149,7 +149,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 设置日志级别。
+     * 设置日志级别
      */
     public function withLogLevel(string $level): static
     {
@@ -159,7 +159,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 设置是否记录日志。
+     * 设置是否记录日志
      */
     public function withReport(bool $report = true): static
     {
@@ -169,7 +169,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 设置响应消息。
+     * 设置响应消息
      */
     public function withResponseMessage(?string $message): static
     {
@@ -179,7 +179,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 设置 HTTP 状态码。
+     * 设置 HTTP 状态码
      */
     public function withStatusCode(int $statusCode): static
     {
@@ -189,7 +189,7 @@ class Exception extends \Exception
     }
 
     /**
-     * 初始化异常。
+     * 初始化异常
      */
     protected function initialize(): void
     {

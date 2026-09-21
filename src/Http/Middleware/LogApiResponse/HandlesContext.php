@@ -53,7 +53,7 @@ trait HandlesContext
     }
 
     /**
-     * 获取慢请求阈值（毫秒），配置值不超过 10 时按秒换算。
+     * 获取慢请求阈值（毫秒），配置值不超过 10 时按秒换算
      */
     protected function slowThreshold(): int
     {

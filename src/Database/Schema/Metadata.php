@@ -9,17 +9,17 @@ use Pin\Models\Model;
 use Pin\Support\Facades\RuntimeCache;
 
 /**
- * 数据表元数据。
+ * 数据表元数据
  */
 class Metadata
 {
     /**
-     * 表名称。
+     * 表名称
      */
     public protected(set) string $label;
 
     /**
-     * 字段名称映射。
+     * 字段名称映射
      *
      * @var array<string, string>
      */
@@ -33,7 +33,7 @@ class Metadata
     }
 
     /**
-     * 获取表元数据。
+     * 获取表元数据
      *
      * @param  string|class-string<Model>  $connection
      */
@@ -54,7 +54,7 @@ class Metadata
     }
 
     /**
-     * 加载元数据文件。
+     * 加载元数据文件
      */
     protected function load(): array
     {

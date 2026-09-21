@@ -13,7 +13,7 @@ use Pin\Errors\IError;
 trait HandlesValidation
 {
     /**
-     * 验证错误。
+     * 验证错误
      *
      * @var array<int, string>
      */
@@ -77,7 +77,7 @@ trait HandlesValidation
     }
 
     /**
-     * 添加验证错误。
+     * 添加验证错误
      *
      * @param  array<string, mixed>  $replacements  错误消息替换参数
      */

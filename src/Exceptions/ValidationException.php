@@ -12,12 +12,12 @@ use Pin\Errors\Errors;
 use Pin\Http\ApiResponse;
 
 /**
- * 验证异常。
+ * 验证异常
  */
 class ValidationException extends Exception implements Responsable
 {
     /**
-     * 包装验证异常。
+     * 包装验证异常
      */
     public function __construct(protected readonly LaravelValidationException $e)
     {
@@ -30,7 +30,7 @@ class ValidationException extends Exception implements Responsable
     }
 
     /**
-     * 解析错误码与消息。
+     * 解析错误码与消息
      *
      * @return array{int, string}
      */
@@ -53,7 +53,7 @@ class ValidationException extends Exception implements Responsable
     }
 
     /**
-     * 获取验证异常位置。
+     * 获取验证异常位置
      */
     #[Override]
     public function getCaller(?string $file = null, ?int $line = null): array
@@ -62,7 +62,7 @@ class ValidationException extends Exception implements Responsable
     }
 
     /**
-     * 获取字段错误消息。
+     * 获取字段错误消息
      *
      * @return array<string, list<string>>
      */
@@ -81,7 +81,7 @@ class ValidationException extends Exception implements Responsable
     }
 
     /**
-     * 输出验证响应。
+     * 输出验证响应
      */
     public function toResponse($request): JsonResponse
     {

@@ -10,12 +10,12 @@ use Pin\Token\Token;
 use Pin\Token\TokenPayload;
 
 /**
- * Token 驱动基类。
+ * Token 驱动基类
  */
 abstract class Driver implements TokenDriver
 {
     /**
-     * 校验 Token 过期时间。
+     * 校验 Token 过期时间
      *
      * @throws TokenExpiredException
      */
@@ -27,7 +27,7 @@ abstract class Driver implements TokenDriver
     }
 
     /**
-     * 判断 Token 是否过期。
+     * 判断 Token 是否过期
      */
     protected function isExpired(Token $token): bool
     {
@@ -43,7 +43,7 @@ abstract class Driver implements TokenDriver
     }
 
     /**
-     * 补充 Token 过期时间。
+     * 补充 Token 过期时间
      */
     protected function setExpiresAt(TokenPayload $payload, ?int $expires): void
     {

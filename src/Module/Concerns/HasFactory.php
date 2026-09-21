@@ -22,7 +22,7 @@ trait HasFactory
     }
 
     /**
-     * 生成工厂候选类名。
+     * 生成工厂候选类名
      *
      * @return list<string>
      */
