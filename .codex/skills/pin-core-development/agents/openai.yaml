@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pin Core Development"
+  short_description: "在 Pin 基础仓库中开发核心框架能力和公共 API"
+  default_prompt: "使用 $pin-core-development 按 Pin 核心框架约定实现或修改功能。"
