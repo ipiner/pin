@@ -14,5 +14,3 @@ use Pin\Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)->in(__DIR__);
-
-uses(Pin\Tests\Password\Concerns\TestCase::class)->in(__DIR__.'/Password/Concerns');

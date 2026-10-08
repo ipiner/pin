@@ -51,10 +51,6 @@ enum Errors: string implements IError
     case TokenInvalid = '1021|500|token_invalid';
     case TokenMissing = '1022|token_missing';
 
-    // 密码
-    case PasswordDecodeFailed = '1030|422|password_decode_failed';
-    case PasswordInvalid = '1031|422|password_invalid';
-
     // 密码规则
     case PasswordTooShort = '1040|422|password_too_short';
     case PasswordTooLong = '1041|422|password_too_long';

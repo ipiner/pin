@@ -24,7 +24,6 @@ use Pin\Log\LogServiceProvider;
 use Pin\Log\StackTraceNormalizer;
 use Pin\Log\StackTracePolicy;
 use Pin\Models\ModelServiceProvider;
-use Pin\Password\PasswordServiceProvider;
 use Pin\Scramble\ScrambleServiceProvider;
 use Pin\Token\TokenServiceProvider;
 use Pin\Tree\TreeServiceProvider;
@@ -53,7 +52,6 @@ class PinServiceProvider extends ServiceProvider
         IdGeneratorServiceProvider::class,
         MigrationServiceProvider::class,
         ModelServiceProvider::class,
-        PasswordServiceProvider::class,
         LogServiceProvider::class,
         ScrambleServiceProvider::class,
         TokenServiceProvider::class,

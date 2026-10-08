@@ -16,7 +16,6 @@ use Illuminate\Support\Traits\Macroable;
  * @method static FakeRule infer() 根据验证规则推导生成器
  * @method static FakeRule string(int $length = 16) 生成随机字符串
  * @method static FakeRule integer(int $min = 1, int $max = 10000) 生成随机整数
- * @method static FakeRule password(string $plain = 'test@123') 生成请求传输密码
  * @method static FakeRule in(mixed ...$value) 从给定值中随机选择
  * @method static FakeRule enum(string $enum) 从枚举中随机选择
  */
