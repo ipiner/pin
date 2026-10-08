@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Pin\Password;
 
 use Illuminate\Support\Facades\Hash;
-use Pin\Crypt\CryptException;
 use Pin\Errors\Errors;
-use Pin\Support\Facades\Aes;
 
 /**
  * 密码编码与校验
@@ -32,30 +30,20 @@ class Password
     }
 
     /**
-     * 解密请求密码
+     * 解码请求密码
      *
      * @throws PasswordException
      */
     public function decodeFromRequest(string $requestPassword): string
     {
-        try {
-            $encoded = Aes::decrypt($requestPassword);
-        } catch (CryptException $e) {
-            throw new PasswordException(
-                '请求密码异常',
-                Errors::PasswordDecodeFailed->code(),
-                $e,
-            );
-        }
-
-        if (! $this->isValid($encoded)) {
+        if (! $this->isValid($requestPassword)) {
             throw new PasswordException(
                 '请求密码异常',
                 Errors::PasswordInvalid->code(),
             );
         }
 
-        return $encoded;
+        return $requestPassword;
     }
 
     /**
@@ -73,11 +61,11 @@ class Password
      * 生成请求传输密码
      *
      * @param  string  $plain  明文密码
-     * @return string 加密后的请求密码
+     * @return string 编码后的请求密码
      */
     public function encodeToRequest(string $plain): string
     {
-        return Aes::encrypt($this->encode($plain), true);
+        return $this->encode($plain);
     }
 
     /**

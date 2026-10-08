@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Pin\Password\PasswordException;
-use Pin\Support\Facades\Aes;
 use Pin\Support\Facades\Password;
 
 it('checks password', function () {
@@ -21,8 +20,9 @@ it('encodes and decodes request password', function () {
     $raw = Str::random();
     $encoded = Password::encodeToRequest($raw);
 
-    expect(Password::decodeFromRequest($encoded))->toBe(Password::encode($raw));
-    expect(fn () => Password::decodeFromRequest(Aes::encrypt($raw)))
+    expect($encoded)->toBe(Password::encode($raw))
+        ->and(Password::decodeFromRequest($encoded))->toBe(Password::encode($raw));
+    expect(fn () => Password::decodeFromRequest($raw))
         ->toThrow(PasswordException::class);
 });
 
