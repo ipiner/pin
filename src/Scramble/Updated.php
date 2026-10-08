@@ -16,15 +16,13 @@ class Updated extends JsonResource implements SchemaType
     /**
      * 更新响应数据
      *
-     * @return array{updated: bool, v: int|null}
+     * @return array{updated: bool}
      */
     #[Override]
     public function toArray(Request $request): array
     {
         return [
             'updated' => true,
-            /** @var int|null */
-            'v' => 0,
         ];
     }
 }

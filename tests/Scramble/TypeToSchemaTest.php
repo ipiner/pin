@@ -95,7 +95,7 @@ it('generates resource and pagination field types', function () {
     $schemas = $this->transformer->getComponents()->toArray()['schemas'];
     expect($schemas['Deleted']['properties']['deleted']['type'])->toBe('boolean')
         ->and($schemas['Updated']['properties']['updated']['type'])->toBe('boolean')
-        ->and($schemas['Updated']['properties']['v']['type'])->toBe(['integer', 'null']);
+        ->and($schemas['Updated']['properties'])->not()->toHaveKey('v');
 });
 
 it('preserves field metadata without modifying the inferred return type', function () {

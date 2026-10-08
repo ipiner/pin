@@ -75,10 +75,10 @@ it('asserts resource update successfully', function () {
     );
 
     UserRoute::Update->testing($this)
-        ->withPayload([...UserFactory::new()->definition(), 'v' => true])
+        ->withPayload(UserFactory::new()->definition())
         ->withFactory(UserFactory::class)
         ->updated(
-            fn (User $user) => expect($user->v)->toBe(1)
+            fn (User $user) => expect($user->username)->not()->toBeEmpty()
         );
 });
 

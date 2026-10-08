@@ -144,9 +144,6 @@ trait HasRequest
         $this->testCase->assertNotNull($model);
 
         $payload = $this->payload ?? $this->action()->fakeData();
-        if (isset($payload['v'])) {
-            $payload['v'] = $model->v ?? 1;
-        }
 
         $response = $this->withRouteParams([...$this->routeParams, 'id' => $model->id])
             ->json($payload)

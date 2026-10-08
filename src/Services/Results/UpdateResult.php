@@ -24,19 +24,12 @@ class UpdateResult extends Result
     /**
      * 更新结果数据
      *
-     * @return array{updated: bool, v?: int}
+     * @return array{updated: bool}
      */
     #[Override]
     public function toArray(): array
     {
-        $data = ['updated' => $this->updated];
-        $version = $this->model->v;
-
-        if ($version !== null) {
-            $data['v'] = $version;
-        }
-
-        return $data;
+        return ['updated' => $this->updated];
     }
 
     /**

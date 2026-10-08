@@ -21,7 +21,6 @@ use Pin\Tree\Concerns\HasTree;
  * 模型基类
  *
  * @property int|null $id
- * @property int|null $v
  *
  * @method static static create(array $data)
  * @method static Builder|static addSelectCount(string $column = '*', string $alias = 'total')

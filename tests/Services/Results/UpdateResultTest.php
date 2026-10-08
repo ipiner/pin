@@ -6,9 +6,9 @@ use Pin\Services\Results\UpdateResult;
 use Pin\Tests\Models\Models\User;
 
 it('returns correct update result when updated is true', function () {
-    $result = new UpdateResult(new User(['v' => 1]), true);
+    $result = new UpdateResult(new User(), true);
 
-    expect(json_encode($result))->toBe('{"updated":true,"v":1}')
+    expect(json_encode($result))->toBe('{"updated":true}')
         ->and($result->message())->toBe('Update successfully');
 });
 
@@ -19,8 +19,8 @@ it('returns correct update result when updated is false', function () {
         ->and($result->message())->toBe('Update failed');
 });
 
-it('preserves zero versions and failed update flags', function () {
-    $result = new UpdateResult(new User(['v' => 0]), false);
+it('preserves failed update flags', function () {
+    $result = new UpdateResult(new User(), false);
 
-    expect($result->toArray())->toBe(['updated' => false, 'v' => 0]);
+    expect($result->toArray())->toBe(['updated' => false]);
 });

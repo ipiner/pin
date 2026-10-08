@@ -165,13 +165,6 @@ dataset('migrations', [
         ],
     ],
 
-    'version: adds version column' => [
-        'method' => 'version',
-        'arguments' => [],
-        'expected' => [
-            "alter table `users` add `v` int unsigned not null default '1' comment '数据版本号'",
-        ],
-    ],
 ]);
 
 it('migrates', function (string $method, array $arguments, array $expected) {

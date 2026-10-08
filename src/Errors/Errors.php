@@ -38,7 +38,6 @@ enum Errors: string implements IError
     case CreateFailed = '1000|create_failed';
     case UpdateFailed = '1001|update_failed';
     case DeleteFailed = '1002|delete_failed';
-    case DataVersionMismatch = '1003|data_version_mismatch';
 
     // 身份认证
     case AuthUserNotFound = '1010|401|auth_user_not_found';

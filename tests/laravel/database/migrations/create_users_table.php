@@ -16,7 +16,6 @@ return new class extends Migration
             $this->string('username', '', 30);
             $this->string('password', '密码', 120, true);
             $this->string('realname', '', 30, true);
-            $this->version();
             $this->blameable();
             $this->timestamps();
             $this->deleted();

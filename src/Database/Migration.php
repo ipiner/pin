@@ -193,12 +193,4 @@ class Migration extends \Illuminate\Database\Migrations\Migration
     {
         $this->table = $table;
     }
-
-    /**
-     * 添加数据版本字段
-     */
-    protected function version(): ColumnDefinition
-    {
-        return $this->unsignedInteger('v', '数据版本号')->default(1);
-    }
 }

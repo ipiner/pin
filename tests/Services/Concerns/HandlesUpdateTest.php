@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Services\UserService;
 use Illuminate\Support\Str;
-use Pin\Errors\Errors;
 use Pin\Services\Results\UpdateResult;
 use Pin\Tests\InteractsWithDatabase;
 use Pin\Tests\Models\Models\User;
@@ -37,25 +36,25 @@ it('supports update callback', function () {
     expect($user->username)->toBe('foo');
 });
 
-it('handles updating version checks', function () {
+it('allows services to hook before update', function () {
     $service = new class extends UserService
     {
+        public bool $called = false;
+
         public function updating($model, array &$data): void
         {
             parent::updating($model, $data);
+
+            $this->called = true;
+            $data['realname'] = 'hooked';
         }
     };
+    $user = $service->create(['username' => Str::random()])->model;
 
-    $data = [];
-    $service->updating(new User(), $data);
-    expect($data)->toBe([]);
+    $result = $service->update($user, ['username' => Str::random()]);
 
-    $data = ['v' => 1];
-    $service->updating(new User(['v' => 1]), $data);
-    expect($data)->toBe(['v' => 2]);
-
-    $this->expectExceptionCode(Errors::DataVersionMismatch->code());
-    $service->updating(new User(['v' => 20]), $data);
+    expect($service->called)->toBeTrue()
+        ->and($result->model->realname)->toBe('hooked');
 });
 
 it('skips success hooks and callbacks when an update is cancelled', function () {

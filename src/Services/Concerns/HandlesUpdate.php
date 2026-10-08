@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Pin\Services\Concerns;
 
 use Closure;
-use Pin\Errors\Errors;
 use Pin\Models\Model;
 use Pin\Services\Results\UpdateResult;
 
@@ -54,15 +53,6 @@ trait HandlesUpdate
      */
     protected function updating($model, array &$data): void
     {
-        if (! isset($data['v'])) {
-            return;
-        }
-
-        if ($model->v != $data['v']) {
-            Errors::DataVersionMismatch->throw();
-        }
-
-        $data['v'] = $model->v + 1;
     }
 
     /**
